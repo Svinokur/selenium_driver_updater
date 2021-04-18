@@ -2,9 +2,6 @@ from setuptools import setup
 
 with open('README.md') as f:
     long_description = f.read()
-
-with open('changelog.txt') as f:
-    long_description = long_description + 'r\nr\n' + f.read()
  
 classifiers = [
   'Development Status :: 5 - Production/Stable',
@@ -15,7 +12,7 @@ classifiers = [
  
 setup(
   name='selenium_driver_updater',
-  version='1.0.0',
+  version='1.0.2',
   description='Download or update your chromedriver automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 
