@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: selenium-driver-updater
+Version: 1.0.0
+Summary: Download or update your chromedriver automatically with this package
+Home-page: https://github.com/Svinokur/selenium_driver_updater
+Author: Stanislav Vinokur
+Author-email: stasvinokur@yahoo.com
+License: MIT
+Description: It is a fast and convenient package that can automatically download or update chromedriver binary.r
+        r
+        Changelog
+        ==================
+        [1.0.0] 18/04/2021
+        
+        - Initial release
+Keywords: chromedriver
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
