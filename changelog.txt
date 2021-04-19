@@ -1,10 +1,16 @@
-Changelog
-==================
+[1.1.0] 19/04/2021
+This version provides minor fixes and improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added Google Docstring to each functions
+- Added checking for all input parameters
+
 [1.0.2] 18/04/2021
 
 - Removed unneccessary folders
 
 [1.0.0] 18/04/2021
 
-- Initial rele
-ase
+- Initial release

@@ -12,23 +12,44 @@ import platform
 
 from typing import Tuple
 
-from selenium_driver_updater_test_version.setting import setting
+from .setting import setting
 
 class ChromeDriver():
     
-    def __init__(self, path : str, upgrade : bool = False, chmod : bool = True):
+    def __init__(self, path : str, upgrade : bool, chmod : bool):
+        """Class for working with Selenium chromedriver binary
+
+        Args:
+            path (str)      : Specified path which will used for downloading or updating Selenium chromedriver binary. Must be folder path.
+            upgrade (bool)  : If true, it will overwrite existing driver in the folder. Defaults to False.
+            chmod (bool)    : If true, it will make chromedriver binary executable. Defaults to True.
+        """
         self.setting = setting
 
-        self.path = path
+        self.path : str = path
 
-        self.chromedriver_path =    path + "chromedriver.exe" if platform.system() == 'Windows' else\
-                                    path + "chromedriver"
+        self.chromedriver_path : str =  path + "chromedriver.exe" if platform.system() == 'Windows' else\
+                                        path + "chromedriver"
                     
-        self.upgrade = upgrade
+        self.upgrade : bool = upgrade
 
-        self.chmod = chmod
+        self.chmod : bool = chmod
 
-    def get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
+    def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
+        """Gets latest chromedriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            latest_version (str)    : Latest version of chromedriver.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
 
         result_run : bool = False
         message_run : str = ''
@@ -47,7 +68,20 @@ class ChromeDriver():
 
         return result_run, message_run , latest_version
 
-    def delete_current_chromedriver_for_current_os(self) -> Tuple[bool, str]:
+    def __delete_current_chromedriver_for_current_os(self) -> Tuple[bool, str]:
+        """Deletes chromedriver from folder if parameter "upgrade" is True
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
 
         result_run : bool = False
         message_run : str = ''
@@ -66,8 +100,23 @@ class ChromeDriver():
 
         return result_run, message_run
 
-    def get_latest_chromedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
+    def __get_latest_chromedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
+        """Downloads latest chromedriver to specific path
 
+        Args:
+            latest_version (str)    : Latest version of chromedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : Path where chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
@@ -109,26 +158,38 @@ class ChromeDriver():
         return result_run, message_run, file_name
 
     def check_if_chromedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates chromedriver binary
 
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : Path where chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
         
         try:
 
-            result, message, latest_version = self.get_latest_version_chrome_driver()
+            result, message, latest_version = self.__get_latest_version_chrome_driver()
             if not result:
                 logging.error(message)
                 return result, message, file_name
 
             if self.upgrade:
 
-                result, message = self.delete_current_chromedriver_for_current_os()
+                result, message = self.__delete_current_chromedriver_for_current_os()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-            result, message, file_name = self.get_latest_chromedriver_for_current_os(latest_version)
+            result, message, file_name = self.__get_latest_chromedriver_for_current_os(latest_version)
             if not result:
                 logging.error(message)
                 return result, message, file_name

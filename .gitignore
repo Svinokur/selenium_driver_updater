@@ -1,2 +1,3 @@
 dist/*
 *.egg-info/
+selenium_driver_updater/__pycache__/*.pyc
