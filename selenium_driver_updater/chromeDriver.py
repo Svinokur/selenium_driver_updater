@@ -14,15 +14,21 @@ from typing import Tuple
 
 from .setting import setting
 
+from selenium import webdriver
+
+from selenium.common.exceptions import SessionNotCreatedException
+
 class ChromeDriver():
     
-    def __init__(self, path : str, upgrade : bool, chmod : bool):
+    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
         """Class for working with Selenium chromedriver binary
 
         Args:
-            path (str)      : Specified path which will used for downloading or updating Selenium chromedriver binary. Must be folder path.
-            upgrade (bool)  : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)    : If true, it will make chromedriver binary executable. Defaults to True.
+            path (str)                          : Specified path which will used for downloading or updating Selenium chromedriver binary. Must be folder path.
+            upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
+            chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
+            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
+            info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
         """
         self.setting = setting
 
@@ -34,6 +40,16 @@ class ChromeDriver():
         self.upgrade : bool = upgrade
 
         self.chmod : bool = chmod
+
+        self.check_driver_is_up_to_date = check_driver_is_up_to_date if os.path.exists(self.chromedriver_path) else False
+
+        self.info_messages = info_messages
+
+        if self.info_messages:
+            logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(level=logging.ERROR)
+
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
@@ -89,6 +105,7 @@ class ChromeDriver():
         try:
 
             if os.path.exists(self.chromedriver_path):
+                logging.info(f'Deleted existing chromedriver chromedriver_path: {self.chromedriver_path}')
                 os.remove(self.chromedriver_path)
             
 
@@ -122,8 +139,12 @@ class ChromeDriver():
         file_name : str = ''
         try:
 
+            logging.info(f'Started download chromedriver latest_version: {latest_version}')
+
             url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
             out_path = self.path + url.split('/')[4]
+
+            logging.info(f'Started download chromedriver by url: {url}')
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -177,10 +198,29 @@ class ChromeDriver():
         
         try:
 
-            result, message, latest_version = self.__get_latest_version_chrome_driver()
-            if not result:
-                logging.error(message)
-                return result, message, file_name
+            if self.check_driver_is_up_to_date:
+
+                result, message, current_version = self.__get_current_version_chrome_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                result, message, latest_version = self.__get_latest_version_chrome_driver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                if current_version == latest_version:
+                    message = f'Your existing chromedriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
+                    logging.info(message)
+                    return True, message_run, self.chromedriver_path
+
+            else:
+
+                result, message, latest_version = self.__get_latest_version_chrome_driver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
 
             if self.upgrade:
 
@@ -194,6 +234,23 @@ class ChromeDriver():
                 logging.error(message)
                 return result, message, file_name
 
+            if self.check_driver_is_up_to_date:
+
+                result, message, current_version_updated = self.__get_current_version_chrome_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                result, message, latest_version = self.__get_latest_version_chrome_driver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                if current_version_updated != latest_version:
+                    message = f'Problem with updating chromedriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
+                    logging.error(message)
+                    return result_run, message, file_name
+
             result_run = True
 
         except:
@@ -201,4 +258,52 @@ class ChromeDriver():
             logging.error(message_run)
 
         return result_run, message_run, file_name
+
+    def __get_current_version_chrome_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current chromedriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_version (str)    : Current chromedriver version
+
+        Raises:
+            SessionNotCreatedException: Occurs when current chromedriver could not start
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        driver_version : str = ''
+        
+        try:
+
+            chrome_options = webdriver.ChromeOptions()
+    
+            chrome_options.add_argument('--headless')
+
+            driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
+            driver_version = str(driver.capabilities['chrome']['chromedriverVersion'].split(" ")[0])
+            driver.close()
+            driver.quit()
+
+            logging.info(f'Current version of chromedriver: {driver_version}')
+
+            result_run = True
+
+        except SessionNotCreatedException:
+            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, driver_version
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+        
+        return result_run, message_run, driver_version
     

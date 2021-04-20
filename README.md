@@ -1,5 +1,5 @@
 # selenium_driver_updater
-It is a fast and convenient package that can automatically download or update chromedriver binary.
+It is a fast and convenience package that can automatically download or update Selenium webdriver binaries for different OS.
 
 ## Installation
 
@@ -10,7 +10,7 @@ pip install selenium-driver-updater
 ```
 
 ## Usage
-This code simply installs chromedriver to main directory
+This example shows how you can use this library to download chromedriver binary.
 ```python
 from selenium_driver_updater import DriverUpdater as DU
 import os
@@ -24,7 +24,7 @@ print(file_name)
 
 # Supported Selenium Binaries
 
-## Chromedriver
+## Chromedriver (DriverUpdater.chromedriver)
 
 - Windows
 - Linux

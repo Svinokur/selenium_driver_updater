@@ -1,3 +1,13 @@
+[1.2.0] 20/04/2021
+This version provides innovations and minor fixes.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added additional parameter "check_driver_is_up_to_date" for checking chromedriver version before and after updating.
+- Added additional parameter "info_message" for disabling info messages during installation or updating.
+- Added additional info messages to some functions
+
 [1.1.0] 19/04/2021
 This version provides minor fixes and improvements.
 This code was written and tested on Python 3.9.4

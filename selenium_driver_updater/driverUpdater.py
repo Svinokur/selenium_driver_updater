@@ -24,12 +24,14 @@ class DriverUpdater():
                                  DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else ''
         
 
-    def install(self, upgrade : bool = False, chmod : bool = True) -> str:
+    def install(self, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, info_messages : bool = True) -> str:
         """Function for install or update Selenium driver binary
 
         Args:
-            upgrade (bool)  : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)    : If true, it will make chromedriver binary executable. Defaults to True.
+            upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
+            chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
+            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
+            info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
 
         Returns:
             file_name (str) : Path where Selenium driver binary was downloaded or updated.
@@ -50,7 +52,7 @@ class DriverUpdater():
 
             if DriverUpdater.chromedriver == self.driver_name:
 
-                chrome_driver = ChromeDriver(path=self.path, upgrade=upgrade, chmod=chmod)
+                chrome_driver = ChromeDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
                 result, message, file_name = chrome_driver.check_if_chromedriver_is_up_to_date()
                 if not result:
                     logging.error(message)
