@@ -12,7 +12,7 @@ classifiers = [
  
 setup(
   name='selenium_driver_updater',
-  version='1.3.0',
+  version='1.3.1',
   description='Download or update your Selenium driver binaries automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 

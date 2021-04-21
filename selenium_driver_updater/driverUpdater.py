@@ -21,7 +21,7 @@ class DriverUpdater():
             driver_name (str)   : Specified driver name which will be downloaded or updated. Like "DriverUpdater.chromedriver" or etc.
         """
         
-        self.path = os.path.abspath(path) if path.endswith(os.path.sep) != False or os.path.isdir(path) == False else os.path.abspath(path) + os.path.sep
+        self.path = os.path.abspath(path) + os.path.sep
 
         self.driver_name : str =    DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
                                     DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
