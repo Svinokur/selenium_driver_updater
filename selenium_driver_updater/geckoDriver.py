@@ -1,24 +1,27 @@
+import json
+from selenium import webdriver
 import requests
 import wget
 import os
 import traceback
 import logging
-import zipfile
 import time
-import stat
 import os
+from selenium.common.exceptions import SessionNotCreatedException
 
-import platform
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from typing import Tuple
 
+import requests
+
+import tarfile
+
 from .setting import setting
 
-from selenium import webdriver
+import platform
 
-from selenium.common.exceptions import SessionNotCreatedException
-
-class ChromeDriver():
+class GeckoDriver():
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
         """Class for working with Selenium chromedriver binary
@@ -34,8 +37,8 @@ class ChromeDriver():
 
         self.path : str = path
 
-        self.chromedriver_path : str =  path + "chromedriver.exe" if platform.system() == 'Windows' else\
-                                        path + "chromedriver"
+        self.geckodriver_path : str =  path + "geckodriver.exe" if platform.system() == 'Windows' else\
+                                        path + "geckodriver"
                     
         self.upgrade : bool = upgrade
 
@@ -55,44 +58,8 @@ class ChromeDriver():
 
         self.headers = {'User-Agent': user_agent}
 
-
-    def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
-        """Gets latest chromedriver version
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            latest_version (str)    : Latest version of chromedriver.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-
-        result_run : bool = False
-        message_run : str = ''
-        latest_version : str = ''
-
-        try:
-            
-            request = requests.get(self.setting["ChromeDriver"]["LinkLastRelease"], headers=self.headers)
-            latest_version = str(request.text)
-
-            logging.info(f'Latest version of chromedriver: {latest_version}')
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run , latest_version
-
-    def __delete_current_chromedriver_for_current_os(self) -> Tuple[bool, str]:
-        """Deletes chromedriver from folder if parameter "upgrade" is True
+    def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current geckodriver version
 
 
         Returns:
@@ -100,182 +67,7 @@ class ChromeDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-
-        result_run : bool = False
-        message_run : str = ''
-
-        try:
-
-            if os.path.exists(self.chromedriver_path):
-                logging.info(f'Deleted existing chromedriver chromedriver_path: {self.chromedriver_path}')
-                os.remove(self.chromedriver_path)
-            
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run
-
-    def __get_latest_chromedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
-        """Downloads latest chromedriver to specific path
-
-        Args:
-            latest_version (str)    : Latest version of chromedriver.
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where chromedriver was downloaded or updated.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        file_name : str = ''
-        try:
-
-            logging.info(f'Started download chromedriver latest_version: {latest_version}')
-
-            url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
-            out_path = self.path + url.split('/')[4]
-
-            logging.info(f'Started download chromedriver by url: {url}')
-
-            if os.path.exists(out_path):
-                os.remove(out_path)
-
-            file_name = wget.download(url=url, out=out_path)
-
-            time.sleep(2)
-
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(self.path)
-
-            time.sleep(3)
-
-            if os.path.exists(file_name):
-                os.remove(file_name)
-
-            
-            file_name = self.chromedriver_path
-
-            if self.chmod:
-
-                st = os.stat(self.chromedriver_path)
-                os.chmod(self.chromedriver_path, st.st_mode | stat.S_IEXEC)
-
-            result_run = True
-
-        except:
-
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run, file_name
-
-    def check_if_chromedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
-        """Main function, checks for the latest version, downloads or updates chromedriver binary
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where chromedriver was downloaded or updated.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        file_name : str = ''
-        
-        try:
-
-            if self.check_driver_is_up_to_date:
-
-                result, message, current_version = self.__get_current_version_chrome_selenium()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-                result, message, latest_version = self.__get_latest_version_chrome_driver()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-                if current_version == latest_version:
-                    message = f'Your existing chromedriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
-                    logging.info(message)
-                    return True, message_run, self.chromedriver_path
-
-            else:
-
-                result, message, latest_version = self.__get_latest_version_chrome_driver()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            if self.upgrade:
-
-                result, message = self.__delete_current_chromedriver_for_current_os()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            result, message, file_name = self.__get_latest_chromedriver_for_current_os(latest_version)
-            if not result:
-                logging.error(message)
-                return result, message, file_name
-
-            if self.check_driver_is_up_to_date:
-
-                result, message, current_version_updated = self.__get_current_version_chrome_selenium()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-                result, message, latest_version = self.__get_latest_version_chrome_driver()
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-                if current_version_updated != latest_version:
-                    message = f'Problem with updating chromedriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
-                    logging.error(message)
-                    return result_run, message, file_name
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run, file_name
-
-    def __get_current_version_chrome_selenium(self) -> Tuple[bool, str, str]:
-        """Gets current chromedriver version
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current chromedriver version
+            driver_version (str)    : Current driver version
 
         Raises:
             SessionNotCreatedException: Occurs when current chromedriver could not start
@@ -287,21 +79,20 @@ class ChromeDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
-        
         try:
 
-            if os.path.exists(self.chromedriver_path):
+            if os.path.exists(self.geckodriver_path):
 
-                chrome_options = webdriver.ChromeOptions()
-        
-                chrome_options.add_argument('--headless')
+                options = FirefoxOptions()
+                options.add_argument("--headless")
 
-                driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
-                driver_version = str(driver.capabilities['chrome']['chromedriverVersion'].split(" ")[0])
+                driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
+                driver_version = str(driver.capabilities['moz:geckodriverVersion'])
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of chromedriver: {driver_version}')
+                logging.info(f'Current version of geckodriver: {driver_version}')
+
 
             result_run = True
 
@@ -315,4 +106,212 @@ class ChromeDriver():
             logging.error(message_run)
         
         return result_run, message_run, driver_version
+
+    def __get_latest_version_geckodriver(self) -> Tuple[bool, str, str]:
+        """Gets latest geckodriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            latest_version (str)    : Latest version of geckodriver
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_version : str = ''
+
+        try:
+            
+            request = requests.get(self.setting['GeckoDriver']['LinkLastRelease'], headers=self.headers)
+            request_text = request.text
+            json_data = json.loads(str(request_text))
+
+            latest_version = json_data.get('name')
+
+            logging.info(f'Latest version of geckodriver: {latest_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_version
+
+    def __delete_current_geckodriver_for_current_os(self) -> Tuple[bool, str]:
+        """Deletes geckodriver from folder
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+
+        try:
+
+            if os.path.exists(self.geckodriver_path):
+                os.remove(self.geckodriver_path)
+            
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __get_latest_geckodriver_for_current_os(self) -> Tuple[bool, str, str]:
+        """Download latest geckodriver to folder
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : File name of unzipped file
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        file_name : str = ''
+        filename_git : str = ''
+        url : str = ''
+        geckodriver_version : str = ''
+
+        try:
+
+            request = requests.get(self.setting['GeckoDriver']['LinkLastRelease'], headers=self.headers)
+            request_text = request.text
+            json_data = json.loads(str(request_text))
+
+            geckodriver_version = json_data.get('name')
+
+            for asset in json_data.get('assets'):
+                if self.setting['GeckoDriver']['LinkLastReleasePlatform'] in asset.get('name') and asset.get('name').endswith('tar.gz'):
+                    filename_git = asset.get('name')
+                    url = asset.get('browser_download_url')
+                    break
+            
+            logging.info(f'Started download geckodriver geckodriver_version: {geckodriver_version}')
+            out_path = self.path + filename_git
+
+            if os.path.exists(out_path):
+                os.remove(out_path)
+
+            logging.info(f'Started download geckodriver by url: {url}')
+            file_name = wget.download(url=url, out=out_path)
+
+            time.sleep(2)
+
+            with tarfile.open(file_name, "r:gz") as tar:
+                tar.extractall(self.path)
+
+            time.sleep(3)
+
+            if os.path.exists(file_name):
+                os.remove(file_name)
+
+            result_run = True
+
+            logging.info(f'Geckodriver was successfully updated to the last version: {geckodriver_version}')
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, file_name
     
+    def check_if_geckodriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates geckodriver binary
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : Path where geckodriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        file_name : str = ''
+        
+        try:
+
+            if self.check_driver_is_up_to_date:
+
+                result, message, current_version = self.__get_current_version_geckodriver_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                result, message, latest_version = self.__get_latest_version_geckodriver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                if current_version == latest_version:
+                    message = f'Your existing geckodriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
+                    logging.info(message)
+                    return True, message_run, self.geckodriver_path
+
+            if self.upgrade:
+
+                result, message = self.__delete_current_geckodriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+            result, message, file_name = self.__get_latest_geckodriver_for_current_os()
+            if not result:
+                logging.error(message)
+                return result, message, file_name
+
+            if self.check_driver_is_up_to_date:
+
+                result, message, current_version_updated = self.__get_current_version_geckodriver_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                result, message, latest_version = self.__get_latest_version_geckodriver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                if current_version_updated != latest_version:
+                    message = f'Problem with updating geckodriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
+                    logging.error(message)
+                    return result_run, message, file_name
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, file_name

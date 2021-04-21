@@ -1,5 +1,6 @@
 # selenium_driver_updater
 
+[![PyPI version](https://badge.fury.io/py/selenium-driver-updater.svg)](https://badge.fury.io/py/selenium-driver-updater)
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/Svinokur/selenium_driver_updater/master/LICENSE)
 
 It is a fast and convenience package that can automatically download or update Selenium webdriver binaries for different OS.
@@ -33,3 +34,16 @@ print(file_name)
 - Linux
 - MacOS
 - MacOS with M1
+
+## Geckodriver (DriverUpdater.geckodriver)
+
+- Windows
+- Linux
+- MacOS
+- MacOS with M1
+
+## Operadriver (DriverUpdater.operadriver)
+
+- Windows
+- Linux
+- MacOS

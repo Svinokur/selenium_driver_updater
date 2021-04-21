@@ -1,4 +1,6 @@
 from .chromeDriver import ChromeDriver
+from .geckoDriver import GeckoDriver
+from .operaDriver import OperaDriver
 
 import logging
 import os
@@ -9,6 +11,7 @@ class DriverUpdater():
 
     chromedriver = 'chromedriver'
     geckodriver = 'geckodriver'
+    operadriver = 'operadriver'
 
     def __init__(self, path : str, driver_name : str):
         """Class for working with Selenium driver binaries
@@ -20,8 +23,9 @@ class DriverUpdater():
         
         self.path = os.path.abspath(path) if path.endswith(os.path.sep) != False or os.path.isdir(path) == False else os.path.abspath(path) + os.path.sep
 
-        self.driver_name : str = DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
-                                 DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else ''
+        self.driver_name : str =    DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
+                                    DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
+                                    DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else '' 
         
 
     def install(self, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, info_messages : bool = True) -> str:
@@ -54,6 +58,22 @@ class DriverUpdater():
 
                 chrome_driver = ChromeDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
                 result, message, file_name = chrome_driver.check_if_chromedriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return file_name
+
+            elif DriverUpdater.geckodriver == self.driver_name:
+
+                gecko_driver = GeckoDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
+                result, message, file_name = gecko_driver.check_if_geckodriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return file_name
+
+            elif DriverUpdater.operadriver == self.driver_name:
+
+                opera_driver = OperaDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
+                result, message, file_name = opera_driver.check_if_operadriver_is_up_to_date()
                 if not result:
                     logging.error(message)
                     return file_name
