@@ -24,12 +24,12 @@ import platform
 class GeckoDriver():
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
-        """Class for working with Selenium chromedriver binary
+        """Class for working with Selenium geckodriver binary
 
         Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium chromedriver binary. Must be folder path.
+            path (str)                          : Specified path which will used for downloading or updating Selenium geckodriver binary. Must be folder path.
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
+            chmod (bool)                        : If true, it will make geckodriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
         """
@@ -70,7 +70,7 @@ class GeckoDriver():
             driver_version (str)    : Current driver version
 
         Raises:
-            SessionNotCreatedException: Occurs when current chromedriver could not start
+            SessionNotCreatedException: Occurs when current geckodriver could not start
 
             Except: If unexpected error raised. 
 
@@ -166,6 +166,7 @@ class GeckoDriver():
         try:
 
             if os.path.exists(self.geckodriver_path):
+                logging.info(f'Deleted existing geckodriver geckodriver_path: {self.geckodriver_path}')
                 os.remove(self.geckodriver_path)
             
 
@@ -220,7 +221,10 @@ class GeckoDriver():
                 os.remove(out_path)
 
             logging.info(f'Started download geckodriver by url: {url}')
+
             file_name = wget.download(url=url, out=out_path)
+
+            logging.info(f'Geckodriver was downloaded to path: {file_name}')
 
             time.sleep(2)
 

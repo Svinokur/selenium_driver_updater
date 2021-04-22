@@ -12,7 +12,7 @@ classifiers = [
  
 setup(
   name='selenium_driver_updater',
-  version='1.3.1',
+  version='1.4.0',
   description='Download or update your Selenium driver binaries automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 
@@ -23,5 +23,5 @@ setup(
   classifiers=classifiers,
   keywords=['chromedriver', 'operadriver', 'edgedriver', 'safaridriver', 'selenium', 'seleniumdriver', 'chromedriver-binary', 'selenium-binary', 'selenium-python'],
   packages=['selenium_driver_updater'],
-  install_requires=['wget', 'requests', 'selenium'] 
+  install_requires=['wget', 'requests', 'selenium', 'beautifulsoup4', 'lxml', 'msedge-selenium-tools'] 
 )

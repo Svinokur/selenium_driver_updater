@@ -1,5 +1,14 @@
-[1.3.1] 21/04/2021
+[1.4.0] 22/04/2021
 This version provides innovations and minor fixes.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added edgedriver support
+- Added support for downloading different OS bit (x86 / x64)
+
+[1.3.1] 21/04/2021
+This version provides minor fixes.
 This code was written and tested on Python 3.9.4
 
 # Fixes

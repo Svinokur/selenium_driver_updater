@@ -20,7 +20,8 @@ from selenium.common.exceptions import SessionNotCreatedException
 
 class ChromeDriver():
     
-    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
+    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
+                info_messages : bool):
         """Class for working with Selenium chromedriver binary
 
         Args:
@@ -151,12 +152,14 @@ class ChromeDriver():
             url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
             out_path = self.path + url.split('/')[4]
 
-            logging.info(f'Started download chromedriver by url: {url}')
-
             if os.path.exists(out_path):
                 os.remove(out_path)
 
+            logging.info(f'Started download chromedriver by url: {url}')
+
             file_name = wget.download(url=url, out=out_path)
+
+            logging.info(f'Chromedriver was downloaded to path: {file_name}')
 
             time.sleep(2)
 

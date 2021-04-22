@@ -1,8 +1,6 @@
-import json
 import shutil
 from selenium import webdriver
 import requests
-from selenium.webdriver.chrome.options import Options
 import wget
 import os
 import traceback
@@ -15,25 +13,25 @@ from typing import Tuple
 
 import requests
 
-import zipfile
-
 from .setting import setting
 
 import platform
 
+from bs4 import BeautifulSoup
+
 import stat
 
-from shutil import copyfile
+import zipfile
 
-class OperaDriver():
+class EdgeDriver():
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
-        """Class for working with Selenium operadriver binary
+        """Class for working with Selenium edgedriver binary
 
         Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium operadriver binary. Must be folder path.
+            path (str)                          : Specified path which will used for downloading or updating Selenium edgedriver binary. Must be folder path.
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make operadriver binary executable. Defaults to True.
+            chmod (bool)                        : If true, it will make edgedriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
         """
@@ -41,11 +39,8 @@ class OperaDriver():
 
         self.path : str = path
 
-        self.operadriver_path : str =  path + "operadriver.exe" if platform.system() == 'Windows' else\
-                                        path + "operadriver"
-
-        self.operadriver_platform = "operadriver.exe" if platform.system() == 'Windows' else\
-                                    "operadriver"
+        self.edgedriver_path : str =  path + "msedgedriver.exe" if platform.system() == 'Windows' else\
+                                        path + "msedgedriver"
                     
         self.upgrade : bool = upgrade
 
@@ -65,8 +60,8 @@ class OperaDriver():
 
         self.headers = {'User-Agent': user_agent}
 
-    def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
-        """Gets current operadriver version
+    def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current edgedriver version
 
 
         Returns:
@@ -77,7 +72,7 @@ class OperaDriver():
             driver_version (str)    : Current driver version
 
         Raises:
-            SessionNotCreatedException: Occurs when current operadriver could not start
+            SessionNotCreatedException: Occurs when current edgedriver could not start
 
             Except: If unexpected error raised. 
 
@@ -88,14 +83,16 @@ class OperaDriver():
         driver_version : str = ''
         try:
 
-            if os.path.exists(self.operadriver_path):
+            if os.path.exists(self.edgedriver_path):
+                
+                desired_cap = {}
 
-                driver = webdriver.Opera(executable_path = self.operadriver_path)
-                driver_version = str(driver.capabilities['opera']['operadriverVersion'].split(' ')[0])
+                driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
+                driver_version = str(driver.capabilities['msedge']['msedgedriverVersion'].split(' ')[0])
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of operadriver: {driver_version}')
+                logging.info(f'Current version of edgedriver: {driver_version}')
 
 
             result_run = True
@@ -111,8 +108,8 @@ class OperaDriver():
         
         return result_run, message_run, driver_version
 
-    def __get_latest_version_operadriver(self) -> Tuple[bool, str, str]:
-        """Gets latest operadriver version
+    def __get_latest_version_edgedriver(self) -> Tuple[bool, str, str]:
+        """Gets latest edgedriver version
 
 
         Returns:
@@ -120,7 +117,7 @@ class OperaDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            latest_version (str)    : Latest version of operadriver
+            latest_version (str)    : Latest version of edgedriver
             
         Raises:
             Except: If unexpected error raised. 
@@ -130,17 +127,31 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         latest_version : str = ''
+        stable_channel_element = None
+        latest_version_element = None
 
         try:
             
-            request = requests.get(self.setting['OperaDriver']['LinkLastRelease'], headers=self.headers)
+            request = requests.get(self.setting['EdgeDriver']['LinkLastRelease'], headers=self.headers)
             request_text = request.text
-            json_data = json.loads(str(request_text))
+            soup = BeautifulSoup(request_text, 'lxml')
 
+            elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
+
+            for element in elements:
+                if 'stable ChannelCurrent' in element.text:
+                    stable_channel_element = element
+                    break
+
+            if not stable_channel_element:
+                message = 'Could not determine latest version of Edge Driver.'
+                logging.error(message)
+                return result_run, message, latest_version
             
-            latest_version = json_data.get('name')
+            latest_version_element = stable_channel_element.findAll('p', attrs={'class' : 'driver-download__meta'})[0].text
+            latest_version = latest_version_element.split(':')[1][1:]
 
-            logging.info(f'Latest version of operadriver: {latest_version}')
+            logging.info(f'Latest version of edgedriver: {latest_version}')
 
             result_run = True
 
@@ -150,8 +161,8 @@ class OperaDriver():
 
         return result_run, message_run , latest_version
 
-    def __delete_current_geckodriver_for_current_os(self) -> Tuple[bool, str]:
-        """Deletes operadriver from specific folder
+    def __delete_current_edgedriver_for_current_os(self) -> Tuple[bool, str]:
+        """Deletes edgedriver from folder
 
 
         Returns:
@@ -170,9 +181,9 @@ class OperaDriver():
 
         try:
 
-            if os.path.exists(self.operadriver_path):
-                logging.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
-                os.remove(self.operadriver_path)
+            if os.path.exists(self.edgedriver_path):
+                logging.info(f'Deleted existing edgedriver edgedriver_path: {self.edgedriver_path}')
+                os.remove(self.edgedriver_path)
             
 
             result_run = True
@@ -183,8 +194,8 @@ class OperaDriver():
 
         return result_run, message_run
 
-    def __get_latest_operadriver_for_current_os(self) -> Tuple[bool, str, str]:
-        """Download latest operadriver to folder
+    def __get_latest_edgedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
+        """Download latest edgedriver to folder
 
         Returns:
             Tuple of bool, str and str
@@ -201,34 +212,23 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        filename_git : str = ''
-        url : str = ''
-        operadriver_version : str = ''
+        driver_notes_path : str = self.path + 'Driver_Notes'
 
         try:
-            request = requests.get(self.setting['OperaDriver']['LinkLastRelease'], headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
-
-            operadriver_version = json_data.get('name')
-
-            for asset in json_data.get('assets'):
-                if self.setting['OperaDriver']['LinkLastReleasePlatform'] == asset.get('name'):
-                    filename_git = asset.get('name')
-                    url = asset.get('browser_download_url')
-                    break
             
-            logging.info(f'Started download operadriver operadriver_version: {operadriver_version}')
-            out_path = self.path + filename_git
+            logging.info(f'Started download edgedriver latest_version: {latest_version}')
+
+            url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_version)
+            out_path = self.path + url.split('/')[4]
+
+            logging.info(f'Started download edgedriver by url: {url}')
 
             if os.path.exists(out_path):
                 os.remove(out_path)
 
-            logging.info(f'Started download operadriver by url: {url}')
-
             file_name = wget.download(url=url, out=out_path)
 
-            logging.info(f'Operadriver was downloaded to path: {file_name}')
+            logging.info(f'Edgedriver was downloaded to path: {file_name}')
 
             time.sleep(2)
 
@@ -237,27 +237,20 @@ class OperaDriver():
 
             time.sleep(3)
 
-            archive_folder_path = self.path + self.setting['OperaDriver']['LinkLastReleasePlatform'][:-4]
-            archive_operadriver_path = archive_folder_path + os.path.sep + self.operadriver_platform
-
-            copyfile(archive_operadriver_path, self.path + self.operadriver_platform)
-
             if os.path.exists(file_name):
                 os.remove(file_name)
 
-            if os.path.exists(archive_folder_path):
-                shutil.rmtree(archive_folder_path)
-            
-            file_name = self.operadriver_path
+            if os.path.exists(driver_notes_path):
+                shutil.rmtree(driver_notes_path)
+
+            file_name = self.edgedriver_path
 
             if self.chmod:
 
-                st = os.stat(self.operadriver_path)
-                os.chmod(self.operadriver_path, st.st_mode | stat.S_IEXEC)
+                st = os.stat(self.edgedriver_path)
+                os.chmod(self.edgedriver_path, st.st_mode | stat.S_IEXEC)
 
             result_run = True
-
-            logging.info(f'Operadriver was successfully updated to the last version: {operadriver_version}')
 
         except:
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
@@ -265,15 +258,15 @@ class OperaDriver():
 
         return result_run, message_run, file_name
     
-    def check_if_operadriver_is_up_to_date(self) -> Tuple[bool, str, str]:
-        """Main function, checks for the latest version, downloads or updates operadriver binary
+    def check_if_edgedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates edgedriver binary
 
         Returns:
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where operadriver was downloaded or updated.
+            file_name (str)         : Path where edgedriver was downloaded or updated.
             
         Raises:
             Except: If unexpected error raised. 
@@ -287,47 +280,54 @@ class OperaDriver():
 
             if self.check_driver_is_up_to_date:
 
-                result, message, current_version = self.__get_current_version_operadriver_selenium()
+                result, message, current_version = self.__get_current_version_edgedriver_selenium()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-                result, message, latest_version = self.__get_latest_version_operadriver()
+                result, message, latest_version = self.__get_latest_version_edgedriver()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
                 if current_version == latest_version:
-                    message = f'Your existing operadriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
+                    message = f'Your existing edgedriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
                     logging.info(message)
-                    return True, message_run, self.operadriver_path
+                    return True, message_run, self.edgedriver_path
 
-            if self.upgrade:
+            else:
 
-                result, message = self.__delete_current_geckodriver_for_current_os()
+                result, message, latest_version = self.__get_latest_version_edgedriver()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-            result, message, file_name = self.__get_latest_operadriver_for_current_os()
+            if self.upgrade:
+
+                result, message = self.__delete_current_edgedriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+            result, message, file_name = self.__get_latest_edgedriver_for_current_os(latest_version)
             if not result:
                 logging.error(message)
                 return result, message, file_name
 
             if self.check_driver_is_up_to_date:
 
-                result, message, current_version_updated = self.__get_current_version_operadriver_selenium()
+                result, message, current_version_updated = self.__get_current_version_edgedriver_selenium()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-                result, message, latest_version = self.__get_latest_version_operadriver()
+                result, message, latest_version = self.__get_latest_version_edgedriver()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
                 if current_version_updated != latest_version:
-                    message = f'Problem with updating operadriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
+                    message = f'Problem with updating edgedriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
                     logging.error(message)
                     return result_run, message, file_name
 

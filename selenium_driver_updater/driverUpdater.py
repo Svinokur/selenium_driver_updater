@@ -1,6 +1,7 @@
 from .chromeDriver import ChromeDriver
 from .geckoDriver import GeckoDriver
 from .operaDriver import OperaDriver
+from .edgeDriver import EdgeDriver
 
 import logging
 import os
@@ -12,6 +13,7 @@ class DriverUpdater():
     chromedriver = 'chromedriver'
     geckodriver = 'geckodriver'
     operadriver = 'operadriver'
+    edgedriver = 'edgedriver'
 
     def __init__(self, path : str, driver_name : str):
         """Class for working with Selenium driver binaries
@@ -25,10 +27,12 @@ class DriverUpdater():
 
         self.driver_name : str =    DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
                                     DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
-                                    DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else '' 
+                                    DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
+                                    DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else '' 
         
 
-    def install(self, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, info_messages : bool = True) -> str:
+    def install(self, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, 
+                info_messages : bool = True) -> str:
         """Function for install or update Selenium driver binary
 
         Args:
@@ -74,6 +78,14 @@ class DriverUpdater():
 
                 opera_driver = OperaDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
                 result, message, file_name = opera_driver.check_if_operadriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return file_name
+
+            elif DriverUpdater.edgedriver == self.driver_name:
+
+                edge_driver = EdgeDriver(path=self.path, upgrade=upgrade, chmod=chmod, check_driver_is_up_to_date=check_driver_is_up_to_date, info_messages=info_messages)
+                result, message, file_name = edge_driver.check_if_edgedriver_is_up_to_date()
                 if not result:
                     logging.error(message)
                     return file_name
