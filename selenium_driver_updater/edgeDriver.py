@@ -239,7 +239,7 @@ class EdgeDriver():
 
             time.sleep(2)
 
-            if not file_name:
+            if not self.filename:
                 with zipfile.ZipFile(file_name, 'r') as zip_ref:
                     zip_ref.extractall(self.path)
 
