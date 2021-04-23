@@ -16,13 +16,12 @@ pip install selenium-driver-updater
 ## Usage
 This example shows how you can use this library to download chromedriver binary.
 ```python
-from selenium_driver_updater import DriverUpdater as DU
+from selenium_driver_updater import DriverUpdater
 import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-du = DU(path=base_dir, driver_name=DU.chromedriver)
-file_name = du.install(upgrade=True)
-print(file_name)
+result, message, filename = DriverUpdater.install(path=base_dir, driver=DriverUpdater.chromedriver, upgrade=True)
+print(filename)
 
 ```
 

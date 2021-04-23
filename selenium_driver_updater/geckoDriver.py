@@ -21,9 +21,17 @@ from .setting import setting
 
 import platform
 
+import shutil
+from shutil import copyfile
+
+import stat
+
 class GeckoDriver():
+
+    _tmp_folder_path = 'tmp'
     
-    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, info_messages : bool):
+    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
+                info_messages : bool, filename : str):
         """Class for working with Selenium geckodriver binary
 
         Args:
@@ -36,9 +44,6 @@ class GeckoDriver():
         self.setting = setting
 
         self.path : str = path
-
-        self.geckodriver_path : str =  path + "geckodriver.exe" if platform.system() == 'Windows' else\
-                                        path + "geckodriver"
                     
         self.upgrade : bool = upgrade
 
@@ -57,6 +62,11 @@ class GeckoDriver():
                         Chrome/35.0.1916.47 Safari/537.36'
 
         self.headers = {'User-Agent': user_agent}
+
+        self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
+                        filename
+
+        self.geckodriver_path : str =  path + setting['GeckoDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version
@@ -80,7 +90,7 @@ class GeckoDriver():
         message_run : str = ''
         driver_version : str = ''
         try:
-
+            
             if os.path.exists(self.geckodriver_path):
 
                 options = FirefoxOptions()
@@ -199,6 +209,7 @@ class GeckoDriver():
         filename_git : str = ''
         url : str = ''
         geckodriver_version : str = ''
+        renamed_driver_path : str = ''
 
         try:
 
@@ -228,13 +239,49 @@ class GeckoDriver():
 
             time.sleep(2)
 
-            with tarfile.open(file_name, "r:gz") as tar:
-                tar.extractall(self.path)
+            if not self.filename:
+
+                with tarfile.open(file_name, "r:gz") as tar:
+                    tar.extractall(self.path)
+
+            else:
+
+                driver_folder_path = self.path + GeckoDriver._tmp_folder_path
+                logging.info(f'Created new directory for replacing name for geckodriver path: {driver_folder_path}')
+
+                if os.path.exists(driver_folder_path):
+                    shutil.rmtree(driver_folder_path)
+
+                with tarfile.open(file_name, "r:gz") as tar:
+                    tar.extractall(driver_folder_path)
+
+                old_geckodriver_path = driver_folder_path + os.path.sep + setting['GeckoDriver']['LastReleasePlatform']
+                new_geckodriver_path = driver_folder_path + os.path.sep + self.filename
+
+                os.rename(old_geckodriver_path, new_geckodriver_path)
+
+                renamed_driver_path = self.path + self.filename
+                if os.path.exists(renamed_driver_path):
+                    os.remove(renamed_driver_path)
+
+                copyfile(new_geckodriver_path, renamed_driver_path)
+
+                if os.path.exists(driver_folder_path):
+                    shutil.rmtree(driver_folder_path)
 
             time.sleep(3)
 
             if os.path.exists(file_name):
                 os.remove(file_name)
+
+            file_name = self.geckodriver_path
+
+            logging.info(f'Geckodriver was successfully unpacked by path: {file_name}')
+
+            if self.chmod:
+
+                st = os.stat(file_name)
+                os.chmod(file_name, st.st_mode | stat.S_IEXEC)
 
             result_run = True
 
@@ -254,7 +301,7 @@ class GeckoDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where geckodriver was downloaded or updated.
+            driver_path (str)       : Path where geckodriver was downloaded or updated.
             
         Raises:
             Except: If unexpected error raised. 
@@ -262,7 +309,7 @@ class GeckoDriver():
         """
         result_run : bool = False
         message_run : str = ''
-        file_name : str = ''
+        driver_path : str = ''
         
         try:
 
@@ -271,12 +318,12 @@ class GeckoDriver():
                 result, message, current_version = self.__get_current_version_geckodriver_selenium()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 result, message, latest_version = self.__get_latest_version_geckodriver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 if current_version == latest_version:
                     message = f'Your existing geckodriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
@@ -288,29 +335,29 @@ class GeckoDriver():
                 result, message = self.__delete_current_geckodriver_for_current_os()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
-            result, message, file_name = self.__get_latest_geckodriver_for_current_os()
+            result, message, driver_path = self.__get_latest_geckodriver_for_current_os()
             if not result:
                 logging.error(message)
-                return result, message, file_name
+                return result, message, driver_path
 
             if self.check_driver_is_up_to_date:
 
                 result, message, current_version_updated = self.__get_current_version_geckodriver_selenium()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 result, message, latest_version = self.__get_latest_version_geckodriver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 if current_version_updated != latest_version:
                     message = f'Problem with updating geckodriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
                     logging.error(message)
-                    return result_run, message, file_name
+                    return result_run, message, driver_path
 
             result_run = True
 
@@ -318,4 +365,4 @@ class GeckoDriver():
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
             logging.error(message_run)
 
-        return result_run, message_run, file_name
+        return result_run, message_run, driver_path

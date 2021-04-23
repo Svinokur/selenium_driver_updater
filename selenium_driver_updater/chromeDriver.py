@@ -18,10 +18,16 @@ from selenium import webdriver
 
 from selenium.common.exceptions import SessionNotCreatedException
 
+from shutil import copyfile
+
+import shutil
+
 class ChromeDriver():
+
+    _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool):
+                info_messages : bool, filename : str):
         """Class for working with Selenium chromedriver binary
 
         Args:
@@ -34,9 +40,6 @@ class ChromeDriver():
         self.setting = setting
 
         self.path : str = path
-
-        self.chromedriver_path : str =  path + "chromedriver.exe" if platform.system() == 'Windows' else\
-                                        path + "chromedriver"
                     
         self.upgrade : bool = upgrade
 
@@ -55,6 +58,11 @@ class ChromeDriver():
                         Chrome/35.0.1916.47 Safari/537.36'
 
         self.headers = {'User-Agent': user_agent}
+
+        self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
+                        filename
+
+        self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
 
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
@@ -145,6 +153,8 @@ class ChromeDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
+        renamed_driver_path : str = ''
+        
         try:
 
             logging.info(f'Started download chromedriver latest_version: {latest_version}')
@@ -163,8 +173,34 @@ class ChromeDriver():
 
             time.sleep(2)
 
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(self.path)
+            if not file_name:
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(self.path)
+
+            else:
+
+                driver_folder_path = self.path + ChromeDriver._tmp_folder_path
+                logging.info(f'Created new directory for replacing name for chromedriver path: {driver_folder_path}')
+
+                if os.path.exists(driver_folder_path):
+                    shutil.rmtree(driver_folder_path)
+
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(driver_folder_path)
+
+                old_chromedriver_path = driver_folder_path + os.path.sep + setting['ChromeDriver']['LastReleasePlatform']
+                new_chromedriver_path = driver_folder_path + os.path.sep + self.filename
+
+                os.rename(old_chromedriver_path, new_chromedriver_path)
+
+                renamed_driver_path = self.path + self.filename
+                if os.path.exists(renamed_driver_path):
+                    os.remove(renamed_driver_path)
+
+                copyfile(new_chromedriver_path, renamed_driver_path)
+
+                if os.path.exists(driver_folder_path):
+                    shutil.rmtree(driver_folder_path)
 
             time.sleep(3)
 
@@ -174,10 +210,12 @@ class ChromeDriver():
             
             file_name = self.chromedriver_path
 
+            logging.info(f'Chromedriver was successfully unpacked by path: {file_name}')
+
             if self.chmod:
 
-                st = os.stat(self.chromedriver_path)
-                os.chmod(self.chromedriver_path, st.st_mode | stat.S_IEXEC)
+                st = os.stat(file_name)
+                os.chmod(file_name, st.st_mode | stat.S_IEXEC)
 
             result_run = True
 
@@ -196,7 +234,7 @@ class ChromeDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where chromedriver was downloaded or updated.
+            driver_path (str)       : Path where chromedriver was downloaded or updated.
             
         Raises:
             Except: If unexpected error raised. 
@@ -204,7 +242,7 @@ class ChromeDriver():
         """
         result_run : bool = False
         message_run : str = ''
-        file_name : str = ''
+        driver_path : str = ''
         
         try:
 
@@ -213,12 +251,12 @@ class ChromeDriver():
                 result, message, current_version = self.__get_current_version_chrome_selenium()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 result, message, latest_version = self.__get_latest_version_chrome_driver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 if current_version == latest_version:
                     message = f'Your existing chromedriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
@@ -230,36 +268,36 @@ class ChromeDriver():
                 result, message, latest_version = self.__get_latest_version_chrome_driver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             if self.upgrade:
 
                 result, message = self.__delete_current_chromedriver_for_current_os()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
-            result, message, file_name = self.__get_latest_chromedriver_for_current_os(latest_version)
+            result, message, driver_path = self.__get_latest_chromedriver_for_current_os(latest_version)
             if not result:
                 logging.error(message)
-                return result, message, file_name
+                return result, message, driver_path
 
             if self.check_driver_is_up_to_date:
 
                 result, message, current_version_updated = self.__get_current_version_chrome_selenium()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 result, message, latest_version = self.__get_latest_version_chrome_driver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 if current_version_updated != latest_version:
                     message = f'Problem with updating chromedriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
                     logging.error(message)
-                    return result_run, message, file_name
+                    return result_run, message, driver_path
 
             result_run = True
 
@@ -267,7 +305,7 @@ class ChromeDriver():
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
             logging.error(message_run)
 
-        return result_run, message_run, file_name
+        return result_run, message_run, driver_path
 
     def __get_current_version_chrome_selenium(self) -> Tuple[bool, str, str]:
         """Gets current chromedriver version
@@ -292,7 +330,7 @@ class ChromeDriver():
         driver_version : str = ''
         
         try:
-
+            
             if os.path.exists(self.chromedriver_path):
 
                 chrome_options = webdriver.ChromeOptions()

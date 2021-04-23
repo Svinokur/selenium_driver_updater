@@ -1,3 +1,17 @@
+[1.5.0] 22/04/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added support for different names of Selenium webdriver binary.
+- Added detailed return to main function
+- Added lighter function call
+
+# Fixes
+
+- Fixed an issue with incorrect detection of system bitness.
+
 [1.4.0] 22/04/2021
 This version provides innovations and minor fixes.
 This code was written and tested on Python 3.9.4
