@@ -8,6 +8,7 @@ import logging
 import time
 import os
 from selenium.common.exceptions import SessionNotCreatedException
+from selenium.common.exceptions import WebDriverException
 
 from typing import Tuple
 
@@ -76,10 +77,12 @@ class EdgeDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current driver version
+            driver_version (str)    : Current driver version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current edgedriver could not start
+            SessionNotCreatedException: Occurs when current edgedriver could not start.
+
+            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
             Except: If unexpected error raised. 
 
@@ -88,9 +91,12 @@ class EdgeDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
+
         try:
 
             if os.path.exists(self.edgedriver_path):
+
+                #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
                 
                 desired_cap = {}
 
@@ -98,7 +104,7 @@ class EdgeDriver():
                 driver_version = str(driver.capabilities['msedge']['msedgedriverVersion'].split(' ')[0])
                 driver.close()
                 driver.quit()
-
+        
                 logging.info(f'Current version of edgedriver: {driver_version}')
 
 
@@ -106,6 +112,11 @@ class EdgeDriver():
 
         except SessionNotCreatedException:
             message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, driver_version
+
+        except WebDriverException:
+            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
             logging.error(message_run)
             return True, message_run, driver_version
 
@@ -246,28 +257,9 @@ class EdgeDriver():
 
             else:
 
-                driver_folder_path = self.path + EdgeDriver._tmp_folder_path
-                logging.info(f'Created new directory for replacing name for edgedriver path: {driver_folder_path}')
-
-                if os.path.exists(driver_folder_path):
-                    shutil.rmtree(driver_folder_path)
-
-                with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                    zip_ref.extractall(driver_folder_path)
-
-                old_chromedriver_path = driver_folder_path + os.path.sep + setting['EdgeDriver']['LastReleasePlatform']
-                new_chromedriver_path = driver_folder_path + os.path.sep + self.filename
-
-                os.rename(old_chromedriver_path, new_chromedriver_path)
-
-                renamed_driver_path = self.path + self.filename
-                if os.path.exists(renamed_driver_path):
-                    os.remove(renamed_driver_path)
-
-                copyfile(new_chromedriver_path, renamed_driver_path)
-
-                if os.path.exists(driver_folder_path):
-                    shutil.rmtree(driver_folder_path)
+                result, message = self.__rename_driver(file_name=file_name)
+                if not result:
+                    return result, message, file_name
 
             time.sleep(3)
 
@@ -278,11 +270,6 @@ class EdgeDriver():
                 shutil.rmtree(driver_notes_path)
 
             file_name = self.edgedriver_path
-
-            if self.chmod:
-
-                st = os.stat(self.edgedriver_path)
-                os.chmod(self.edgedriver_path, st.st_mode | stat.S_IEXEC)
 
             result_run = True
 
@@ -314,20 +301,13 @@ class EdgeDriver():
 
             if self.check_driver_is_up_to_date:
 
-                result, message, current_version = self.__get_current_version_edgedriver_selenium()
+                result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
 
-                result, message, latest_version = self.__get_latest_version_edgedriver()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-                if current_version == latest_version:
-                    message = f'Your existing edgedriver is already up to date. current_version: {current_version} latest_version: {latest_version}' 
-                    logging.info(message)
-                    return True, message_run, self.edgedriver_path
+                if is_driver_up_to_date:
+                    return True, message, self.edgedriver_path
 
             else:
 
@@ -348,20 +328,21 @@ class EdgeDriver():
                 logging.error(message)
                 return result, message, driver_path
 
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, driver_path
+
             if self.check_driver_is_up_to_date:
 
-                result, message, current_version_updated = self.__get_current_version_edgedriver_selenium()
+                result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
 
-                result, message, latest_version = self.__get_latest_version_edgedriver()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-                if current_version_updated != latest_version:
-                    message = f'Problem with updating edgedriver current_version_updated : {current_version_updated} latest_version : {latest_version}'
+                if not is_driver_up_to_date:
+                    message = f'Problem with updating edgedriver current_version : {current_version} latest_version : {latest_version}'
                     logging.error(message)
                     return result_run, message, driver_path
 
@@ -372,3 +353,136 @@ class EdgeDriver():
             logging.error(message_run)
 
         return result_run, message_run, driver_path
+
+    def __compare_current_version_and_latest_version(self) -> Tuple[bool, str, bool, str, str]:
+        """Compares current version of edgedriver to latest version
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)           : True if function passed correctly, False otherwise.
+            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            is_driver_up_to_date (bool) : If true current version of edgedriver is up to date. Defaults to False.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        is_driver_up_to_date : bool = False
+        current_version : str = ''
+        latest_version : str = ''
+        
+        try:
+
+            result, message, current_version = self.__get_current_version_edgedriver_selenium()
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, current_version, latest_version
+
+            result, message, latest_version = self.__get_latest_version_edgedriver()
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, current_version, latest_version
+
+            if current_version == latest_version:
+                is_driver_up_to_date = True
+                message = f'Your existing edgedriver is up to date. current_version: {current_version} latest_version: {latest_version}' 
+                logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, is_driver_up_to_date, current_version, latest_version
+
+    def __rename_driver(self, file_name : str) -> Tuple[bool, str]:
+        """Renames edgedriver if it was given
+
+        Args:
+            file_name (str)     : Path to the edgedriver
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)           : True if function passed correctly, False otherwise.
+            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        renamed_driver_path : str = ''
+        
+        try:
+
+            driver_folder_path = self.path + EdgeDriver._tmp_folder_path
+            logging.info(f'Created new directory for replacing name for edgedriver path: {driver_folder_path}')
+
+            if os.path.exists(driver_folder_path):
+                shutil.rmtree(driver_folder_path)
+
+            with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                zip_ref.extractall(driver_folder_path)
+
+            old_edgedriver_path = driver_folder_path + os.path.sep + setting['EdgeDriver']['LastReleasePlatform']
+            new_edgedriver_path = driver_folder_path + os.path.sep + self.filename
+
+            os.rename(old_edgedriver_path, new_edgedriver_path)
+
+            renamed_driver_path = self.path + self.filename
+            if os.path.exists(renamed_driver_path):
+                os.remove(renamed_driver_path)
+
+            copyfile(new_edgedriver_path, renamed_driver_path)
+
+            if os.path.exists(driver_folder_path):
+                shutil.rmtree(driver_folder_path)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __chmod_driver(self) -> Tuple[bool, str]:
+        """Tries to give edgedriver needed permissions
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)           : True if function passed correctly, False otherwise.
+            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            if os.path.exists(self.edgedriver_path):
+
+                logging.info('Trying to give edgedriver needed permissions')
+
+                st = os.stat(self.edgedriver_path)
+                os.chmod(self.edgedriver_path, st.st_mode | stat.S_IEXEC)
+
+                logging.info('Needed rights for edgedriver was successfully issued')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
