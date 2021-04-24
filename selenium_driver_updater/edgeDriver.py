@@ -65,7 +65,7 @@ class EdgeDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
                         filename
 
-        self.edgedriver_path : str =  path + setting['EdgeDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
+        self.edgedriver_path : str =  path + setting['EdgeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
     def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current edgedriver version

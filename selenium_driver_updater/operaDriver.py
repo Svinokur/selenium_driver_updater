@@ -62,7 +62,7 @@ class OperaDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
                         filename
 
-        self.operadriver_path : str =  path + setting['OperaDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
+        self.operadriver_path : str =  path + setting['OperaDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
     def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current operadriver version

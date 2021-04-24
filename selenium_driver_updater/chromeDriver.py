@@ -62,7 +62,7 @@ class ChromeDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
                         filename
 
-        self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
+        self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:

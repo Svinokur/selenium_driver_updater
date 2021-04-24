@@ -26,6 +26,8 @@ from shutil import copyfile
 
 import stat
 
+import zipfile
+
 class GeckoDriver():
 
     _tmp_folder_path = 'tmp'
@@ -66,7 +68,7 @@ class GeckoDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
                         filename
 
-        self.geckodriver_path : str =  path + setting['GeckoDriver']['LastReleasePlatform'] if not self.filename else self.path + self.filename
+        self.geckodriver_path : str =  path + setting['GeckoDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version
@@ -220,7 +222,7 @@ class GeckoDriver():
             geckodriver_version = json_data.get('name')
 
             for asset in json_data.get('assets'):
-                if self.setting['GeckoDriver']['LinkLastReleasePlatform'] in asset.get('name') and asset.get('name').endswith('tar.gz'):
+                if self.setting['GeckoDriver']['LinkLastReleasePlatform'] in asset.get('name'):
                     filename_git = asset.get('name')
                     url = asset.get('browser_download_url')
                     break
@@ -241,8 +243,20 @@ class GeckoDriver():
 
             if not self.filename:
 
-                with tarfile.open(file_name, "r:gz") as tar:
-                    tar.extractall(self.path)
+                if filename_git.endswith('.tar.gz'):
+
+                    with tarfile.open(file_name, "r:gz") as tar:
+                        tar.extractall(self.path)
+
+                elif filename_git.endswith('.zip'):
+
+                    with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                        zip_ref.extractall(self.path)
+
+                else:
+                    message = f'Unknown archive format was specified filename: {filename_git}'
+                    logging.error(message)
+                    return result_run, message, file_name
 
             else:
 
@@ -252,8 +266,20 @@ class GeckoDriver():
                 if os.path.exists(driver_folder_path):
                     shutil.rmtree(driver_folder_path)
 
-                with tarfile.open(file_name, "r:gz") as tar:
-                    tar.extractall(driver_folder_path)
+                if filename_git.endswith('.tar.gz'):
+
+                    with tarfile.open(file_name, "r:gz") as tar:
+                        tar.extractall(driver_folder_path)
+
+                elif filename_git.endswith('.zip'):
+
+                    with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                        zip_ref.extractall(driver_folder_path)
+
+                else:
+                    message = f'Unknown archive format was specified filename: {filename_git}'
+                    logging.error(message)
+                    return result_run, message, file_name
 
                 old_geckodriver_path = driver_folder_path + os.path.sep + setting['GeckoDriver']['LastReleasePlatform']
                 new_geckodriver_path = driver_folder_path + os.path.sep + self.filename
