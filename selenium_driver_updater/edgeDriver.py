@@ -62,7 +62,7 @@ class EdgeDriver():
 
         self.headers = {'User-Agent': user_agent}
 
-        self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
+        self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
         self.edgedriver_path : str =  path + setting['EdgeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
@@ -240,6 +240,7 @@ class EdgeDriver():
             time.sleep(2)
 
             if not self.filename:
+                
                 with zipfile.ZipFile(file_name, 'r') as zip_ref:
                     zip_ref.extractall(self.path)
 

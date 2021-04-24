@@ -59,7 +59,7 @@ class ChromeDriver():
 
         self.headers = {'User-Agent': user_agent}
 
-        self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
+        self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
         self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename

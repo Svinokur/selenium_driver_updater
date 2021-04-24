@@ -59,7 +59,7 @@ class OperaDriver():
 
         self.headers = {'User-Agent': user_agent}
 
-        self.filename = f"{filename}.exe" if platform.system() == 'Windows' else\
+        self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
         self.operadriver_path : str =  path + setting['OperaDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
