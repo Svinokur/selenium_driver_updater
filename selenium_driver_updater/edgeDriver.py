@@ -14,7 +14,11 @@ from typing import Tuple
 
 import requests
 
-from .setting import setting
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
+
+from setting import setting
 
 import platform
 
@@ -31,7 +35,7 @@ class EdgeDriver():
     _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str):
+                info_messages : bool, filename : str, version : str):
         """Class for working with Selenium edgedriver binary
 
         Args:
@@ -40,6 +44,8 @@ class EdgeDriver():
             chmod (bool)                        : If true, it will make edgedriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
+            filename (str)                      : Specific name for edgedriver. If given, it will replace name for edgedriver.
+            version (str)                       : Specific version for edgedriver. If given, it will downloads given version.
         """
         self.setting = setting
 
@@ -67,6 +73,8 @@ class EdgeDriver():
                         filename
 
         self.edgedriver_path : str =  path + setting['EdgeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
+
+        self.version = version
 
     def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current edgedriver version
@@ -97,7 +105,6 @@ class EdgeDriver():
             if os.path.exists(self.edgedriver_path):
 
                 #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
-                
                 desired_cap = {}
 
                 driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
@@ -106,7 +113,6 @@ class EdgeDriver():
                 driver.quit()
         
                 logging.info(f'Current version of edgedriver: {driver_version}')
-
 
             result_run = True
 
@@ -279,7 +285,7 @@ class EdgeDriver():
 
         return result_run, message_run, file_name
     
-    def check_if_edgedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+    def __check_if_edgedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
         """Main function, checks for the latest version, downloads or updates edgedriver binary
 
         Returns:
@@ -477,7 +483,7 @@ class EdgeDriver():
                 st = os.stat(self.edgedriver_path)
                 os.chmod(self.edgedriver_path, st.st_mode | stat.S_IEXEC)
 
-                logging.info('Needed rights for edgedriver was successfully issued')
+                logging.info('Needed rights for edgedriver were successfully issued')
 
             result_run = True
 
@@ -486,3 +492,166 @@ class EdgeDriver():
             logging.error(message_run)
 
         return result_run, message_run
+
+    def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates edgedriver binary
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where edgedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if not self.version:
+
+                result, message, driver_path = self.__check_if_edgedriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            else:
+
+                result, message, driver_path = self.__download_edgedriver_for_specific_version(version=self.version)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __download_edgedriver_for_specific_version(self, version : str) -> Tuple[bool, str, str]:
+        """Downloads specific version of edgedriver
+
+        Args:
+            version (str)    : Specific version of edgedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where edgedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if self.upgrade:
+
+                result, message = self.__delete_current_edgedriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            result, message, driver_path = self.__get_specific_version_edgedriver_for_current_os(version=version)
+            if not result:
+                logging.error(message)
+                return result, message, driver_path
+
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __get_specific_version_edgedriver_for_current_os(self, version : str) -> Tuple[bool, str, str]:
+        """Download specific version of edgedriver to folder
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : File name of unzipped file
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        file_name : str = ''
+        driver_notes_path : str = self.path + 'Driver_Notes'
+
+        try:
+            
+            logging.info(f'Started download edgedriver specific_version: {version}')
+
+            url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(version)
+            request = requests.get(url=url, headers=self.headers)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'The wrong version was specified. url: {url} status_code: {status_code} version: {version}'
+                logging.error(message)
+                return result_run, message, file_name
+
+            out_path = self.path + url.split('/')[4]
+
+            logging.info(f'Started download edgedriver by url: {url}')
+
+            if os.path.exists(out_path):
+                os.remove(out_path)
+
+            file_name = wget.download(url=url, out=out_path)
+
+            logging.info(f'Edgedriver was downloaded to path: {file_name}')
+
+            time.sleep(2)
+
+            if not self.filename:
+                
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(self.path)
+
+            else:
+
+                result, message = self.__rename_driver(file_name=file_name)
+                if not result:
+                    return result, message, file_name
+
+            time.sleep(3)
+
+            if os.path.exists(file_name):
+                os.remove(file_name)
+
+            if os.path.exists(driver_notes_path):
+                shutil.rmtree(driver_notes_path)
+
+            file_name = self.edgedriver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, file_name

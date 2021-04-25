@@ -17,7 +17,7 @@ class DriverUpdater():
         
     @staticmethod
     def install(path : str, driver_name : str, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, 
-                info_messages : bool = True, filename : str = '') -> Tuple[bool, str, str]:
+                info_messages : bool = True, filename : str = '', version : str = '') -> Tuple[bool, str, str]:
         """Function for install or update Selenium driver binary
 
         Args:
@@ -27,6 +27,8 @@ class DriverUpdater():
             chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
+            filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver. Defaults to empty string.
+            version (str)                       : Specific version for chromedriver. If given, it will downloads given version. Defaults to empty string.
 
         Returns:
             Tuple of bool, str and str
@@ -51,6 +53,8 @@ class DriverUpdater():
                         DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
                         DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else '' 
 
+        filename = filename.replace('.', '')
+
         try:
 
             result, message = DriverUpdater.__check_all_input_parameteres(path=path, driver_name=driver_name)
@@ -62,8 +66,8 @@ class DriverUpdater():
 
                 chrome_driver = ChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                             check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                            info_messages=info_messages, filename=filename)
-                result, message, driver_path = chrome_driver.check_if_chromedriver_is_up_to_date()
+                                            info_messages=info_messages, filename=filename, version=version)
+                result, message, driver_path = chrome_driver.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -72,8 +76,8 @@ class DriverUpdater():
 
                 gecko_driver = GeckoDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                        info_messages=info_messages, filename=filename)
-                result, message, driver_path = gecko_driver.check_if_geckodriver_is_up_to_date()
+                                        info_messages=info_messages, filename=filename, version=version)
+                result, message, driver_path = gecko_driver.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -82,8 +86,8 @@ class DriverUpdater():
 
                 opera_driver = OperaDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                        info_messages=info_messages, filename=filename)
-                result, message, driver_path = opera_driver.check_if_operadriver_is_up_to_date()
+                                        info_messages=info_messages, filename=filename, version=version)
+                result, message, driver_path = opera_driver.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -92,11 +96,13 @@ class DriverUpdater():
 
                 edge_driver = EdgeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                     check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                    info_messages=info_messages, filename=filename)
-                result, message, driver_path = edge_driver.check_if_edgedriver_is_up_to_date()
+                                    info_messages=info_messages, filename=filename, version=version)
+                result, message, driver_path = edge_driver.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
+
+            result_run = True
 
         except:
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'

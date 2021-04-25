@@ -17,7 +17,11 @@ import requests
 
 import zipfile
 
-from .setting import setting
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
+
+from setting import setting
 
 import platform
 
@@ -28,7 +32,7 @@ from shutil import copyfile
 class OperaDriver():
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str):
+                info_messages : bool, filename : str, version : str):
         """Class for working with Selenium operadriver binary
 
         Args:
@@ -37,6 +41,8 @@ class OperaDriver():
             chmod (bool)                        : If true, it will make operadriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
+            filename (str)                      : Specific name for operadriver. If given, it will replace name for operadriver. Defaults to empty string.
+            version (str)                       : Specific version for operadriver. If given, it will downloads given version. Defaults to empty string.
         """
         self.setting = setting
 
@@ -64,6 +70,8 @@ class OperaDriver():
                         filename
 
         self.operadriver_path : str =  path + setting['OperaDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
+
+        self.version = version
 
     def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current operadriver version
@@ -158,7 +166,7 @@ class OperaDriver():
 
         return result_run, message_run , latest_version
 
-    def __delete_current_geckodriver_for_current_os(self) -> Tuple[bool, str]:
+    def __delete_current_operadriver_for_current_os(self) -> Tuple[bool, str]:
         """Deletes operadriver from specific folder
 
 
@@ -283,7 +291,7 @@ class OperaDriver():
 
         return result_run, message_run, file_name
     
-    def check_if_operadriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+    def __check_if_operadriver_is_up_to_date(self) -> Tuple[bool, str, str]:
         """Main function, checks for the latest version, downloads or updates operadriver binary
 
         Returns:
@@ -315,7 +323,7 @@ class OperaDriver():
 
             if self.upgrade:
 
-                result, message = self.__delete_current_geckodriver_for_current_os()
+                result, message = self.__delete_current_operadriver_for_current_os()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -465,7 +473,7 @@ class OperaDriver():
                 st = os.stat(self.operadriver_path)
                 os.chmod(self.operadriver_path, st.st_mode | stat.S_IEXEC)
 
-                logging.info('Needed rights for edgedriver was successfully issued')
+                logging.info('Needed rights for operadriver were successfully issued')
 
             result_run = True
 
@@ -474,3 +482,186 @@ class OperaDriver():
             logging.error(message_run)
 
         return result_run, message_run
+
+    def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates operadriver binary or
+        downloads specific version of operadriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where operadriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if not self.version:
+
+                result, message, driver_path = self.__check_if_operadriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            else:
+
+                result, message, driver_path = self.__download_operadriver_for_specific_version(version=self.version)
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __download_operadriver_for_specific_version(self, version : str) -> Tuple[bool, str, str]:
+        """Downloads specific version of operadriver
+
+        Args:
+            version (str)    : Specific version of operadriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where operadriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if self.upgrade:
+
+                result, message = self.__delete_current_operadriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            result, message, driver_path = self.__get_specific_version_operadriver_for_current_os(version=version)
+            if not result:
+                logging.error(message)
+                return result, message, driver_path
+
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __get_specific_version_operadriver_for_current_os(self, version : str) -> Tuple[bool, str, str]:
+        """Download specific version of operadriver to folder
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : File name of unzipped file
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        file_name : str = ''
+        filename_git : str = ''
+        url : str = ''
+
+        try:
+
+            url = self.setting["OperaDriver"]["LinkAllReleases"]
+            request = requests.get(url=url, headers=self.headers)
+            request_text = request.text
+            json_data = json.loads(str(request_text))
+
+            for release in json_data:
+                if version == release.get('name') or version in release.get('tag_name'):
+                    for asset in release.get('assets'):
+                        if self.setting['OperaDriver']['LinkLastReleasePlatform'] in asset.get('name'):
+                            filename_git = asset.get('name')
+                            url = asset.get('browser_download_url')
+                            break
+
+            if not filename_git:
+                message = (f"OperaDriver binary was not found, maybe unknown OS or incorrect version "
+                           f"LinkLastReleasePlatform: {self.setting['OperaDriver']['LinkLastReleasePlatform']} "
+                           f"specific_version: {version}" )
+                logging.error(message)
+                return False, message, file_name
+            
+            logging.info(f'Started download operadriver specific_version: {version}')
+            out_path = self.path + filename_git
+
+            if os.path.exists(out_path):
+                os.remove(out_path)
+
+            logging.info(f'Started download operadriver by url: {url}')
+
+            file_name = wget.download(url=url, out=out_path)
+
+            logging.info(f'Operadriver was downloaded to path: {file_name}')
+
+            time.sleep(2)
+
+            with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                zip_ref.extractall(self.path)
+
+            time.sleep(3)
+
+            archive_folder_path = self.path + self.setting['OperaDriver']['LinkLastReleasePlatform'][:-4]
+            archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
+
+            if not self.filename:
+
+                copyfile(archive_operadriver_path, self.path + self.setting['OperaDriver']['LastReleasePlatform'])
+
+            else:
+
+                result, message = self.__rename_driver(archive_folder_path=archive_folder_path,
+                                                        archive_operadriver_path=archive_operadriver_path)
+                if not result:
+                    return result, message, file_name
+
+            if os.path.exists(file_name):
+                os.remove(file_name)
+
+            if os.path.exists(archive_folder_path):
+                shutil.rmtree(archive_folder_path)
+            
+            file_name = self.operadriver_path
+
+            result_run = True
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, file_name

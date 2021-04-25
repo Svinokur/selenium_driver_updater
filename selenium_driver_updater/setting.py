@@ -56,12 +56,14 @@ setting = dict(
             "LinkLastRelease"           : latest_release_geckodriver,
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : geckodriver_platform_last_release,
+            "LinkAllReleases"           : 'https://api.github.com/repos/mozilla/geckodriver/releases',
         },
         "OperaDriver":
         {
             "LinkLastRelease"           : latest_release_operadriver,
             "LinkLastReleasePlatform"   : operadriver_latest_release, 
             "LastReleasePlatform"       : operadriver_platform_release, 
+            "LinkAllReleases"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases',
         },
         "EdgeDriver":
         {

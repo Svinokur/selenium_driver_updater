@@ -12,7 +12,11 @@ import platform
 
 from typing import Tuple
 
-from .setting import setting
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
+
+from setting import setting
 
 from selenium import webdriver
 
@@ -28,7 +32,7 @@ class ChromeDriver():
     _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str):
+                info_messages : bool, filename : str, version : str):
         """Class for working with Selenium chromedriver binary
 
         Args:
@@ -37,6 +41,8 @@ class ChromeDriver():
             chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
+            filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver.
+            version (str)                       : Specific version for chromedriver. If given, it will downloads given version.
         """
         self.setting = setting
 
@@ -65,6 +71,7 @@ class ChromeDriver():
 
         self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
+        self.version = version
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
@@ -88,7 +95,8 @@ class ChromeDriver():
 
         try:
             
-            request = requests.get(self.setting["ChromeDriver"]["LinkLastRelease"], headers=self.headers)
+            url = self.setting["ChromeDriver"]["LinkLastRelease"]
+            request = requests.get(url=url, headers=self.headers)
             latest_version = str(request.text)
 
             logging.info(f'Latest version of chromedriver: {latest_version}')
@@ -203,8 +211,8 @@ class ChromeDriver():
 
         return result_run, message_run, file_name
 
-    def check_if_chromedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
-        """Main function, checks for the latest version, downloads or updates chromedriver binary
+    def __check_if_chromedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+        """Сhecks for the latest version, downloads or updates chromedriver binary
 
         Returns:
             Tuple of bool, str and str
@@ -468,3 +476,171 @@ class ChromeDriver():
 
         return result_run, message_run
     
+    def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates chromedriver binary or
+        downloads specific version of chromedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if not self.version:
+
+                result, message, driver_path = self.__check_if_chromedriver_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            else:
+
+                result, message, driver_path = self.__download_chromedriver_for_specific_version(version=self.version)
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __download_chromedriver_for_specific_version(self, version : str) -> Tuple[bool, str, str]:
+        """Downloads specific version of chromedriver
+
+        Args:
+            version (str)    : Specific version of chromedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if self.upgrade:
+
+                result, message = self.__delete_current_chromedriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            result, message, driver_path = self.__get_specific_version_chromedriver_for_current_os(version)
+            if not result:
+                logging.error(message)
+                return result, message, driver_path
+
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __get_specific_version_chromedriver_for_current_os(self, version : str) -> Tuple[bool, str, str]:
+        """Downloads specific version of chromedriver to specific path
+
+        Args:
+            version (str)    : Specific version of chromedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            file_name (str)         : Path where chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        file_name : str = ''
+        
+        try:
+
+            logging.info(f'Started download chromedriver specific_version: {version}')
+
+            url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(version)
+            request = requests.get(url, headers=self.headers)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'The wrong version was specified. url: {url} status_code: {status_code} version: {version}'
+                logging.error(message)
+                return result_run, message, file_name
+
+            out_path = self.path + url.split('/')[4]
+
+            if os.path.exists(out_path):
+                os.remove(out_path)
+
+            logging.info(f'Started download chromedriver by url: {url}')
+
+            file_name = wget.download(url=url, out=out_path)
+
+            logging.info(f'Chromedriver was downloaded to path: {file_name}')
+
+            time.sleep(2)
+
+            if not self.filename:
+
+                with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                    zip_ref.extractall(self.path)
+
+            else:
+
+                result, message = self.__rename_driver(file_name=file_name)
+                if not result:
+                    return result, message, file_name
+
+            time.sleep(3)
+
+            if os.path.exists(file_name):
+                os.remove(file_name)
+
+            
+            file_name = self.chromedriver_path
+
+            logging.info(f'Chromedriver was successfully unpacked by path: {file_name}')
+
+            result_run = True
+
+        except:
+
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, file_name
