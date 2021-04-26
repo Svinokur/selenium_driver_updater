@@ -3,7 +3,6 @@ import wget
 import os
 import traceback
 import logging
-import zipfile
 import time
 import stat
 import os
@@ -23,9 +22,7 @@ from selenium import webdriver
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
-from shutil import copyfile
-
-import shutil
+from util.extractor import Extractor
 
 class ChromeDriver():
 
@@ -72,6 +69,8 @@ class ChromeDriver():
         self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
+
+        self.extractor = Extractor
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
@@ -182,14 +181,24 @@ class ChromeDriver():
             time.sleep(2)
 
             if not self.filename:
-
-                with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                    zip_ref.extractall(self.path)
+                
+                archive_path = file_name
+                out_path = self.path
+                result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
 
             else:
 
-                result, message = self.__rename_driver(file_name=file_name)
+                archive_path = file_name
+                out_path = self.path
+                filename = setting['ChromeDriver']['LastReleasePlatform']
+                filename_replace = self.filename
+                result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
+                out_path=out_path, filename=filename, filename_replace=filename_replace)
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
 
             time.sleep(3)
@@ -205,7 +214,6 @@ class ChromeDriver():
             result_run = True
 
         except:
-
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
             logging.error(message_run)
 
@@ -388,59 +396,6 @@ class ChromeDriver():
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
 
-    def __rename_driver(self, file_name : str) -> Tuple[bool, str]:
-        """Renames chromedriver if it was given
-
-        Args:
-            file_name (str) : Path to the chromedriver
-
-        Returns:
-            Tuple of bool, str and bool
-
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        renamed_driver_path : str = ''
-        
-        try:
-
-            driver_folder_path = self.path + ChromeDriver._tmp_folder_path
-            logging.info(f'Created new directory for replacing name for chromedriver path: {driver_folder_path}')
-
-            if os.path.exists(driver_folder_path):
-                shutil.rmtree(driver_folder_path)
-
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(driver_folder_path)
-
-            old_chromedriver_path = driver_folder_path + os.path.sep + setting['ChromeDriver']['LastReleasePlatform']
-            new_chromedriver_path = driver_folder_path + os.path.sep + self.filename
-
-            os.rename(old_chromedriver_path, new_chromedriver_path)
-
-            renamed_driver_path = self.path + self.filename
-            if os.path.exists(renamed_driver_path):
-                os.remove(renamed_driver_path)
-
-            copyfile(new_chromedriver_path, renamed_driver_path)
-
-            if os.path.exists(driver_folder_path):
-                shutil.rmtree(driver_folder_path)
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run
-
     def __chmod_driver(self) -> Tuple[bool, str]:
         """Tries to give chromedriver needed permissions
 
@@ -617,13 +572,23 @@ class ChromeDriver():
 
             if not self.filename:
 
-                with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                    zip_ref.extractall(self.path)
+                archive_path = file_name
+                out_path = self.path
+                result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
 
             else:
 
-                result, message = self.__rename_driver(file_name=file_name)
+                archive_path = file_name
+                out_path = self.path
+                filename = setting['ChromeDriver']['LastReleasePlatform']
+                filename_replace = self.filename
+                result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
+                out_path=out_path, filename=filename, filename_replace=filename_replace)
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
 
             time.sleep(3)

@@ -1,6 +1,5 @@
 import json
 from selenium import webdriver
-import requests
 import wget
 import os
 import traceback
@@ -16,8 +15,6 @@ from typing import Tuple
 
 import requests
 
-import tarfile
-
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
@@ -26,16 +23,18 @@ from _setting import setting
 
 import platform
 
-import shutil
-from shutil import copyfile
-
 import stat
 
-import zipfile
+from util.extractor import Extractor
+
+try:
+    from util.github_viewer import GithubViewer
+except:
+    from selenium_driver_updater.selenium_driver_updater.util.github_viewer import GithubViewer
 
 class GeckoDriver():
 
-    _tmp_folder_path = 'tmp'
+    _repo_name = 'mozilla/geckodriver'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
                 info_messages : bool, filename : str, version : str):
@@ -78,6 +77,10 @@ class GeckoDriver():
         self.geckodriver_path : str =  path + setting['GeckoDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
+
+        self.extractor = Extractor
+
+        self.github_viewer = GithubViewer
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version
@@ -157,10 +160,10 @@ class GeckoDriver():
 
         try:
             
-            url = self.setting['GeckoDriver']['LinkLastRelease']
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
+            repo_name = GeckoDriver._repo_name
+            result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
+            if not result:
+                return result, message, latest_version
 
             latest_version = json_data.get('name')
 
@@ -225,33 +228,24 @@ class GeckoDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        filename_git : str = ''
+        asset_name : str = ''
         url : str = ''
         geckodriver_version : str = ''
 
         try:
             
-            url = self.setting['GeckoDriver']['LinkLastRelease']
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
+            repo_name = GeckoDriver._repo_name
+            asset_name = self.setting['GeckoDriver']['LinkLastReleasePlatform']
+            result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
+            if not result:
+                return result, message, file_name
 
-            geckodriver_version = json_data.get('name')
-
-            for asset in json_data.get('assets'):
-                if self.setting['GeckoDriver']['LinkLastReleasePlatform'] in asset.get('name'):
-                    filename_git = asset.get('name')
-                    url = asset.get('browser_download_url')
-                    break
-
-            if not filename_git:
-                message = (f"Geckodriver binary was not found, maybe unknown OS "
-                          f"LinkLastReleasePlatform: {self.setting['GeckoDriver']['LinkLastReleasePlatform']}" )
-                logging.error(message)
-                return False, message, file_name
+            geckodriver_version = data[0].get('version')
+            url = data[0].get('asset').get('browser_download_url')
+            asset_name = data[0].get('asset').get('name')
             
             logging.info(f'Started download geckodriver geckodriver_version: {geckodriver_version}')
-            out_path = self.path + filename_git
+            out_path = self.path + asset_name
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -266,25 +260,39 @@ class GeckoDriver():
 
             if not self.filename:
 
-                if filename_git.endswith('.tar.gz'):
+                if asset_name.endswith('.tar.gz'):
 
-                    with tarfile.open(file_name, "r:gz") as tar:
-                        tar.extractall(self.path)
+                    archive_path = file_name
+                    out_path = self.path
+                    result, message = self.extractor.extract_all_tar_gz_archive(archive_path=archive_path, out_path=out_path)
+                    if not result:
+                        logging.error(message)
+                        return result, message, file_name
 
-                elif filename_git.endswith('.zip'):
+                elif asset_name.endswith('.zip'):
 
-                    with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                        zip_ref.extractall(self.path)
+                    archive_path = file_name
+                    out_path = self.path
+                    result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+                    if not result:
+                        logging.error(message)
+                        return result, message, file_name
 
                 else:
-                    message = f'Unknown archive format was specified filename: {filename_git}'
+                    message = f'Unknown archive format was specified asset_name: {asset_name}'
                     logging.error(message)
                     return result_run, message, file_name
 
             else:
 
-                result, message = self.__rename_driver(file_name=file_name,filename_git=filename_git)
+                archive_path = file_name
+                out_path = self.path
+                filename = setting['GeckoDriver']['LastReleasePlatform']
+                filename_replace = self.filename
+                result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
+                out_path=out_path, filename=filename, filename_replace=filename_replace)
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
 
             time.sleep(3)
@@ -297,8 +305,6 @@ class GeckoDriver():
             logging.info(f'Geckodriver was successfully unpacked by path: {file_name}')
 
             result_run = True
-
-            logging.info(f'Geckodriver was successfully updated to the last version: {geckodriver_version}')
 
         except:
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
@@ -418,72 +424,6 @@ class GeckoDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
-
-    def __rename_driver(self, file_name : str, filename_git : str) -> Tuple[bool, str]:
-        """Renames geckodriver if it was given
-
-        Args:
-            file_name (str)     : Path to the geckodriver
-            filename_git (str)  : Name of geckodriver archive
-
-        Returns:
-            Tuple of bool, str and bool
-
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        renamed_driver_path : str = ''
-        
-        try:
-
-            driver_folder_path = self.path + GeckoDriver._tmp_folder_path
-            logging.info(f'Created new directory for replacing name for geckodriver path: {driver_folder_path}')
-
-            if os.path.exists(driver_folder_path):
-                shutil.rmtree(driver_folder_path)
-
-            if filename_git.endswith('.tar.gz'):
-
-                with tarfile.open(file_name, "r:gz") as tar:
-                    tar.extractall(driver_folder_path)
-
-            elif filename_git.endswith('.zip'):
-
-                with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                    zip_ref.extractall(driver_folder_path)
-
-            else:
-                message = f'Unknown archive format was specified filename: {filename_git}'
-                logging.error(message)
-                return result_run, message
-
-            old_geckodriver_path = driver_folder_path + os.path.sep + setting['GeckoDriver']['LastReleasePlatform']
-            new_geckodriver_path = driver_folder_path + os.path.sep + self.filename
-
-            os.rename(old_geckodriver_path, new_geckodriver_path)
-
-            renamed_driver_path = self.path + self.filename
-            if os.path.exists(renamed_driver_path):
-                os.remove(renamed_driver_path)
-
-            copyfile(new_geckodriver_path, renamed_driver_path)
-
-            if os.path.exists(driver_folder_path):
-                shutil.rmtree(driver_folder_path)
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run
 
     def __chmod_driver(self) -> Tuple[bool, str]:
         """Tries to give geckodriver needed permissions
@@ -633,33 +573,24 @@ class GeckoDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        filename_git : str = ''
         url : str = ''
+        asset_name : str = ''
 
         try:
 
-            url = self.setting["GeckoDriver"]["LinkAllReleases"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
+            repo_name = GeckoDriver._repo_name
+            asset_name = self.setting['GeckoDriver']['LinkLastReleasePlatform']
+            version = version
+            result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
+            asset_name=asset_name, version=version)
+            if not result:
+                return result, message, file_name
 
-            for release in json_data:
-                if version == release.get('name') or version in release.get('tag_name'):
-                    for asset in release.get('assets'):
-                        if self.setting['GeckoDriver']['LinkLastReleasePlatform'] in asset.get('name'):
-                            filename_git = asset.get('name')
-                            url = asset.get('browser_download_url')
-                            break
-
-            if not filename_git:
-                message = (f"Geckodriver binary was not found, maybe unknown OS or incorrect version "
-                           f"LinkLastReleasePlatform: {self.setting['GeckoDriver']['LinkLastReleasePlatform']} "
-                           f"specific_version: {version}" )
-                logging.error(message)
-                return False, message, file_name
+            url = data[0].get('asset').get('browser_download_url')
+            asset_name = data[0].get('asset').get('name')
             
             logging.info(f'Started download geckodriver specific_version: {version}')
-            out_path = self.path + filename_git
+            out_path = self.path + asset_name
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -674,25 +605,39 @@ class GeckoDriver():
 
             if not self.filename:
 
-                if filename_git.endswith('.tar.gz'):
+                if asset_name.endswith('.tar.gz'):
 
-                    with tarfile.open(file_name, "r:gz") as tar:
-                        tar.extractall(self.path)
+                    archive_path = file_name
+                    out_path = self.path
+                    result, message = self.extractor.extract_all_tar_gz_archive(archive_path=archive_path, out_path=out_path)
+                    if not result:
+                        logging.error(message)
+                        return result, message, file_name
 
-                elif filename_git.endswith('.zip'):
+                elif asset_name.endswith('.zip'):
 
-                    with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                        zip_ref.extractall(self.path)
+                    archive_path = file_name
+                    out_path = self.path
+                    result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+                    if not result:
+                        logging.error(message)
+                        return result, message, file_name
 
                 else:
-                    message = f'Unknown archive format was specified filename: {filename_git}'
+                    message = f'Unknown archive format was specified asset_name: {asset_name}'
                     logging.error(message)
                     return result_run, message, file_name
 
             else:
 
-                result, message = self.__rename_driver(file_name=file_name,filename_git=filename_git)
+                archive_path = file_name
+                out_path = self.path
+                filename = setting['GeckoDriver']['LastReleasePlatform']
+                filename_replace = self.filename
+                result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
+                out_path=out_path, filename=filename, filename_replace=filename_replace)
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
 
             time.sleep(3)

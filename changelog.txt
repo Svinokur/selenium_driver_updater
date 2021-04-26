@@ -1,3 +1,11 @@
+[1.8.0] 26/04/2021
+This version provides minor fixes.
+This code was written and tested on Python 3.9.4
+
+# Improvements
+
+- Improved functions decomposition.
+
 [1.7.1] 26/04/2021
 This version provides minor fixes.
 This code was written and tested on Python 3.9.4

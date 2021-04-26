@@ -15,8 +15,6 @@ from typing import Tuple
 
 import requests
 
-import zipfile
-
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
@@ -29,7 +27,12 @@ import stat
 
 from shutil import copyfile
 
+from util.extractor import Extractor
+from util.github_viewer import GithubViewer
+
 class OperaDriver():
+
+    _repo_name = 'operasoftware/operachromiumdriver'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
                 info_messages : bool, filename : str, version : str):
@@ -72,6 +75,10 @@ class OperaDriver():
         self.operadriver_path : str =  path + setting['OperaDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
+
+        self.extractor = Extractor
+
+        self.github_viewer = GithubViewer
 
     def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current operadriver version
@@ -149,11 +156,11 @@ class OperaDriver():
 
         try:
             
-            request = requests.get(self.setting['OperaDriver']['LinkLastRelease'], headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
+            repo_name = OperaDriver._repo_name
+            result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
+            if not result:
+                return result, message, latest_version
 
-            
             latest_version = json_data.get('name')
 
             logging.info(f'Latest version of operadriver: {latest_version}')
@@ -222,26 +229,18 @@ class OperaDriver():
         operadriver_version : str = ''
 
         try:
-            request = requests.get(self.setting['OperaDriver']['LinkLastRelease'], headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
 
-            operadriver_version = json_data.get('name')
+            repo_name = OperaDriver._repo_name
+            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform']
+            result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
+            if not result:
+                return result, message, file_name
 
-            for asset in json_data.get('assets'):
-                if self.setting['OperaDriver']['LinkLastReleasePlatform'] == asset.get('name'):
-                    filename_git = asset.get('name')
-                    url = asset.get('browser_download_url')
-                    break
-
-            if not filename_git:
-                message = (f"Operadriver binary was not found, maybe unknown OS"
-                          f"LinkLastReleasePlatform: {self.setting['OperaDriver']['LinkLastReleasePlatform']}")
-                logging.error(message)
-                return False, message, file_name
+            operadriver_version = data[0].get('version')
+            url = data[0].get('asset').get('browser_download_url')
             
             logging.info(f'Started download operadriver operadriver_version: {operadriver_version}')
-            out_path = self.path + filename_git
+            out_path = self.path + data[0].get('asset').get('name')
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -254,8 +253,12 @@ class OperaDriver():
 
             time.sleep(2)
 
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(self.path)
+            archive_path = file_name
+            out_path = self.path
+            result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+            if not result:
+                logging.error(message)
+                return result, message, file_name
 
             time.sleep(3)
 
@@ -281,9 +284,9 @@ class OperaDriver():
             
             file_name = self.operadriver_path
 
-            result_run = True
+            logging.info(f'Operadriver was successfully unpacked by path: {file_name}')
 
-            logging.info(f'Operadriver was successfully updated to the last version: {operadriver_version}')
+            result_run = True
 
         except:
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
@@ -438,7 +441,7 @@ class OperaDriver():
             if os.path.exists(renamed_driver_path):
                 os.remove(renamed_driver_path)
 
-            copyfile(new_path, self.path + self.filename)
+            copyfile(new_path, renamed_driver_path)
 
             result_run = True
 
@@ -593,33 +596,22 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        filename_git : str = ''
         url : str = ''
 
         try:
 
-            url = self.setting["OperaDriver"]["LinkAllReleases"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            json_data = json.loads(str(request_text))
+            repo_name = OperaDriver._repo_name
+            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform']
+            version = version
+            result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
+            asset_name=asset_name, version=version)
+            if not result:
+                return result, message, file_name
 
-            for release in json_data:
-                if version == release.get('name') or version in release.get('tag_name'):
-                    for asset in release.get('assets'):
-                        if self.setting['OperaDriver']['LinkLastReleasePlatform'] in asset.get('name'):
-                            filename_git = asset.get('name')
-                            url = asset.get('browser_download_url')
-                            break
-
-            if not filename_git:
-                message = (f"OperaDriver binary was not found, maybe unknown OS or incorrect version "
-                           f"LinkLastReleasePlatform: {self.setting['OperaDriver']['LinkLastReleasePlatform']} "
-                           f"specific_version: {version}" )
-                logging.error(message)
-                return False, message, file_name
+            url = data[0].get('asset').get('browser_download_url')
             
             logging.info(f'Started download operadriver specific_version: {version}')
-            out_path = self.path + filename_git
+            out_path = self.path + data[0].get('asset').get('name')
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -632,8 +624,12 @@ class OperaDriver():
 
             time.sleep(2)
 
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(self.path)
+            archive_path = file_name
+            out_path = self.path
+            result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+            if not result:
+                logging.error(message)
+                return result, message, file_name
 
             time.sleep(3)
 
