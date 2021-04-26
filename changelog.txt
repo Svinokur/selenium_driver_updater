@@ -1,4 +1,4 @@
-[1.8.2] 26/04/2021
+[1.8.1] 26/04/2021
 This version provides minor fixes.
 This code was written and tested on Python 3.9.4
 
