@@ -21,7 +21,7 @@ import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
-from setting import setting
+from _setting import setting
 
 import platform
 

@@ -5,7 +5,7 @@ import os.path
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-from setting import setting
+from _setting import setting
 from chromeDriver import ChromeDriver
 import time
 

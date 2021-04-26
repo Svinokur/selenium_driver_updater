@@ -5,7 +5,7 @@ import platform
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-from setting import setting
+from _setting import setting
 
 os_bit = platform.architecture()[0][:-3]
 
