@@ -21,7 +21,7 @@ keywords = ['chromedriver', 'operadriver',
  
 setup(
   name='selenium_driver_updater',
-  version='1.8.0',
+  version='1.8.1',
   description='Download or update your Selenium driver binaries automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 
@@ -31,6 +31,6 @@ setup(
   license='MIT', 
   classifiers=classifiers,
   keywords=keywords,
-  packages=['selenium_driver_updater'],
+  packages=['selenium_driver_updater', 'selenium_driver_updater/util'],
   install_requires=['wget', 'requests', 'selenium', 'beautifulsoup4', 'lxml', 'msedge-selenium-tools'] 
 )
