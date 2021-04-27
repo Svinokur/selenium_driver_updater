@@ -20,7 +20,7 @@ from selenium_driver_updater import DriverUpdater
 import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-result, message, filename = DriverUpdater.install(path=base_dir, driver=DriverUpdater.chromedriver, upgrade=True)
+result, message, filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True)
 print(filename)
 
 ```
