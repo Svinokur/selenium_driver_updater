@@ -96,6 +96,12 @@ class ChromeDriver():
             
             url = self.setting["ChromeDriver"]["LinkLastRelease"]
             request = requests.get(url=url, headers=self.headers)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                return result_run, message, latest_version
+
             latest_version = str(request.text)
 
             logging.info(f'Latest version of chromedriver: {latest_version}')

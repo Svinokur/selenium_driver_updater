@@ -158,6 +158,13 @@ class EdgeDriver():
             
             request = requests.get(self.setting['EdgeDriver']['LinkLastRelease'], headers=self.headers)
             request_text = request.text
+
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
+                return result_run, message, latest_version
+
             soup = BeautifulSoup(request_text, 'lxml')
 
             elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})

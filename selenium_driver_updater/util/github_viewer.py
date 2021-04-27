@@ -39,6 +39,12 @@ class GithubViewer():
 
             request = requests.get(url, headers=GithubViewer._headers)
             request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
+                return result_run, message, json_data
+
             json_data = json.loads(str(request_text))
 
             result_run = True
@@ -78,6 +84,12 @@ class GithubViewer():
 
             request = requests.get(url, headers=GithubViewer._headers)
             request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
+                return result_run, message, data
+                
             json_data = json.loads(str(request_text))
 
             version = json_data.get('name')
@@ -132,6 +144,12 @@ class GithubViewer():
 
             request = requests.get(url=url, headers=GithubViewer._headers)
             request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
+                return result_run, message, data
+                
             json_data = json.loads(str(request_text))
 
             for release in json_data:

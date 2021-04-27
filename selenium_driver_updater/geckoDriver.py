@@ -1,4 +1,3 @@
-import json
 from selenium import webdriver
 import wget
 import os
@@ -13,8 +12,6 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from typing import Tuple
 
-import requests
-
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
@@ -26,11 +23,8 @@ import platform
 import stat
 
 from util.extractor import Extractor
+from util.github_viewer import GithubViewer
 
-try:
-    from util.github_viewer import GithubViewer
-except:
-    from selenium_driver_updater.selenium_driver_updater.util.github_viewer import GithubViewer
 
 class GeckoDriver():
 

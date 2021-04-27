@@ -21,7 +21,7 @@ keywords = ['chromedriver', 'operadriver',
  
 setup(
   name='selenium_driver_updater',
-  version='1.8.1',
+  version='1.9.0',
   description='Download or update your Selenium driver binaries automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 

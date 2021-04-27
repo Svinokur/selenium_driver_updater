@@ -1,7 +1,5 @@
-import json
 import shutil
 from selenium import webdriver
-import requests
 import wget
 import os
 import traceback
@@ -12,8 +10,6 @@ from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
 from typing import Tuple
-
-import requests
 
 import sys
 import os.path
