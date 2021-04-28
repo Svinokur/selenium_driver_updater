@@ -9,7 +9,7 @@ import os
 
 import platform
 
-from typing import Tuple
+from typing import Any, Tuple
 
 import sys
 import os.path
@@ -24,12 +24,14 @@ from selenium.common.exceptions import WebDriverException
 
 from util.extractor import Extractor
 
+from bs4 import BeautifulSoup
+
 class ChromeDriver():
 
     _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str, version : str):
+                info_messages : bool, filename : str, version : str, check_browser_is_up_to_date : bool):
         """Class for working with Selenium chromedriver binary
 
         Args:
@@ -40,6 +42,7 @@ class ChromeDriver():
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version.
+            check_driver_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
         """
         self.setting = setting
 
@@ -71,6 +74,8 @@ class ChromeDriver():
         self.version = version
 
         self.extractor = Extractor
+        
+        self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
     def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
@@ -458,6 +463,15 @@ class ChromeDriver():
         
         try:
 
+            if self.check_browser_is_up_to_date:
+
+                if os.path.exists(self.chromedriver_path):
+
+                    result, message = self.__check_if_chrome_browser_is_up_to_date()
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
+
             if not self.version:
 
                 result, message, driver_path = self.__check_if_chromedriver_is_up_to_date()
@@ -615,3 +629,221 @@ class ChromeDriver():
             logging.error(message_run)
 
         return result_run, message_run, file_name
+
+    def __check_if_chrome_browser_is_up_to_date(self) -> Tuple[bool, str]:
+        """Сhecks for the latest version of chrome browser
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+            
+            chromebrowser_updater_path = str(setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+            if not chromebrowser_updater_path:
+                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                logging.info(message)
+                return True, message
+
+            result, message, current_version_chrome_browser = self.__get_current_version_chrome_browser_selenium()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            result, message, latest_version_chrome_browser = self.__get_latest_version_chrome_browser()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            if current_version_chrome_browser == latest_version_chrome_browser:
+                message = (f'Your existing chrome browser is up to date. '
+                f"current_version_chrome_browser: {current_version_chrome_browser} latest_version_chrome_browser: {latest_version_chrome_browser}")
+                logging.info(message)
+
+            elif current_version_chrome_browser != latest_version_chrome_browser:
+
+                result, message = self.__get_latest_chrome_browser_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                result, message, current_version_chrome_browser = self.__get_current_version_chrome_browser_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                result, message, latest_version_chrome_browser = self.__get_latest_version_chrome_browser()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                if current_version_chrome_browser != latest_version_chrome_browser:
+                    message = (f'Problem with updating chrome browser current_version_chrome_browser: {current_version_chrome_browser}'
+                    f'latest_version_chrome_browser: {latest_version_chrome_browser}')
+                    logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __get_current_version_chrome_browser_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current chrome browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current chrome browser version.
+
+        Raises:
+            SessionNotCreatedException: Occurs when current chromedriver could not start.
+
+            WebDriverException: Occurs when current chromedriver could not start or critical error occured.
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.chromedriver_path):
+
+                chrome_options = webdriver.ChromeOptions()
+        
+                chrome_options.add_argument('--headless')
+
+                driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
+                browser_version = str(driver.capabilities['browserVersion'])
+                driver.close()
+                driver.quit()
+
+                logging.info(f'Current version of chrome browser: {browser_version}')
+
+            result_run = True
+
+        except SessionNotCreatedException:
+            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except WebDriverException:
+            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_latest_version_chrome_browser(self) -> Tuple[bool, str, str]:
+        """Gets latest chrome browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            latest_version (str)    : Latest version of chrome browser.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_version : str = ''
+        latest_stable_version_element : Any = ''
+
+        try:
+            
+            url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
+            request = requests.get(url=url, headers=self.headers)
+            request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                return result_run, message, latest_version
+
+            soup = BeautifulSoup(request_text, 'html.parser')
+            elements_news = soup.findAll('div', attrs={'class' : 'post-body'})
+
+            for news in elements_news:
+                if 'The Stable channel has been updated to' in news.text:
+                    latest_stable_version_element = news
+                    break
+
+            if not latest_stable_version_element:
+                message = 'Could not determine latest version of Chrome Browser. Maybe the text The Stable channel has been updated to is changed'
+                logging.error(message)
+                return result_run, message, latest_version
+
+            latest_version = latest_stable_version_element.text.split('The Stable channel has been updated to ')[1].split(' for Windows')[0]
+
+            logging.info(f'Latest version of chrome browser: {latest_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_version
+
+    def __get_latest_chrome_browser_for_current_os(self) -> Tuple[bool, str]:
+        """Trying to update chrome browser to its latest version
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            message = f'Trying to update chrome browser to the latest version.'
+            logging.info(message)
+
+            os.system(setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+            time.sleep(20)
+            
+            message = f'Chrome browser was successfully updated to the latest version.'
+            logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run

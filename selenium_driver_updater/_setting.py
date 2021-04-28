@@ -42,6 +42,8 @@ edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windo
                              "msedgedriver"
 
 
+chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else ''
+
 
 setting = dict(
     {
@@ -70,6 +72,11 @@ setting = dict(
             "LinkLastRelease"           : 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/',
             "LinkLastReleaseFile"       : edgedriver_latest_release, 
             "LastReleasePlatform"       : edgedriver_platform_release,
+        },
+        "ChromeBrowser":
+        {
+            "LinkAllLatestRelease"  : 'https://chromereleases.googleblog.com',
+            'ChromeBrowserUpdater'  : chrome_browser_updater,
         }
     }
 )

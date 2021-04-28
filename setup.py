@@ -21,8 +21,8 @@ keywords = ['chromedriver', 'operadriver',
  
 setup(
   name='selenium_driver_updater',
-  version='1.9.0',
-  description='Download or update your Selenium driver binaries automatically with this package',
+  version='2.0.0',
+  description='Download or update your Selenium driver binaries and their browsers automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 
   url='https://github.com/Svinokur/selenium_driver_updater',  

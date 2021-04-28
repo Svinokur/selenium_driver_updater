@@ -175,7 +175,7 @@ class EdgeDriver():
                     break
 
             if not stable_channel_element:
-                message = 'Could not determine latest version of Edge Driver.'
+                message = 'Could not determine latest version of Edge Driver. Maybe the text stable ChannelCurrent is changed'
                 logging.error(message)
                 return result_run, message, latest_version
             

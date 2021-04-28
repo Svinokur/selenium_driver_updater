@@ -47,6 +47,8 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
+chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else ''
+
 class testSetting(unittest.TestCase): 
     """Class for unit-testing settings
 
@@ -67,7 +69,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 4)
+        self.assertEqual(len(self.setting), 5)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
@@ -75,6 +77,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
+        self.assertEqual(len(self.setting["ChromeBrowser"]), 2)
     
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
@@ -96,6 +99,9 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
+
+        self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com')
+        self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

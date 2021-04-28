@@ -1,3 +1,11 @@
+[2.0.0] 28/04/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added support for updating chrome browser for Windows
+
 [1.9.0] 27/04/2021
 This version provides minor fixes and improvements.
 This code was written and tested on Python 3.9.4

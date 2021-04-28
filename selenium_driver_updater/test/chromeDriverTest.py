@@ -24,7 +24,8 @@ class testChromeDriver(unittest.TestCase):
     def setUp(self):
         path = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
         self.chrome_driver = ChromeDriver(path=path, upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver_test', version='')
+        check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver_test', version='', 
+        check_browser_is_up_to_date = False)
         self.startTime : float = time.time()
         self.setting = setting
 

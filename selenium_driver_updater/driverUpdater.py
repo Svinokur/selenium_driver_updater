@@ -17,7 +17,7 @@ class DriverUpdater():
         
     @staticmethod
     def install(path : str, driver_name : str, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, 
-                info_messages : bool = True, filename : str = '', version : str = '') -> Tuple[bool, str, str]:
+                info_messages : bool = True, filename : str = '', version : str = '', check_browser_is_up_to_date : bool = False) -> Tuple[bool, str, str]:
         """Function for install or update Selenium driver binary
 
         Args:
@@ -29,13 +29,14 @@ class DriverUpdater():
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver. Defaults to empty string.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version. Defaults to empty string.
+            check_driver_is_up_to_date (bool)   : If true, it will check browser version before specific driver update/upgrade. Defaults to False.
 
         Returns:
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_path (str) : Path where Selenium driver binary was downloaded or updated.
+            driver_path (str)       : Path where Selenium driver binary was downloaded or updated.
 
         Raises:
             Except: If unexpected error raised. 
@@ -66,7 +67,8 @@ class DriverUpdater():
 
                 chrome_driver = ChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                             check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                            info_messages=info_messages, filename=filename, version=version)
+                                            info_messages=info_messages, filename=filename, version=version,
+                                            check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = chrome_driver.main()
                 if not result:
                     logging.error(message)

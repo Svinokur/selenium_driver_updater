@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/selenium-driver-updater.svg)](https://badge.fury.io/py/selenium-driver-updater)
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/Svinokur/selenium_driver_updater/master/LICENSE)
 
-It is a fast and convenience package that can automatically download or update Selenium webdriver binaries for different OS.
+It is a fast and convenience package that can automatically download or update Selenium webdriver binaries and their browsers for different OS.
 
 ## Installation
 
@@ -53,3 +53,9 @@ print(filename)
 - Linux
 - MacOS
 - ARM
+
+# Supported browsers for updates
+
+## Chrome Browser
+
+- Windows
