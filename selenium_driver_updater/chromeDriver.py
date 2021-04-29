@@ -69,7 +69,7 @@ class ChromeDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
-        self.chromedriver_path : str =  path + setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
+        self.chromedriver_path : str =  path + self.setting['ChromeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
 
@@ -204,7 +204,7 @@ class ChromeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['ChromeDriver']['LastReleasePlatform']
+                filename = self.setting['ChromeDriver']['LastReleasePlatform']
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)
@@ -603,7 +603,7 @@ class ChromeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['ChromeDriver']['LastReleasePlatform']
+                filename = self.setting['ChromeDriver']['LastReleasePlatform']
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)
@@ -648,9 +648,14 @@ class ChromeDriver():
         
         try:
             
-            chromebrowser_updater_path = str(setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+            chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
             if not chromebrowser_updater_path:
                 message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                logging.info(message)
+                return True, message
+
+            if not os.path.exists(chromebrowser_updater_path):
+                message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to GoogleUpdate file in repository.'
                 logging.info(message)
                 return True, message
 
@@ -785,7 +790,7 @@ class ChromeDriver():
             status_code = request.status_code
 
             if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
                 return result_run, message, latest_version
 
             soup = BeautifulSoup(request_text, 'html.parser')
@@ -834,8 +839,8 @@ class ChromeDriver():
             message = f'Trying to update chrome browser to the latest version.'
             logging.info(message)
 
-            os.system(setting["ChromeBrowser"]["ChromeBrowserUpdater"])
-            time.sleep(20)
+            os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+            time.sleep(15) #wait for the updating
             
             message = f'Chrome browser was successfully updated to the latest version.'
             logging.info(message)

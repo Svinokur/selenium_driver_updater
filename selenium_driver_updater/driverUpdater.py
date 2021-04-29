@@ -88,7 +88,8 @@ class DriverUpdater():
 
                 opera_driver = OperaDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                        info_messages=info_messages, filename=filename, version=version)
+                                        info_messages=info_messages, filename=filename, version=version,
+                                        check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = opera_driver.main()
                 if not result:
                     logging.error(message)
@@ -98,7 +99,8 @@ class DriverUpdater():
 
                 edge_driver = EdgeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                     check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                    info_messages=info_messages, filename=filename, version=version)
+                                    info_messages=info_messages, filename=filename, version=version,
+                                    check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = edge_driver.main()
                 if not result:
                     logging.error(message)

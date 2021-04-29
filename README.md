@@ -59,3 +59,11 @@ print(filename)
 ## Chrome Browser
 
 - Windows
+
+## Opera Browser
+
+- Windows
+
+## Edge Browser
+
+- Windows

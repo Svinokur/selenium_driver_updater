@@ -33,7 +33,7 @@ class EdgeDriver():
     _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str, version : str):
+                info_messages : bool, filename : str, version : str, check_browser_is_up_to_date : bool):
         """Class for working with Selenium edgedriver binary
 
         Args:
@@ -44,6 +44,7 @@ class EdgeDriver():
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for edgedriver. If given, it will replace name for edgedriver.
             version (str)                       : Specific version for edgedriver. If given, it will downloads given version.
+            check_driver_is_up_to_date (bool)   : If true, it will check edge browser version before edgedriver update/upgrade.
         """
         self.setting = setting
 
@@ -70,11 +71,13 @@ class EdgeDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
-        self.edgedriver_path : str =  path + setting['EdgeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
+        self.edgedriver_path : str =  path + self.setting['EdgeDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
 
         self.extractor = Extractor
+
+        self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
     def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current edgedriver version
@@ -277,7 +280,7 @@ class EdgeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['EdgeDriver']['LastReleasePlatform']
+                filename = self.setting['EdgeDriver']['LastReleasePlatform']
                 filename_replace = self.filename
 
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
@@ -305,7 +308,7 @@ class EdgeDriver():
         return result_run, message_run, file_name
     
     def __check_if_edgedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
-        """Main function, checks for the latest version, downloads or updates edgedriver binary
+        """Checks for the latest version, downloads or updates edgedriver binary
 
         Returns:
             Tuple of bool, str and str
@@ -479,6 +482,15 @@ class EdgeDriver():
         
         try:
 
+            if self.check_browser_is_up_to_date:
+
+                if os.path.exists(self.edgedriver_path):
+
+                    result, message = self.__check_if_edge_browser_is_up_to_date()
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
+
             if not self.version:
 
                 result, message, driver_path = self.__check_if_edgedriver_is_up_to_date()
@@ -606,7 +618,7 @@ class EdgeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['EdgeDriver']['LastReleasePlatform']
+                filename = self.setting['EdgeDriver']['LastReleasePlatform']
                 filename_replace = self.filename
 
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
@@ -632,3 +644,211 @@ class EdgeDriver():
             logging.error(message_run)
 
         return result_run, message_run, file_name
+
+    def __check_if_edge_browser_is_up_to_date(self) -> Tuple[bool, str]:
+        """Сhecks for the latest version of edge browser
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            edgebrowser_updater_path = str(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"])
+            if not edgebrowser_updater_path:
+                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                logging.info(message)
+                return True, message
+
+            if not os.path.exists(edgebrowser_updater_path):
+                message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to MicrosoftEdgeUpdate file in repository.'
+                logging.info(message)
+                return True, message
+
+            result, message, current_version_edge_browser = self.__get_current_version_edge_browser_selenium()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            result, message, latest_version_edge_browser = self.__get_latest_version_edge_browser()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            if current_version_edge_browser == latest_version_edge_browser:
+                message = (f'Your existing edge browser is up to date. '
+                f"current_version_edge_browser: {current_version_edge_browser} latest_version_edge_browser: {latest_version_edge_browser}")
+                logging.info(message)
+
+            elif current_version_edge_browser != latest_version_edge_browser:
+
+                result, message = self.__get_latest_edge_browser_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                result, message, current_version_edge_browser = self.__get_current_version_edge_browser_selenium()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                result, message, latest_version_edge_browser = self.__get_latest_version_edge_browser()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                if current_version_edge_browser != latest_version_edge_browser:
+                    message = (f'Problem with updating edge browser current_version_edge_browser: {current_version_edge_browser}'
+                    f'latest_version_edge_browser: {latest_version_edge_browser}')
+                    logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __get_current_version_edge_browser_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current edge browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current edge browser version.
+
+        Raises:
+            SessionNotCreatedException: Occurs when current edgedriver could not start.
+
+            WebDriverException: Occurs when current edgedriver could not start or critical error occured.
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.edgedriver_path):
+
+                desired_cap = {}
+
+                driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
+                browser_version = str(driver.capabilities['browserVersion'])
+                driver.close()
+                driver.quit()
+
+                logging.info(f'Current version of edge browser: {browser_version}')
+
+            result_run = True
+
+        except SessionNotCreatedException:
+            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except WebDriverException:
+            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
+        """Gets latest edge browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            latest_version (str)    : Latest version of edge browser.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_version : str = ''
+
+        try:
+
+            url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
+            request = requests.get(url=url, headers=self.headers)
+            request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
+                return result_run, message, latest_version
+
+            soup = BeautifulSoup(request_text, 'html.parser')
+            latest_version = soup.findAll('h2')[0].text.split(': ')[0].split(' ')[1]
+            
+            logging.info(f'Latest version of edge browser: {latest_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_version
+
+    def __get_latest_edge_browser_for_current_os(self) -> Tuple[bool, str]:
+        """Trying to update edge browser to its latest version
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            message = f'Trying to update edge browser to the latest version.'
+            logging.info(message)
+
+            os.system(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"])
+            time.sleep(15) #wait for the updating
+            
+            message = f'Edge browser was successfully updated to the latest version.'
+            logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run

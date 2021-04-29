@@ -43,7 +43,13 @@ edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windo
 
 
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else ''
+chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else ''
 
+edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else ''
+edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else ''
+
+opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else ''
+opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else ''
 
 setting = dict(
     {
@@ -75,8 +81,22 @@ setting = dict(
         },
         "ChromeBrowser":
         {
-            "LinkAllLatestRelease"  : 'https://chromereleases.googleblog.com',
-            'ChromeBrowserUpdater'  : chrome_browser_updater,
+            "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com',
+            'ChromeBrowserUpdater'      : chrome_browser_updater,
+            'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
+        },
+        "EdgeBrowser":
+        {
+            "LinkAllLatestRelease"          : 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel',
+            'EdgeBrowserUpdater'            : edge_browser_updater,
+            'EdgeBrowserUpdaterPath'        : edge_browser_updater_path,
+        },
+        "OperaBrowser":
+        {
+            'LinkAllReleases'               : 'https://blogs.opera.com/desktop/?s=changelog',
+            "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
+            "OperaBrowserUpdater"           : opera_browser_updater,
+            'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
         }
     }
 )

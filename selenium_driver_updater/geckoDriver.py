@@ -68,7 +68,7 @@ class GeckoDriver():
         self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
                         filename
 
-        self.geckodriver_path : str =  path + setting['GeckoDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
+        self.geckodriver_path : str =  path + self.setting['GeckoDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
 
         self.version = version
 
@@ -281,7 +281,7 @@ class GeckoDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['GeckoDriver']['LastReleasePlatform']
+                filename = self.setting['GeckoDriver']['LastReleasePlatform']
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)
@@ -626,7 +626,7 @@ class GeckoDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = setting['GeckoDriver']['LastReleasePlatform']
+                filename = self.setting['GeckoDriver']['LastReleasePlatform']
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)
