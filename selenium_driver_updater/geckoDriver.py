@@ -25,13 +25,16 @@ import stat
 from util.extractor import Extractor
 from util.github_viewer import GithubViewer
 
+import requests
+from bs4 import BeautifulSoup
+import re
 
 class GeckoDriver():
 
     _repo_name = 'mozilla/geckodriver'
     
     def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str, version : str):
+                info_messages : bool, filename : str, version : str, check_browser_is_up_to_date : bool):
         """Class for working with Selenium geckodriver binary
 
         Args:
@@ -42,6 +45,7 @@ class GeckoDriver():
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for geckodriver. If given, it will replace name for geckodriver.
             version (str)                       : Specific version for geckodriver. If given, it will downloads given version.
+            check_driver_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
         """
         self.setting = setting
 
@@ -75,6 +79,8 @@ class GeckoDriver():
         self.extractor = Extractor
 
         self.github_viewer = GithubViewer
+
+        self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version
@@ -475,6 +481,15 @@ class GeckoDriver():
         
         try:
 
+            if self.check_browser_is_up_to_date:
+
+                if os.path.exists(self.geckodriver_path):
+
+                    result, message = self.__check_if_firefox_browser_is_up_to_date()
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
+
             if not self.version:
 
                 result, message, driver_path = self.__check_if_geckodriver_is_up_to_date()
@@ -649,3 +664,249 @@ class GeckoDriver():
             logging.error(message_run)
 
         return result_run, message_run, file_name
+
+    def __check_if_firefox_browser_is_up_to_date(self) -> Tuple[bool, str]:
+        """Сhecks for the latest version of firefox browser
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            firefoxbrowser_updater_path = str(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"])
+            if not firefoxbrowser_updater_path:
+                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                logging.info(message)
+                return True, message
+
+            if not os.path.exists(firefoxbrowser_updater_path):
+                message = f'firefoxbrowser_updater_path: {firefoxbrowser_updater_path} is not exists. Please report your OS information and path to {firefoxbrowser_updater_path} file in repository.'
+                logging.info(message)
+                return True, message
+
+            result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            if not is_browser_up_to_date:
+
+                result, message = self.__get_latest_firefox_browser_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                if not is_browser_up_to_date:
+                    message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
+                    logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __get_current_version_firefox_browser_selenium(self) -> Tuple[bool, str, str]:
+        """Gets current firefox browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current chrome browser version.
+
+        Raises:
+            SessionNotCreatedException: Occurs when current geckodriver could not start.
+
+            WebDriverException: Occurs when current geckodriver could not start or critical error occured.
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.geckodriver_path):
+
+                options = FirefoxOptions()
+                options.add_argument("--headless")
+
+                driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
+                browser_version = str(driver.capabilities['browserVersion'])
+                driver.close()
+                driver.quit()
+
+                logging.info(f'Current version of firefox browser: {browser_version}')
+
+            result_run = True
+
+        except SessionNotCreatedException:
+            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except WebDriverException:
+            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, browser_version
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
+        """Gets latest firefox browser version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            latest_version (str)    : Latest version of firefox browser.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_version : str = ''
+
+        try:
+            
+            url = self.setting["FirefoxBrowser"]["LinkAllLatestReleases"]
+            request = requests.get(url=url, headers=self.headers)
+            request_text = request.text
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
+                return result_run, message, latest_version
+
+            soup = BeautifulSoup(request_text, 'html.parser')
+            element_releases_list = soup.findAll('ol', attrs={'class' : 'c-release-list'})[0]
+
+            all_releases_elements = element_releases_list.findAll('a', attrs={'href' : re.compile('/releasenotes/')})
+            all_releases = []
+
+            [all_releases.append(release.text) for release in all_releases_elements]
+            all_releases.sort(key=lambda s: list(map(int, s.split('.'))), reverse=True)
+
+            latest_version = all_releases[0]
+            
+            logging.info(f'Latest version of firefox browser: {latest_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_version
+
+    def __get_latest_firefox_browser_for_current_os(self) -> Tuple[bool, str]:
+        """Trying to update firefox browser to its latest version
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        
+        try:
+
+            message = f'Trying to update firefox browser to the latest version.'
+            logging.info(message)
+
+            os.system(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"])
+            time.sleep(25) #wait for the updating
+            
+            message = f'Firefox browser was successfully updated to the latest version.'
+            logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    def __compare_current_version_and_latest_version_firefox_browser(self) -> Tuple[bool, str, bool, str, str]:
+        """Compares current version of firefox browser to latest version
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            is_browser_up_to_date (bool)    : If true current version of firefox browser is up to date. Defaults to False.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        is_browser_up_to_date : bool = False
+        current_version : str = ''
+        latest_version : str = ''
+        
+        try:
+
+            result, message, current_version = self.__get_current_version_firefox_browser_selenium()
+            if not result:
+                logging.error(message)
+                return result, message, is_browser_up_to_date, current_version, latest_version
+
+            result, message, latest_version = self.__get_latest_version_firefox_browser()
+            if not result:
+                logging.error(message)
+                return result, message, is_browser_up_to_date, current_version, latest_version
+
+            if current_version == latest_version:
+                is_browser_up_to_date = True
+                message = f"Your existing firefox browser is up to date. current_version: {current_version} latest_version: {latest_version}"
+                logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, is_browser_up_to_date, current_version, latest_version

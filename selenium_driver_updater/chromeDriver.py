@@ -655,45 +655,29 @@ class ChromeDriver():
                 return True, message
 
             if not os.path.exists(chromebrowser_updater_path):
-                message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to GoogleUpdate file in repository.'
+                message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
 
-            result, message, current_version_chrome_browser = self.__get_current_version_chrome_browser_selenium()
+            result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
             if not result:
                 logging.error(message)
                 return result, message
 
-            result, message, latest_version_chrome_browser = self.__get_latest_version_chrome_browser()
-            if not result:
-                logging.error(message)
-                return result, message
-
-            if current_version_chrome_browser == latest_version_chrome_browser:
-                message = (f'Your existing chrome browser is up to date. '
-                f"current_version_chrome_browser: {current_version_chrome_browser} latest_version_chrome_browser: {latest_version_chrome_browser}")
-                logging.info(message)
-
-            elif current_version_chrome_browser != latest_version_chrome_browser:
+            if not is_browser_up_to_date:
 
                 result, message = self.__get_latest_chrome_browser_for_current_os()
                 if not result:
                     logging.error(message)
                     return result, message
 
-                result, message, current_version_chrome_browser = self.__get_current_version_chrome_browser_selenium()
+                result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
                 if not result:
                     logging.error(message)
                     return result, message
 
-                result, message, latest_version_chrome_browser = self.__get_latest_version_chrome_browser()
-                if not result:
-                    logging.error(message)
-                    return result, message
-
-                if current_version_chrome_browser != latest_version_chrome_browser:
-                    message = (f'Problem with updating chrome browser current_version_chrome_browser: {current_version_chrome_browser}'
-                    f'latest_version_chrome_browser: {latest_version_chrome_browser}')
+                if not is_browser_up_to_date:
+                    message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
                     logging.info(message)
 
             result_run = True
@@ -852,3 +836,48 @@ class ChromeDriver():
             logging.error(message_run)
 
         return result_run, message_run
+
+    def __compare_current_version_and_latest_version_chrome_browser(self) -> Tuple[bool, str, bool, str, str]:
+        """Compares current version of chrome browser to latest version
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            is_browser_up_to_date (bool)    : If true current version of chrome browser is up to date. Defaults to False.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        is_browser_up_to_date : bool = False
+        current_version : str = ''
+        latest_version : str = ''
+        
+        try:
+
+            result, message, current_version = self.__get_current_version_chrome_browser_selenium()
+            if not result:
+                logging.error(message)
+                return result, message, is_browser_up_to_date, current_version, latest_version
+
+            result, message, latest_version = self.__get_latest_version_chrome_browser()
+            if not result:
+                logging.error(message)
+                return result, message, is_browser_up_to_date, current_version, latest_version
+
+            if current_version == latest_version:
+                is_browser_up_to_date = True
+                message = f"Your existing chrome browser is up to date. current_version: {current_version} latest_version: {latest_version}"
+                logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, is_browser_up_to_date, current_version, latest_version
