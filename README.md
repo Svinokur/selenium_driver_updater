@@ -2,7 +2,10 @@
 
 [![PyPI version](https://badge.fury.io/py/selenium-driver-updater.svg)](https://badge.fury.io/py/selenium-driver-updater)
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/Svinokur/selenium_driver_updater/master/LICENSE)
+[![Downloads](https://pepy.tech/badge/selenium-driver-updater)](https://pepy.tech/project/selenium-driver-updater)
+[![Downloads](https://pepy.tech/badge/selenium-driver-updater/month)](https://pepy.tech/project/selenium-driver-updater)
 [![Downloads](https://pepy.tech/badge/selenium-driver-updater/week)](https://pepy.tech/project/selenium-driver-updater)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xf2691CC12a70B4589edf081E059fD4A1c457417D)](https://en.cryptobadges.io/donate/0xf2691CC12a70B4589edf081E059fD4A1c457417D)
 
 It is a fast and convenience package that can automatically download or update Selenium webdriver binaries and their browsers for different OS.
 
@@ -64,6 +67,7 @@ print(filename)
 
 ## Firefox Browser
 
+- Windows
 - MacOS
 
 ## Opera Browser

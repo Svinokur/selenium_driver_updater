@@ -54,10 +54,10 @@ chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.e
 chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
 
-firefox_browser_updater = '' if platform.system() == 'Windows' else \
+firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
 'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
 
-firefox_browser_updater_path = "" if platform.system() == 'Windows' else \
+firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else \
 '/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \

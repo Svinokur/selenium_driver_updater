@@ -1,3 +1,19 @@
+[2.3.0] 01/05/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added support for updating firefox browser for Windows
+
+# Improvements
+
+- Improved unit-tests by chromedriver
+
+# Operations
+
+- Excluded unneccessary files in final package
+
 [2.2.0] 30/04/2021
 This version provides innovations and minor improvements.
 This code was written and tested on Python 3.9.4

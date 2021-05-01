@@ -853,7 +853,7 @@ class GeckoDriver():
             logging.info(message)
 
             os.system(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"])
-            time.sleep(25) #wait for the updating
+            time.sleep(60) #wait for the updating - too long
             
             message = f'Firefox browser was successfully updated to the latest version.'
             logging.info(message)
