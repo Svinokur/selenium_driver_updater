@@ -1,3 +1,15 @@
+[2.4.0] 02/05/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added unit-tests by all classes in /util folder
+
+# Improvements
+
+- Improved unit-tests by all drivers
+
 [2.3.0] 01/05/2021
 This version provides innovations and minor improvements.
 This code was written and tested on Python 3.9.4

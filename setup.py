@@ -18,11 +18,12 @@ keywords = ['chromedriver', 'operadriver',
             'selenium-python', 'selenium-driver',
             'geckodriver', 'geckodriver-binary',
             'operadriver-binary', 'edgedriver-binary',
-            'safaridriver-binary', 'chromebrowser', 'chrome-browser', 'firefox']
+            'safaridriver-binary', 'chromebrowser', 'chrome-browser', 'firefox',
+            'firefox-browser', 'selenium-update', 'selenium-updater', 'updater']
  
 setup(
   name='selenium_driver_updater',
-  version='2.3.0',
+  version='2.4.0',
   description='Download or update your Selenium driver binaries and their browsers automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 

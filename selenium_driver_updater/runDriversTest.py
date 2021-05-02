@@ -14,6 +14,8 @@ from test import chromeDriverTest
 from test import geckoDriverTest
 from test import operaDriverTest
 from test import edgeDriverTest
+from test import githubViewerTest
+from test import extractorTest
 
 #refresh logger sometimes issue with writing log file
 for handler in logging.root.handlers[:]:
@@ -44,6 +46,8 @@ try:
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver))
     testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
+    testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
+    testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     
     
     runner = unittest.TextTestRunner(verbosity=2, failfast=True)
