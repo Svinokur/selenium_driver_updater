@@ -1,0 +1,5 @@
+selenium
+wget
+requests
+jsonschema
+beautifulsoup4

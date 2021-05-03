@@ -1,6 +1,8 @@
 import os
 import platform
 
+base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
+
 os_bit = platform.architecture()[0][:-3]
 
 latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
@@ -117,6 +119,10 @@ setting = dict(
             "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
             "OperaBrowserUpdater"           : opera_browser_updater,
             'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
-        }
+        },
+        "JsonSchema":
+        {
+            "githubAssetSchema" : base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json',
+        },
     }
 )

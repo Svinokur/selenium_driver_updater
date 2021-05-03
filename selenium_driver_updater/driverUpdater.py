@@ -16,8 +16,7 @@ class DriverUpdater():
     edgedriver = 'edgedriver'
         
     @staticmethod
-    def install(path : str, driver_name : str, upgrade : bool = False, chmod : bool = True, check_driver_is_up_to_date : bool = False, 
-                info_messages : bool = True, filename : str = '', version : str = '', check_browser_is_up_to_date : bool = False) -> Tuple[bool, str, str]:
+    def install(**kwargs):
         """Function for install or update Selenium driver binary
 
         Args:
@@ -47,14 +46,16 @@ class DriverUpdater():
         message_run : str = ''
         driver_path : str = ''
 
-        path = os.path.abspath(path) + os.path.sep
+        path : str = kwargs.get('path', '')
+        path : str = os.path.abspath(path) + os.path.sep if path else ''
 
-        driver_name =   DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
-                        DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
-                        DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
-                        DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else '' 
+        driver_name_specific : str = kwargs.get('driver_name', '')
+        driver_name : str =   DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name_specific else \
+                        DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name_specific else \
+                        DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name_specific else \
+                        DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name_specific else '' 
 
-        filename = filename.replace('.', '')
+        filename : str = str(kwargs.get('filename', '')).replace('.', '')
 
         try:
 
@@ -62,6 +63,13 @@ class DriverUpdater():
             if not result:
                 logging.error(message)
                 return result, message, driver_path
+
+            upgrade = kwargs.get('upgrade', False)
+            chmod = kwargs.get('chmod', True)
+            check_driver_is_up_to_date = kwargs.get('check_driver_is_up_to_date', False)
+            info_messages = kwargs.get('info_messages', True)
+            version = kwargs.get('version', '')
+            check_browser_is_up_to_date = kwargs.get('check_browser_is_up_to_date', False)
 
             if DriverUpdater.chromedriver == driver_name:
 
@@ -133,6 +141,11 @@ class DriverUpdater():
         message_run : str = ''
 
         try:
+
+            if not path:
+                message = f"Please specify path to folder current path is: {path}"
+                logging.error(message)
+                return result_run, message
 
             if not os.path.exists(path):
                 message = f"The specified path does not exist current path is: {path}"

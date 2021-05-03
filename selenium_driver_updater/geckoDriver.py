@@ -33,8 +33,7 @@ class GeckoDriver():
 
     _repo_name = 'mozilla/geckodriver'
     
-    def __init__(self, path : str, upgrade : bool, chmod : bool, check_driver_is_up_to_date : bool, 
-                info_messages : bool, filename : str, version : str, check_browser_is_up_to_date : bool):
+    def __init__(self, **kwargs):
         """Class for working with Selenium geckodriver binary
 
         Args:
@@ -49,15 +48,15 @@ class GeckoDriver():
         """
         self.setting = setting
 
-        self.path : str = path
+        self.path : str = str(kwargs.get('path'))
                     
-        self.upgrade : bool = upgrade
+        self.upgrade : bool = bool(kwargs.get('upgrade'))
 
-        self.chmod : bool = chmod
+        self.chmod : bool = bool(kwargs.get('chmod'))
 
-        self.check_driver_is_up_to_date = check_driver_is_up_to_date
+        self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.info_messages = info_messages
+        self.info_messages = bool(kwargs.get('info_messages'))
 
         if self.info_messages:
             logging.basicConfig(level=logging.INFO)
@@ -68,19 +67,20 @@ class GeckoDriver():
                         Chrome/35.0.1916.47 Safari/537.36'
 
         self.headers = {'User-Agent': user_agent}
+        
+        specific_filename = str(kwargs.get('filename'))
+        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                        specific_filename
 
-        self.filename = f"{filename}.exe" if platform.system() == 'Windows' and filename else\
-                        filename
+        self.geckodriver_path : str =  self.path + self.setting['GeckoDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
-        self.geckodriver_path : str =  path + self.setting['GeckoDriver']['LastReleasePlatform'] if not filename else self.path + self.filename
-
-        self.version = version
+        self.version = str(kwargs.get('version'))
 
         self.extractor = Extractor
 
         self.github_viewer = GithubViewer
 
-        self.check_browser_is_up_to_date = check_browser_is_up_to_date
+        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version

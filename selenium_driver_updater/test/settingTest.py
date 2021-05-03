@@ -8,6 +8,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 
 from _setting import setting
 
+base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
+
 os_bit = platform.architecture()[0][:-3]
 
 latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
@@ -92,7 +94,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 8)
+        self.assertEqual(len(self.setting), 9)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
@@ -104,6 +106,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 3)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 3)
         self.assertEqual(len(self.setting["OperaBrowser"]), 4)
+        self.assertEqual(len(self.setting["JsonSchema"]), 1)
     
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
@@ -142,6 +145,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"], 'https://blogs.opera.com/desktop/changelog-for-{}/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
+
+        self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

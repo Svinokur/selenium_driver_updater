@@ -1,0 +1,344 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1620051379.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"url",
+		"id",
+		"node_id",
+		"name",
+		"label",
+		"uploader",
+		"content_type",
+		"state",
+		"size",
+		"download_count",
+		"created_at",
+		"updated_at",
+		"browser_download_url"
+	],
+	"properties": {
+		"url": {
+			"$id": "#root/url", 
+			"title": "Url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/releases/assets/34696770"
+			],
+			"pattern": "^.*$"
+		},
+		"id": {
+			"$id": "#root/id", 
+			"title": "Id", 
+			"type": "integer",
+			"examples": [
+				34696770
+			],
+			"default": 0
+		},
+		"node_id": {
+			"$id": "#root/node_id", 
+			"title": "Node_id", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"MDEyOlJlbGVhc2VBc3NldDM0Njk2Nzcw"
+			],
+			"pattern": "^.*$"
+		},
+		"name": {
+			"$id": "#root/name", 
+			"title": "Name", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"geckodriver-v0.29.1-win64.zip"
+			],
+			"pattern": "^.*$"
+		},
+		"label": {
+			"$id": "#root/label", 
+			"title": "Label", 
+			"type": "null",
+			"default": null
+		},
+		"uploader": {
+			"$id": "#root/uploader", 
+			"title": "Uploader", 
+			"type": "object",
+			"required": [
+				"login",
+				"id",
+				"node_id",
+				"avatar_url",
+				"gravatar_id",
+				"url",
+				"html_url",
+				"followers_url",
+				"following_url",
+				"gists_url",
+				"starred_url",
+				"subscriptions_url",
+				"organizations_url",
+				"repos_url",
+				"events_url",
+				"received_events_url",
+				"type",
+				"site_admin"
+			],
+			"properties": {
+				"login": {
+					"$id": "#root/uploader/login", 
+					"title": "Login", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"id": {
+					"$id": "#root/uploader/id", 
+					"title": "Id", 
+					"type": "integer",
+					"examples": [
+						129603
+					],
+					"default": 0
+				},
+				"node_id": {
+					"$id": "#root/uploader/node_id", 
+					"title": "Node_id", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"MDQ6VXNlcjEyOTYwMw=="
+					],
+					"pattern": "^.*$"
+				},
+				"avatar_url": {
+					"$id": "#root/uploader/avatar_url", 
+					"title": "Avatar_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://avatars.githubusercontent.com/u/129603?v=4"
+					],
+					"pattern": "^.*$"
+				},
+				"gravatar_id": {
+					"$id": "#root/uploader/gravatar_id", 
+					"title": "Gravatar_id", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"url": {
+					"$id": "#root/uploader/url", 
+					"title": "Url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"html_url": {
+					"$id": "#root/uploader/html_url", 
+					"title": "Html_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://github.com/whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"followers_url": {
+					"$id": "#root/uploader/followers_url", 
+					"title": "Followers_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/followers"
+					],
+					"pattern": "^.*$"
+				},
+				"following_url": {
+					"$id": "#root/uploader/following_url", 
+					"title": "Following_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/following{/other_user}"
+					],
+					"pattern": "^.*$"
+				},
+				"gists_url": {
+					"$id": "#root/uploader/gists_url", 
+					"title": "Gists_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/gists{/gist_id}"
+					],
+					"pattern": "^.*$"
+				},
+				"starred_url": {
+					"$id": "#root/uploader/starred_url", 
+					"title": "Starred_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/starred{/owner}{/repo}"
+					],
+					"pattern": "^.*$"
+				},
+				"subscriptions_url": {
+					"$id": "#root/uploader/subscriptions_url", 
+					"title": "Subscriptions_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/subscriptions"
+					],
+					"pattern": "^.*$"
+				},
+				"organizations_url": {
+					"$id": "#root/uploader/organizations_url", 
+					"title": "Organizations_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/orgs"
+					],
+					"pattern": "^.*$"
+				},
+				"repos_url": {
+					"$id": "#root/uploader/repos_url", 
+					"title": "Repos_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/repos"
+					],
+					"pattern": "^.*$"
+				},
+				"events_url": {
+					"$id": "#root/uploader/events_url", 
+					"title": "Events_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/events{/privacy}"
+					],
+					"pattern": "^.*$"
+				},
+				"received_events_url": {
+					"$id": "#root/uploader/received_events_url", 
+					"title": "Received_events_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/received_events"
+					],
+					"pattern": "^.*$"
+				},
+				"type": {
+					"$id": "#root/uploader/type", 
+					"title": "Type", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"User"
+					],
+					"pattern": "^.*$"
+				},
+				"site_admin": {
+					"$id": "#root/uploader/site_admin", 
+					"title": "Site_admin", 
+					"type": "boolean",
+					"examples": [
+						false
+					],
+					"default": true
+				}
+			}
+		}
+,
+		"content_type": {
+			"$id": "#root/content_type", 
+			"title": "Content_type", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"application/zip"
+			],
+			"pattern": "^.*$"
+		},
+		"state": {
+			"$id": "#root/state", 
+			"title": "State", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"uploaded"
+			],
+			"pattern": "^.*$"
+		},
+		"size": {
+			"$id": "#root/size", 
+			"title": "Size", 
+			"type": "integer",
+			"examples": [
+				1506049
+			],
+			"default": 0
+		},
+		"download_count": {
+			"$id": "#root/download_count", 
+			"title": "Download_count", 
+			"type": "integer",
+			"examples": [
+				132354
+			],
+			"default": 0
+		},
+		"created_at": {
+			"$id": "#root/created_at", 
+			"title": "Created_at", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"2021-04-09T08:21:20Z"
+			],
+			"pattern": "^.*$"
+		},
+		"updated_at": {
+			"$id": "#root/updated_at", 
+			"title": "Updated_at", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"2021-04-09T08:21:22Z"
+			],
+			"pattern": "^.*$"
+		},
+		"browser_download_url": {
+			"$id": "#root/browser_download_url", 
+			"title": "Browser_download_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip"
+			],
+			"pattern": "^.*$"
+		}
+	}
+}
+

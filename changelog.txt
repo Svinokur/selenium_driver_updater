@@ -1,3 +1,17 @@
+[2.5.0] 03/05/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.4
+
+# New
+
+- Added requirements.txt for github workflow (this will be not included in final package)
+- Added validating of json_data from github
+- Added **kwargs instead of many parameters
+
+# Improvements
+
+- Improved unit-tests by githubviewer
+
 [2.4.0] 02/05/2021
 This version provides innovations and minor improvements.
 This code was written and tested on Python 3.9.4
