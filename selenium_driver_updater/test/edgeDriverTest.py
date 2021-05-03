@@ -30,7 +30,7 @@ class testEdgeDriver(unittest.TestCase):
 
         self.edge_driver = EdgeDriver(path=self.path, upgrade=True, chmod=True, 
         check_driver_is_up_to_date = True, info_messages=True, filename='edgedriver_test', version='',
-        check_browser_is_up_to_date = True)
+        check_browser_is_up_to_date = False)
         
         self.startTime : float = time.time()
         self.setting = setting
@@ -76,13 +76,13 @@ class testEdgeDriver(unittest.TestCase):
     def test04_check_get_specific_version_edgedriver_for_current_os(self):
         result, message = self.edge_driver._EdgeDriver__delete_current_edgedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + 'edgedriver_test'))
+        self.assertFalse(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
 
         result, message, file_name = self.edge_driver._EdgeDriver__get_specific_version_edgedriver_for_current_os(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + 'edgedriver_test'))
+        self.assertTrue(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
 
         result, message = self.edge_driver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -104,7 +104,7 @@ class testEdgeDriver(unittest.TestCase):
     def test06_check_delete_current_edgedriver_for_current_os(self):
         result, message = self.edge_driver._EdgeDriver__delete_current_edgedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + 'edgedriver_test'))
+        self.assertFalse(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
 
     #@unittest.skip('Temporary not needed')
     def test07_check_get_latest_edgedriver_for_current_os(self):
@@ -117,7 +117,7 @@ class testEdgeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + 'edgedriver_test'))
+        self.assertTrue(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
 
         result, message = self.edge_driver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)

@@ -30,7 +30,7 @@ class testOperaDriver(unittest.TestCase):
 
         self.opera_driver = OperaDriver(path=self.path, upgrade=True, chmod=True, 
         check_driver_is_up_to_date = True, info_messages=True, filename='operadriver_test', version='',
-        check_browser_is_up_to_date = True)
+        check_browser_is_up_to_date = False)
         
         self.startTime : float = time.time()
         self.setting = setting
