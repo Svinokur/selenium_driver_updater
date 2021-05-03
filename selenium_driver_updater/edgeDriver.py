@@ -28,6 +28,8 @@ import stat
 
 from util.extractor import Extractor
 
+import pathlib
+
 class EdgeDriver():
 
     _tmp_folder_path = 'tmp'
@@ -217,7 +219,8 @@ class EdgeDriver():
 
             if os.path.exists(self.edgedriver_path):
                 logging.info(f'Deleted existing edgedriver edgedriver_path: {self.edgedriver_path}')
-                os.remove(self.edgedriver_path)
+                file_to_rem = pathlib.Path(self.edgedriver_path)
+                file_to_rem.unlink()
             
 
             result_run = True

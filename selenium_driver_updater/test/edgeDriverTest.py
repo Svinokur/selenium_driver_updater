@@ -9,6 +9,7 @@ from _setting import setting
 from edgeDriver import EdgeDriver
 import time
 import requests
+import platform
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,6 +41,9 @@ class testEdgeDriver(unittest.TestCase):
         self.headers = {'User-Agent': user_agent}
 
         self.specific_version : str = '90.0.818.49'
+
+        self.edgedriver_name : str = "edgedriver_test.exe" if platform.system() == 'Windows' else\
+                                        "edgedriver_test"
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -149,6 +153,7 @@ class testEdgeDriver(unittest.TestCase):
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
+    @unittest.skip('Temporary could not test it on Github Workflow')
     def test12_check_compare_current_version_and_latest_version_edge_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.edge_driver._EdgeDriver__compare_current_version_and_latest_version_edge_browser()
         self.assertTrue(result, message)

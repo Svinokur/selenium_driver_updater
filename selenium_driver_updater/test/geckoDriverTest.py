@@ -9,6 +9,7 @@ from _setting import setting
 from geckoDriver import GeckoDriver
 import time
 import requests
+import platform
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,6 +42,9 @@ class testGeckoDriver(unittest.TestCase):
 
         self.specific_version : str = '0.29.1'
 
+        self.geckodriver_name : str = "geckodriver_test.exe" if platform.system() == 'Windows' else\
+                                        "geckodriver_test"
+
     def tearDown(self):
         t = time.time() - self.startTime
         print("%.3f" % t)
@@ -65,13 +69,13 @@ class testGeckoDriver(unittest.TestCase):
     def test04_check_get_specific_version_geckodriver_for_current_os(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + 'geckodriver_test'))
+        self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
         result, message, file_name = self.gecko_driver._GeckoDriver__get_specific_version_geckodriver_for_current_os(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + 'geckodriver_test'))
+        self.assertTrue(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
         result, message = self.gecko_driver._GeckoDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -93,7 +97,7 @@ class testGeckoDriver(unittest.TestCase):
     def test06_check_delete_current_geckodriver_for_current_os(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + 'geckodriver_test'))
+        self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
     #@unittest.skip('Temporary not needed')
     def test07_check_get_latest_geckodriver_for_current_os(self):
@@ -101,7 +105,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + 'geckodriver_test'))
+        self.assertTrue(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
         result, message = self.gecko_driver._GeckoDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -137,6 +141,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
+    @unittest.skip('Temporary could not test it on Github Workflow')
     def test12_check_compare_current_version_and_latest_version_firefox_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.gecko_driver._GeckoDriver__compare_current_version_and_latest_version_firefox_browser()
         self.assertTrue(result, message)

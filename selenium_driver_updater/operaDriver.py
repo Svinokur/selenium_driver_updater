@@ -29,6 +29,8 @@ from util.github_viewer import GithubViewer
 from bs4 import BeautifulSoup
 import requests
 
+import pathlib
+
 class OperaDriver():
 
     _repo_name = 'operasoftware/operachromiumdriver'
@@ -197,7 +199,8 @@ class OperaDriver():
 
             if os.path.exists(self.operadriver_path):
                 logging.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
-                os.remove(self.operadriver_path)
+                file_to_rem = pathlib.Path(self.operadriver_path)
+                file_to_rem.unlink()
             
 
             result_run = True

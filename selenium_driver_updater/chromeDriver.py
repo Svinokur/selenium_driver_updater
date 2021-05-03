@@ -26,6 +26,8 @@ from util.extractor import Extractor
 
 from bs4 import BeautifulSoup
 
+import pathlib
+
 class ChromeDriver():
 
     _tmp_folder_path = 'tmp'
@@ -141,7 +143,8 @@ class ChromeDriver():
 
             if os.path.exists(self.chromedriver_path):
                 logging.info(f'Deleted existing chromedriver chromedriver_path: {self.chromedriver_path}')
-                os.remove(self.chromedriver_path)
+                file_to_rem = pathlib.Path(self.chromedriver_path)
+                file_to_rem.unlink()
             
 
             result_run = True
@@ -212,7 +215,7 @@ class ChromeDriver():
                     logging.error(message)
                     return result, message, file_name
 
-            time.sleep(3)
+            time.sleep(6)
 
             if os.path.exists(file_name):
                 os.remove(file_name)

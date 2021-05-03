@@ -29,6 +29,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+import pathlib
+
 class GeckoDriver():
 
     _repo_name = 'mozilla/geckodriver'
@@ -199,7 +201,8 @@ class GeckoDriver():
 
             if os.path.exists(self.geckodriver_path):
                 logging.info(f'Deleted existing geckodriver geckodriver_path: {self.geckodriver_path}')
-                os.remove(self.geckodriver_path)
+                file_to_rem = pathlib.Path(self.geckodriver_path)
+                file_to_rem.unlink()
             
 
             result_run = True

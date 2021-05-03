@@ -1,3 +1,15 @@
+[2.5.1] 03/05/2021
+This version provides minor fixes and improvements.
+This code was written and tested on Python 3.9.4
+
+# Improvements
+
+- Improved deletion of different Selenium driver binaries.
+
+# Operations
+
+- Turned off some tests that cannot run on github workflow.
+
 [2.5.0] 03/05/2021
 This version provides innovations and minor improvements.
 This code was written and tested on Python 3.9.4
