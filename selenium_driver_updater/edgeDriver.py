@@ -97,6 +97,8 @@ class EdgeDriver():
 
             WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
+            OSError: Occurs when chromedriver made for another CPU type
+
             Except: If unexpected error raised. 
 
         """
@@ -128,6 +130,11 @@ class EdgeDriver():
 
         except WebDriverException:
             message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, driver_version
+
+        except OSError:
+            message_run = f'OSError error: {str(traceback.format_exc())}' #probably [Errno 86] Bad CPU type in executable:
             logging.error(message_run)
             return True, message_run, driver_version
 
