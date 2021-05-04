@@ -98,7 +98,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
-        self.assertEqual(len(self.setting["ChromeDriver"]), 3)
+        self.assertEqual(len(self.setting["ChromeDriver"]), 4)
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
@@ -114,6 +114,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
         self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], chromedriver_platform_release)
+        self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
 
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], latest_release_geckodriver)
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)

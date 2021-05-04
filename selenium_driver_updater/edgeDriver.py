@@ -34,7 +34,7 @@ class EdgeDriver():
 
     _tmp_folder_path = 'tmp'
     
-    def __init__(self, **kwargs):
+    def __init__(self, path : str, **kwargs):
         """Class for working with Selenium edgedriver binary
 
         Args:
@@ -49,7 +49,7 @@ class EdgeDriver():
         """
         self.setting = setting
 
-        self.path : str = str(kwargs.get('path'))
+        self.path : str = path
                     
         self.upgrade : bool = bool(kwargs.get('upgrade'))
 

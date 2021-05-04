@@ -51,7 +51,8 @@ class testEdgeDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_get_result_by_request(self):
-        request = requests.get(self.setting["EdgeDriver"]["LinkLastRelease"], headers=self.headers)
+        url = self.setting["EdgeDriver"]["LinkLastRelease"]
+        request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
         request_text = request.text
         self.assertEqual(status_code, 200, status_code)
@@ -59,7 +60,8 @@ class testEdgeDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_get_result_by_request(self):
-        request = requests.get(self.setting["EdgeBrowser"]["LinkAllLatestRelease"], headers=self.headers)
+        url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
+        request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
         request_text = request.text
         self.assertEqual(status_code, 200, status_code)
@@ -148,6 +150,7 @@ class testEdgeDriver(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
+    @unittest.skip('Temporary could not test it on Github Workflow')
     def test11_check_get_latest_edge_browser_for_current_os(self):
         result, message = self.edge_driver._EdgeDriver__get_latest_edge_browser_for_current_os()
         self.assertTrue(result, message)

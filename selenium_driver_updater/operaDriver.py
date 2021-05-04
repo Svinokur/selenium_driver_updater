@@ -35,7 +35,7 @@ class OperaDriver():
 
     _repo_name = 'operasoftware/operachromiumdriver'
     
-    def __init__(self, **kwargs):
+    def __init__(self, path : str, **kwargs):
         """Class for working with Selenium operadriver binary
 
         Args:
@@ -50,7 +50,7 @@ class OperaDriver():
         """
         self.setting = setting
 
-        self.path : str = str(kwargs.get('path'))
+        self.path : str = path
                     
         self.upgrade : bool = bool(kwargs.get('upgrade'))
 

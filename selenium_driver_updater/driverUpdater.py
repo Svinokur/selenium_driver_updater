@@ -16,7 +16,7 @@ class DriverUpdater():
     edgedriver = 'edgedriver'
         
     @staticmethod
-    def install(**kwargs):
+    def install(path : str, driver_name : str, **kwargs):
         """Function for install or update Selenium driver binary
 
         Args:
@@ -46,14 +46,12 @@ class DriverUpdater():
         message_run : str = ''
         driver_path : str = ''
 
-        path : str = kwargs.get('path', '')
-        path : str = os.path.abspath(path) + os.path.sep if path else ''
+        path = os.path.abspath(path) + os.path.sep
 
-        driver_name_specific : str = kwargs.get('driver_name', '')
-        driver_name : str =   DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name_specific else \
-                        DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name_specific else \
-                        DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name_specific else \
-                        DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name_specific else '' 
+        driver_name =   DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
+                        DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
+                        DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
+                        DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else '' 
 
         filename : str = str(kwargs.get('filename', '')).replace('.', '')
 

@@ -32,7 +32,7 @@ class ChromeDriver():
 
     _tmp_folder_path = 'tmp'
     
-    def __init__(self, **kwargs):
+    def __init__(self, path : str, **kwargs):
         """Class for working with Selenium chromedriver binary
 
         Args:
@@ -47,7 +47,7 @@ class ChromeDriver():
         """
         self.setting = setting
 
-        self.path : str = str(kwargs.get('path'))
+        self.path : str = path
                     
         self.upgrade : bool = bool(kwargs.get('upgrade'))
 
@@ -79,7 +79,7 @@ class ChromeDriver():
         
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
-    def __get_latest_version_chrome_driver(self) -> Tuple[bool, str, str]:
+    def __get_latest_version_chrome_driver(self, no_messages : bool = False) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
 
 
@@ -111,7 +111,9 @@ class ChromeDriver():
 
             latest_version = str(request.text)
 
-            logging.info(f'Latest version of chromedriver: {latest_version}')
+            if not no_messages:
+
+                logging.info(f'Latest version of chromedriver: {latest_version}')
 
             result_run = True
 
@@ -324,6 +326,8 @@ class ChromeDriver():
 
             WebDriverException: Occurs when current chromedriver could not start or critical error occured.
 
+            OSError: Occurs when chromedriver made for another CPU type
+
             Except: If unexpected error raised. 
 
         """
@@ -356,6 +360,11 @@ class ChromeDriver():
 
         except WebDriverException:
             message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+            return True, message_run, driver_version
+
+        except OSError:
+            message_run = f'OSError error: {str(traceback.format_exc())}' #probably [Errno 86] Bad CPU type in executable:
             logging.error(message_run)
             return True, message_run, driver_version
 
@@ -477,10 +486,25 @@ class ChromeDriver():
 
             if not self.version:
 
-                result, message, driver_path = self.__check_if_chromedriver_is_up_to_date()
+                #additional checking for equal versions
+                result, message, is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
+
+                if is_equal:
+
+                    result, message, driver_path = self.__check_if_chromedriver_is_up_to_date()
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
+
+                if not is_equal:
+
+                    result, message, is_driver_up_to_date, latest_previous_version = self.__get_previous_latest_version_chromedriver()
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
 
             else:
 
@@ -748,7 +772,7 @@ class ChromeDriver():
         
         return result_run, message_run, browser_version
 
-    def __get_latest_version_chrome_browser(self) -> Tuple[bool, str, str]:
+    def __get_latest_version_chrome_browser(self, no_messages : bool = False) -> Tuple[bool, str, str]:
         """Gets latest chrome browser version
 
 
@@ -795,7 +819,9 @@ class ChromeDriver():
 
             latest_version = latest_stable_version_element.text.split('The Stable channel has been updated to ')[1].split(' for Windows')[0]
 
-            logging.info(f'Latest version of chrome browser: {latest_version}')
+            if not no_messages:
+
+                logging.info(f'Latest version of chrome browser: {latest_version}')
 
             result_run = True
 
@@ -884,3 +910,181 @@ class ChromeDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
+
+    def __get_previous_latest_version_chromedriver(self):
+        """Gets previous latest version of chromedriver
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)           : True if function passed correctly, False otherwise.
+            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            is_driver_up_to_date (bool) : If true current version of chromedriver is successfully updated. Defaults to False.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        is_driver_up_to_date : bool = False
+        latest_previous_version : str = ''
+        
+        try:
+
+            result, message, is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, latest_previous_version
+            
+            message = (f' Problem with chromedriver latest_version_driver : {latest_version_driver} latest_version_browser : {latest_version_browser}\n'
+                        f' It often happen when new version of chromedriver released, but new version of chrome browser is not\n'
+                        f' Trying to download the latest previous version of chromedriver')
+            logging.error(message)
+
+            if self.upgrade:
+
+                result, message = self.__delete_current_chromedriver_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, is_driver_up_to_date, latest_previous_version
+
+            result, message, latest_previous_version = self.__get_latest_previous_version_chromedriver_via_requests()
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, latest_previous_version
+
+            result, message, driver_path = self.__get_specific_version_chromedriver_for_current_os(latest_previous_version)
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, latest_previous_version
+
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, is_driver_up_to_date, latest_previous_version
+
+            result, message, current_version = self.__get_current_version_chrome_selenium()
+            if not result:
+                logging.error(message)
+                return result, message, is_driver_up_to_date, latest_previous_version
+
+            if current_version == latest_previous_version:
+                is_driver_up_to_date = True
+                message = f'Successfully downgraded to the latest previous version of chromedriver: {latest_previous_version}'
+                logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, is_driver_up_to_date, latest_previous_version
+
+    def __get_latest_previous_version_chromedriver_via_requests(self) -> Tuple[bool, str, str]:
+        """Gets latest chromedriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            latest_version_previous (str)   : Latest previous version of chromedriver.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_version_previous : str = ''
+
+        try:
+            
+            url = self.setting["ChromeDriver"]["LinkLastRelease"]
+            request = requests.get(url=url, headers=self.headers)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                return result_run, message, latest_version_previous
+
+            latest_version = str(request.text)
+
+            logging.info(f'Latest version of chromedriver: {latest_version}')
+
+            latest_version_main = latest_version.split(".")[0]
+
+            logging.info(f'Latest main version of chromedriver: {latest_version_main}')
+
+            latest_version_main_previous = int(latest_version_main) - 1
+
+            url = self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_version_main_previous)
+            request = requests.get(url=url, headers=self.headers)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                return result_run, message, latest_version
+
+            latest_version_previous = str(request.text)
+
+            logging.info(f'Latest previous version of chromedriver: {latest_version_previous}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_version_previous
+
+    def __compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser(self) -> Tuple[bool, str, bool, str, str]:
+        """Compares latest main version of chromedriver and latest main version of chrome browser
+
+        Returns:
+            Tuple of bool, str and bool
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            is_equal (bool)                 : If true latest versions are both equal. Defaults to False.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        is_equal : bool = False
+        latest_version_chromedriver_main : str = ''
+        latest_version_browser_main : str = ''
+        
+        try:
+
+            result, message, latest_version_chromedriver = self.__get_latest_version_chrome_driver(no_messages=True)
+            if not result:
+                logging.error(message)
+                return result, message, is_equal, latest_version_chromedriver_main, latest_version_browser_main
+
+            result, message, latest_version_browser = self.__get_latest_version_chrome_browser(no_messages=True)
+            if not result:
+                logging.error(message)
+                return result, message, is_equal, latest_version_chromedriver_main, latest_version_browser_main
+
+            latest_version_chromedriver_main = latest_version_chromedriver.split('.')[0]
+            latest_version_browser_main = latest_version_browser.split('.')[0]
+
+            if latest_version_chromedriver_main == latest_version_browser_main:
+                is_equal = True
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            logging.error(message_run)
+
+        return result_run, message_run, is_equal, latest_version_chromedriver_main, latest_version_browser_main
