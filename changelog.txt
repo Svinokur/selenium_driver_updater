@@ -1,3 +1,11 @@
+[2.6.3] 04/05/2021
+This version provides some minor fixes.
+This code was written and tested on Python 3.9.4
+
+# Fixes
+
+- Fixed an issue with unable to determination latest version of chrome browser
+
 [2.6.2] 04/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.4
