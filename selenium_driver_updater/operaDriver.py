@@ -236,14 +236,13 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        filename_git : str = ''
         url : str = ''
         operadriver_version : str = ''
 
         try:
 
             repo_name = OperaDriver._repo_name
-            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform']
+            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform'].replace('.zip', '') #temporary
             result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
             if not result:
                 return result, message, file_name
@@ -622,7 +621,7 @@ class OperaDriver():
         try:
 
             repo_name = OperaDriver._repo_name
-            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform']
+            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform'].replace('.zip', '') #temporary
             version = version
             result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
             asset_name=asset_name, version=version)

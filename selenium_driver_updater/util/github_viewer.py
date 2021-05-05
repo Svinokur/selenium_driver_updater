@@ -97,7 +97,9 @@ class GithubViewer():
             version = json_data.get('name')
 
             for asset in json_data.get('assets'):
-                if asset_name == asset.get('name') or asset_name in asset.get('name'):
+                asset_name_package = asset.get('name').replace('.tar', '').replace('.gz', '').replace('.zip', '').replace('.asc', '')
+
+                if asset_name_package.endswith(asset_name):
                     is_found = True
                     specific_asset = asset
                     break
@@ -157,10 +159,13 @@ class GithubViewer():
             for release in json_data:
                 if version == release.get('name') or version in release.get('tag_name'):
                     for asset in release.get('assets'):
-                        if asset_name in asset.get('name'):
+                        asset_name_package = asset.get('name').replace('.tar', '').replace('.gz', '').replace('.zip', '').replace('.asc', '')
+
+                        if asset_name_package.endswith(asset_name):
                             is_found = True
                             specific_asset = asset
                             break
+                    break
 
             if not is_found:
                 message = (f"Specific binary by specific release was not found, maybe unknown OS."
