@@ -41,7 +41,7 @@ class Extractor():
 
         except:
 
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -74,7 +74,7 @@ class Extractor():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -140,7 +140,7 @@ class Extractor():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run

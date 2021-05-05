@@ -124,22 +124,22 @@ class EdgeDriver():
             result_run = True
 
         except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
             logging.error(message_run)
             return True, message_run, driver_version
 
         except WebDriverException:
-            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            message_run = f'WebDriverException error: {traceback.format_exc()}'
             logging.error(message_run)
             return True, message_run, driver_version
 
         except OSError:
-            message_run = f'OSError error: {str(traceback.format_exc())}' #probably [Errno 86] Bad CPU type in executable:
+            message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
             logging.error(message_run)
             return True, message_run, driver_version
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
         
         return result_run, message_run, driver_version
@@ -199,7 +199,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run , latest_version
@@ -233,7 +233,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -312,7 +312,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, file_name
@@ -387,7 +387,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, driver_path
@@ -432,7 +432,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
@@ -467,7 +467,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -515,7 +515,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, driver_path
@@ -564,7 +564,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, driver_path
@@ -650,7 +650,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, file_name
@@ -708,7 +708,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -753,17 +753,17 @@ class EdgeDriver():
             result_run = True
 
         except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {str(traceback.format_exc())}'
+            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
             logging.error(message_run)
             return True, message_run, browser_version
 
         except WebDriverException:
-            message_run = f'WebDriverException error: {str(traceback.format_exc())}'
+            message_run = f'WebDriverException error: {traceback.format_exc()}'
             logging.error(message_run)
             return True, message_run, browser_version
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
         
         return result_run, message_run, browser_version
@@ -807,7 +807,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run , latest_version
@@ -842,7 +842,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
@@ -887,7 +887,7 @@ class EdgeDriver():
             result_run = True
 
         except:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version

@@ -43,10 +43,19 @@ class testGithubViewer(unittest.TestCase):
         self.assertGreater(len(json_data), 0, len(json_data))
 
         with open(setting["JsonSchema"]["githubAssetSchema"], 'r', encoding='utf-8') as schema_file:
-            schema = json.loads(schema_file.read())
+            schema_asset = json.loads(schema_file.read())
 
         for asset in json_data.get('assets'):
-            self.assertIsNone(jsonschema.validate(instance=asset, schema=schema))
+            self.assertIsNone(jsonschema.validate(instance=asset, schema=schema_asset))
+
+        del json_data['assets']
+
+        self.assertIsNone(json_data.get('assets'), json_data)
+
+        with open(setting["JsonSchema"]["githubReleaseSchema"], 'r', encoding='utf-8') as schema_file:
+            schema_release = json.loads(schema_file.read())
+        
+        self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema_release))
     
     #@unittest.skip('Temporary not needed')
     def test02_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):

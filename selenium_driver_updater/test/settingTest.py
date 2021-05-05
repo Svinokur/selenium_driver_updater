@@ -22,8 +22,6 @@ chromedriver_latest_release =   latest_release + f"chromedriver_win32.zip" if pl
 chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Windows' else\
                                 "chromedriver"
 
-latest_release_geckodriver = 'https://api.github.com/repos/mozilla/geckodriver/releases/latest'
-
 geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' else\
                     f"linux{os_bit}" if platform.system() == "Linux" else\
                     "macos-aarch64" if 'ARM64' in str(os.uname()) else\
@@ -31,8 +29,6 @@ geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' 
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
-
-latest_release_operadriver = 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest'
 
 operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 "operadriver_linux64.zip" if platform.system() == "Linux" else\
@@ -94,7 +90,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 9)
+        self.assertEqual(len(self.setting), 10)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
@@ -106,7 +102,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 3)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 3)
         self.assertEqual(len(self.setting["OperaBrowser"]), 4)
-        self.assertEqual(len(self.setting["JsonSchema"]), 1)
+        self.assertEqual(len(self.setting["JsonSchema"]), 2)
+        self.assertEqual(len(self.setting["Github"]), 2)
     
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
@@ -116,12 +113,12 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], chromedriver_platform_release)
         self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
 
-        self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], latest_release_geckodriver)
+        self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], geckodriver_platform_last_release)
         self.assertEqual(self.setting["GeckoDriver"]["LinkAllReleases"], 'https://api.github.com/repos/mozilla/geckodriver/releases')
 
-        self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], latest_release_operadriver)
+        self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
         self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)
         self.assertEqual(self.setting["OperaDriver"]["LinkAllReleases"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases')
@@ -148,6 +145,10 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
+        self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')
+
+        self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
+        self.assertEqual(self.setting["Github"]["linkAllReleasesBySpecificRepoName"], 'https://api.github.com/repos/{}/releases')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

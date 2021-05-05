@@ -8,6 +8,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+from _setting import setting
+
 class GithubViewer():
 
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
@@ -32,7 +34,7 @@ class GithubViewer():
 
         result_run : bool = False
         message_run : str = '' 
-        url : str = f'https://api.github.com/repos/{repo_name}/releases/latest'
+        url : str = setting["Github"]["linkLatestReleaseBySpecificRepoName"].format(repo_name)
         json_data : Any = ''
 
         try:
@@ -74,7 +76,7 @@ class GithubViewer():
 
         result_run : bool = False
         message_run : str = '' 
-        url : str = f'https://api.github.com/repos/{repo_name}/releases/latest'
+        url : str = setting["Github"]["linkLatestReleaseBySpecificRepoName"].format(repo_name)
         data = []
         asset = ''
         is_found : bool = False
@@ -134,7 +136,7 @@ class GithubViewer():
 
         result_run : bool = False
         message_run : str = '' 
-        url : str = f'https://api.github.com/repos/{repo_name}/releases'
+        url : str = setting["Github"]["linkAllReleasesBySpecificRepoName"].format(repo_name)
         data = []
         asset = ''
         is_found : bool = False

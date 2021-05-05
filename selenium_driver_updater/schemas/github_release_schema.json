@@ -1,0 +1,392 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1620205622.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"url",
+		"assets_url",
+		"upload_url",
+		"html_url",
+		"id",
+		"author",
+		"node_id",
+		"tag_name",
+		"target_commitish",
+		"name",
+		"draft",
+		"prerelease",
+		"created_at",
+		"published_at",
+		"tarball_url",
+		"zipball_url",
+		"body"
+	],
+	"properties": {
+		"url": {
+			"$id": "#root/url", 
+			"title": "Url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/releases/41168424"
+			],
+			"pattern": "^.*$"
+		},
+		"assets_url": {
+			"$id": "#root/assets_url", 
+			"title": "Assets_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/releases/41168424/assets"
+			],
+			"pattern": "^.*$"
+		},
+		"upload_url": {
+			"$id": "#root/upload_url", 
+			"title": "Upload_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://uploads.github.com/repos/mozilla/geckodriver/releases/41168424/assets{?name,label}"
+			],
+			"pattern": "^.*$"
+		},
+		"html_url": {
+			"$id": "#root/html_url", 
+			"title": "Html_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://github.com/mozilla/geckodriver/releases/tag/v0.29.1"
+			],
+			"pattern": "^.*$"
+		},
+		"id": {
+			"$id": "#root/id", 
+			"title": "Id", 
+			"type": "integer",
+			"examples": [
+				41168424
+			],
+			"default": 0
+		},
+		"author": {
+			"$id": "#root/author", 
+			"title": "Author", 
+			"type": "object",
+			"required": [
+				"login",
+				"id",
+				"node_id",
+				"avatar_url",
+				"gravatar_id",
+				"url",
+				"html_url",
+				"followers_url",
+				"following_url",
+				"gists_url",
+				"starred_url",
+				"subscriptions_url",
+				"organizations_url",
+				"repos_url",
+				"events_url",
+				"received_events_url",
+				"type",
+				"site_admin"
+			],
+			"properties": {
+				"login": {
+					"$id": "#root/author/login", 
+					"title": "Login", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"id": {
+					"$id": "#root/author/id", 
+					"title": "Id", 
+					"type": "integer",
+					"examples": [
+						129603
+					],
+					"default": 0
+				},
+				"node_id": {
+					"$id": "#root/author/node_id", 
+					"title": "Node_id", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"MDQ6VXNlcjEyOTYwMw=="
+					],
+					"pattern": "^.*$"
+				},
+				"avatar_url": {
+					"$id": "#root/author/avatar_url", 
+					"title": "Avatar_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://avatars.githubusercontent.com/u/129603?v=4"
+					],
+					"pattern": "^.*$"
+				},
+				"gravatar_id": {
+					"$id": "#root/author/gravatar_id", 
+					"title": "Gravatar_id", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"url": {
+					"$id": "#root/author/url", 
+					"title": "Url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"html_url": {
+					"$id": "#root/author/html_url", 
+					"title": "Html_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://github.com/whimboo"
+					],
+					"pattern": "^.*$"
+				},
+				"followers_url": {
+					"$id": "#root/author/followers_url", 
+					"title": "Followers_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/followers"
+					],
+					"pattern": "^.*$"
+				},
+				"following_url": {
+					"$id": "#root/author/following_url", 
+					"title": "Following_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/following{/other_user}"
+					],
+					"pattern": "^.*$"
+				},
+				"gists_url": {
+					"$id": "#root/author/gists_url", 
+					"title": "Gists_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/gists{/gist_id}"
+					],
+					"pattern": "^.*$"
+				},
+				"starred_url": {
+					"$id": "#root/author/starred_url", 
+					"title": "Starred_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/starred{/owner}{/repo}"
+					],
+					"pattern": "^.*$"
+				},
+				"subscriptions_url": {
+					"$id": "#root/author/subscriptions_url", 
+					"title": "Subscriptions_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/subscriptions"
+					],
+					"pattern": "^.*$"
+				},
+				"organizations_url": {
+					"$id": "#root/author/organizations_url", 
+					"title": "Organizations_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/orgs"
+					],
+					"pattern": "^.*$"
+				},
+				"repos_url": {
+					"$id": "#root/author/repos_url", 
+					"title": "Repos_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/repos"
+					],
+					"pattern": "^.*$"
+				},
+				"events_url": {
+					"$id": "#root/author/events_url", 
+					"title": "Events_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/events{/privacy}"
+					],
+					"pattern": "^.*$"
+				},
+				"received_events_url": {
+					"$id": "#root/author/received_events_url", 
+					"title": "Received_events_url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/users/whimboo/received_events"
+					],
+					"pattern": "^.*$"
+				},
+				"type": {
+					"$id": "#root/author/type", 
+					"title": "Type", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"User"
+					],
+					"pattern": "^.*$"
+				},
+				"site_admin": {
+					"$id": "#root/author/site_admin", 
+					"title": "Site_admin", 
+					"type": "boolean",
+					"examples": [
+						false
+					],
+					"default": true
+				}
+			}
+		}
+,
+		"node_id": {
+			"$id": "#root/node_id", 
+			"title": "Node_id", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"MDc6UmVsZWFzZTQxMTY4NDI0"
+			],
+			"pattern": "^.*$"
+		},
+		"tag_name": {
+			"$id": "#root/tag_name", 
+			"title": "Tag_name", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"v0.29.1"
+			],
+			"pattern": "^.*$"
+		},
+		"target_commitish": {
+			"$id": "#root/target_commitish", 
+			"title": "Target_commitish", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"release"
+			],
+			"pattern": "^.*$"
+		},
+		"name": {
+			"$id": "#root/name", 
+			"title": "Name", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"0.29.1"
+			],
+			"pattern": "^.*$"
+		},
+		"draft": {
+			"$id": "#root/draft", 
+			"title": "Draft", 
+			"type": "boolean",
+			"examples": [
+				false
+			],
+			"default": true
+		},
+		"prerelease": {
+			"$id": "#root/prerelease", 
+			"title": "Prerelease", 
+			"type": "boolean",
+			"examples": [
+				false
+			],
+			"default": true
+		},
+		"created_at": {
+			"$id": "#root/created_at", 
+			"title": "Created_at", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"2021-04-09T08:08:16Z"
+			],
+			"pattern": "^.*$"
+		},
+		"published_at": {
+			"$id": "#root/published_at", 
+			"title": "Published_at", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"2021-04-09T08:22:01Z"
+			],
+			"pattern": "^.*$"
+		},
+		"tarball_url": {
+			"$id": "#root/tarball_url", 
+			"title": "Tarball_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/tarball/v0.29.1"
+			],
+			"pattern": "^.*$"
+		},
+		"zipball_url": {
+			"$id": "#root/zipball_url", 
+			"title": "Zipball_url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/zipball/v0.29.1"
+			],
+			"pattern": "^.*$"
+		},
+		"body": {
+			"$id": "#root/body", 
+			"title": "Body", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"0.29.1  (2021-04-09), `970ef713fe58`)\r\n-------------------------------------\r\n\r\n### Known problems\r\n\r\n- _macOS 10.15 (Catalina):_\r\n\r\n  Due to the requirement from Apple that all programs must be\r\n  notarized, geckodriver will not work on Catalina if you manually\r\n  download it through another notarized program, such as Firefox.\r\n\r\n  Whilst we are working on a repackaging fix for this problem, you can\r\n  find more details on how to work around this issue in the [macOS\r\n  notarization](https://firefox-source-docs.mozilla.org/testing/geckodriver/Notarization.html)  section of the documentation.\r\n\r\n- _Android:_\r\n\r\n  Marionette will only be enabled in GeckoView based applications when the\r\n  Firefox preference `devtools.debugger.remote-enabled` is set to `True` via\r\n  [`moz:firefoxOptions`](https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities/firefoxOptions). This will be fixed in the Firefox 90 release for Android.\r\n\r\n### Added\r\n\r\n- When testing GeckoView based applications on Android it's now enough to\r\n  specify the `androidPackage` capability. The appropriate activity name,\r\n  and required intent arguments will now automatically be used for\r\n  applications released by Mozilla.\r\n\r\n- Native AArch64 (M1) builds of geckodriver for MacOS are now available. These\r\n  are currently shipped as Tier2 due to missing test infrastructure. Please let\r\n  us know if you experience issues.\r\n\r\n### Fixed\r\n\r\n- Fixed a stack overflow crash in thread 'webdriver dispatcher' when\r\n  handling certain device errors.\r\n\r\n- Fixed an application crash due to missing permissions on unrooted devices\r\n  by changing the location of the test related files, e.g the profile folder.\r\n  Therefore the deprecated &#x2D;&#x2D;android-storage command line argument\r\n  now defaults to the `sdcard` option, which changed its location to\r\n  `$EXTERNAL_STORAGE/Android/data/%androidPackage%/files/`. With this change\r\n  proper support for unrooted devices running Android 10+ has been added.\r\n\r\n  _Note_: Do not use the &#x2D;&#x2D;android-storage command line argument\r\n  anymore unless there is a strong reason. It will be removed in a future\r\n  release."
+			],
+			"pattern": ".*"
+		}
+	}
+}
+

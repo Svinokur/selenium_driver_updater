@@ -9,23 +9,19 @@ latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
 
 chromedriver_latest_release =   latest_release + f"chromedriver_win32.zip" if platform.system() == 'Windows' else\
                                 latest_release + "chromedriver_linux64.zip" if platform.system() == "Linux" else\
-                                latest_release + "chromedriver_mac64_m1.zip" if 'ARM' in str(os.uname()) and platform.system() == 'Darwin' else\
+                                latest_release + "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
                                 latest_release + "chromedriver_mac64.zip"
 
 chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Windows' else\
                                 "chromedriver"
 
-latest_release_geckodriver = 'https://api.github.com/repos/mozilla/geckodriver/releases/latest'
-
 geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' else\
                     f"linux{os_bit}" if platform.system() == "Linux" else\
-                    "macos-aarch64" if 'ARM64' in str(os.uname()) else\
+                    "macos-aarch64" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
                     "macos"
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
-
-latest_release_operadriver = 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest'
 
 operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 "operadriver_linux64.zip" if platform.system() == "Linux" else\
@@ -78,14 +74,14 @@ setting = dict(
         },
         "GeckoDriver":
         {
-            "LinkLastRelease"           : latest_release_geckodriver,
+            "LinkLastRelease"           : 'https://api.github.com/repos/mozilla/geckodriver/releases/latest',
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : geckodriver_platform_last_release,
             "LinkAllReleases"           : 'https://api.github.com/repos/mozilla/geckodriver/releases',
         },
         "OperaDriver":
         {
-            "LinkLastRelease"           : latest_release_operadriver,
+            "LinkLastRelease"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest',
             "LinkLastReleasePlatform"   : operadriver_latest_release, 
             "LastReleasePlatform"       : operadriver_platform_release, 
             "LinkAllReleases"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases',
@@ -123,7 +119,13 @@ setting = dict(
         },
         "JsonSchema":
         {
-            "githubAssetSchema" : base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json',
+            "githubAssetSchema"     : base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json',
+            "githubReleaseSchema"   : base_dir + 'schemas' + os.path.sep + 'github_release_schema.json',
+        },
+        "Github":
+        {
+            "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
+            "linkAllReleasesBySpecificRepoName"     : 'https://api.github.com/repos/{}/releases',
         },
     }
 )
