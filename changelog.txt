@@ -1,3 +1,15 @@
+[2.8.0] 07/05/2021
+This version provides some minor improvements.
+This code was written and tested on Python 3.9.4
+
+# Improvements
+
+- Improved setting.py file (became more understandable)
+
+# Operations
+
+- Removed some hardcode from operaDriver.py file
+
 [2.7.1] 05/05/2021
 This version provides improvements and minor fixes.
 This code was written and tested on Python 3.9.4

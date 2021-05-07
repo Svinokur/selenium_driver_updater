@@ -15,6 +15,8 @@ chromedriver_latest_release =   latest_release + f"chromedriver_win32.zip" if pl
 chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Windows' else\
                                 "chromedriver"
 
+
+
 geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' else\
                     f"linux{os_bit}" if platform.system() == "Linux" else\
                     "macos-aarch64" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
@@ -23,12 +25,20 @@ geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
 
+
+
 operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 "operadriver_linux64.zip" if platform.system() == "Linux" else\
                                 "operadriver_mac64.zip"
 
 operadriver_platform_release = "operadriver.exe" if platform.system() == 'Windows' else\
                                     "operadriver"
+
+operadriver_name_platform_release = f"operadriver_win{os_bit}" if platform.system() == 'Windows' else\
+                                    "operadriver_linux64" if platform.system() == "Linux" else\
+                                    "operadriver_mac64"
+
+
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
 edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
@@ -45,11 +55,15 @@ chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.e
 chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
 
+
+
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
 'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
 
 firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else \
 '/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
+
+
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -57,11 +71,15 @@ edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\Microsoft
 edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
+
+
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
 'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
+
+
 
 setting = dict(
     {
@@ -85,6 +103,7 @@ setting = dict(
             "LinkLastReleasePlatform"   : operadriver_latest_release, 
             "LastReleasePlatform"       : operadriver_platform_release, 
             "LinkAllReleases"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases',
+            "NamePlatformRelease"       : operadriver_name_platform_release,
         },
         "EdgeDriver":
         {

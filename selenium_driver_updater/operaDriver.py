@@ -242,7 +242,7 @@ class OperaDriver():
         try:
 
             repo_name = OperaDriver._repo_name
-            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform'].replace('.zip', '') #temporary
+            asset_name = self.setting["OperaDriver"]["NamePlatformRelease"]
             result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
             if not result:
                 return result, message, file_name
@@ -273,7 +273,7 @@ class OperaDriver():
 
             time.sleep(3)
 
-            archive_folder_path = self.path + self.setting['OperaDriver']['LinkLastReleasePlatform'][:-4]
+            archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
             archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
 
             if not self.filename:
@@ -621,7 +621,7 @@ class OperaDriver():
         try:
 
             repo_name = OperaDriver._repo_name
-            asset_name = self.setting['OperaDriver']['LinkLastReleasePlatform'].replace('.zip', '') #temporary
+            asset_name = self.setting["OperaDriver"]["NamePlatformRelease"]
             version = version
             result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
             asset_name=asset_name, version=version)
@@ -653,7 +653,7 @@ class OperaDriver():
 
             time.sleep(3)
 
-            archive_folder_path = self.path + self.setting['OperaDriver']['LinkLastReleasePlatform'][:-4]
+            archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
             archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
 
             if not self.filename:
