@@ -51,6 +51,12 @@ class DriverUpdater():
         message_run : str = ''
         driver_path : str = ''
 
+        info_messages = bool(kwargs.get('info_messages', True))
+        if info_messages:
+            logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(level=logging.ERROR)
+
         enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
 
         if enable_library_update_check:
@@ -78,7 +84,6 @@ class DriverUpdater():
             upgrade = kwargs.get('upgrade', False)
             chmod = kwargs.get('chmod', True)
             check_driver_is_up_to_date = kwargs.get('check_driver_is_up_to_date', False)
-            info_messages = kwargs.get('info_messages', True)
             version = kwargs.get('version', '')
             check_browser_is_up_to_date = kwargs.get('check_browser_is_up_to_date', False)
 

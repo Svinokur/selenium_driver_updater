@@ -128,7 +128,7 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.9.0")
+        self.assertEqual(self.setting["Program"]["version"], "2.9.1")
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
