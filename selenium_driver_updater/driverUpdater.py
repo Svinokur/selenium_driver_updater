@@ -2,11 +2,15 @@ from .chromeDriver import ChromeDriver
 from .geckoDriver import GeckoDriver
 from .operaDriver import OperaDriver
 from .edgeDriver import EdgeDriver
+from ._setting import setting
 
 import logging
 import os
 import traceback
 from typing import Tuple
+
+import requests
+import json
 
 class DriverUpdater():
 
@@ -29,6 +33,7 @@ class DriverUpdater():
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver. Defaults to empty string.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version. Defaults to empty string.
             check_driver_is_up_to_date (bool)   : If true, it will check browser version before specific driver update/upgrade. Defaults to False.
+            enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
 
         Returns:
             Tuple of bool, str and str
@@ -45,6 +50,14 @@ class DriverUpdater():
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
+
+        enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
+
+        if enable_library_update_check:
+
+            result, message = DriverUpdater.__check_library_is_up_to_date()
+            if not result:
+                logging.error(message)
 
         path = os.path.abspath(path) + os.path.sep
 
@@ -159,6 +172,46 @@ class DriverUpdater():
                 message = f'Unknown driver name was specified current driver_name is: {driver_name}'
                 logging.error(message)
                 return result_run, message
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run
+    
+    @staticmethod
+    def __check_library_is_up_to_date() -> Tuple[bool, str]:
+        
+
+        result_run : bool = False
+        message_run : str = ''
+
+        try:
+            
+            url = setting["PyPi"]["urlProjectJson"]
+            request = requests.get(url=url)
+            status_code = request.status_code
+
+            if status_code != 200:
+                message = f'Could not determine latest version of library, status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                return result_run, message
+
+            request_text = request.text
+            json_data = json.loads(request_text)
+
+            current_version = setting["Program"]["version"]
+            latest_version = json_data.get('info').get('version')
+
+            if latest_version != current_version:
+                message = ('Your selenium-driver-updater library is out of date, please update it. '
+                           f'current_version: {current_version} latest_version: {latest_version} ')
+                logging.warning(message)
+
+            elif latest_version == current_version:
+                message = 'Your selenium-driver-updater library is up to date.'
+                logging.info(message)
 
             result_run = True
 

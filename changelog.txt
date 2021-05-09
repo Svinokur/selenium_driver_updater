@@ -1,3 +1,12 @@
+[2.9.0] 09/05/2021
+This version provides innovations and minor improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added checking of library is up to date
+- Added new parameter (disable_library_update_check) - for disable checking versions
+
 [2.8.0] 07/05/2021
 This version provides some minor improvements.
 This code was written and tested on Python 3.9.4

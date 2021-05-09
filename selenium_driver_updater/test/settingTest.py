@@ -108,10 +108,11 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 10)
+        self.assertEqual(len(self.setting), 12)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
+        self.assertEqual(len(self.setting["Program"]), 1)
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
@@ -122,9 +123,12 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["OperaBrowser"]), 4)
         self.assertEqual(len(self.setting["JsonSchema"]), 2)
         self.assertEqual(len(self.setting["Github"]), 2)
+        self.assertEqual(len(self.setting["PyPi"]), 1)
     
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
+
+        self.assertEqual(self.setting["Program"]["version"], "2.9.0")
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -168,6 +172,8 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
         self.assertEqual(self.setting["Github"]["linkAllReleasesBySpecificRepoName"], 'https://api.github.com/repos/{}/releases')
+
+        self.assertEqual(self.setting["PyPi"]["urlProjectJson"], 'https://pypi.python.org/pypi/selenium-driver-updater/json')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

@@ -83,6 +83,10 @@ opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Loca
 
 setting = dict(
     {
+        "Program":
+        {
+            'version'   : '2.9.0',
+        },
         "ChromeDriver":
         {   
             "LinkLastRelease"                   : "https://chromedriver.storage.googleapis.com/LATEST_RELEASE",
@@ -145,6 +149,10 @@ setting = dict(
         {
             "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
             "linkAllReleasesBySpecificRepoName"     : 'https://api.github.com/repos/{}/releases',
+        },
+        "PyPi":
+        {
+            'urlProjectJson'    : 'https://pypi.python.org/pypi/selenium-driver-updater/json',
         },
     }
 )
