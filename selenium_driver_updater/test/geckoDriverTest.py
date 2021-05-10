@@ -50,7 +50,7 @@ class testGeckoDriver(unittest.TestCase):
         print("%.3f" % t)
 
     #@unittest.skip('Temporary not needed')
-    def test01_get_result_by_request(self):
+    def test01_check_get_result_by_request(self):
         url = self.setting["GeckoDriver"]["LinkLastRelease"]
         request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
@@ -59,7 +59,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertGreater(len(request_text), 0, request_text)
 
     #@unittest.skip('Temporary not needed')
-    def test02_get_result_by_request(self):
+    def test02_check_get_result_by_request(self):
         url = self.setting["GeckoDriver"]["LinkAllReleases"]
         request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code

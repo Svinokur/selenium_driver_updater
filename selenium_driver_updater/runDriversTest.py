@@ -10,6 +10,7 @@ import logging
 import traceback
 
 from test import settingTest
+from test import driverUpdaterTest
 from test import chromeDriverTest
 from test import geckoDriverTest
 from test import operaDriverTest
@@ -42,6 +43,7 @@ try:
 
     testSuite = unittest.TestSuite()
     testSuite.addTest(unittest.makeSuite(settingTest.testSetting))
+    testSuite.addTest(unittest.makeSuite(driverUpdaterTest.testDriverUpdater))
     testSuite.addTest(unittest.makeSuite(chromeDriverTest.testChromeDriver))
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it on Github Workflow

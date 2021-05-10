@@ -1,8 +1,12 @@
-from .chromeDriver import ChromeDriver
-from .geckoDriver import GeckoDriver
-from .operaDriver import OperaDriver
-from .edgeDriver import EdgeDriver
-from ._setting import setting
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
+
+from chromeDriver import ChromeDriver
+from geckoDriver import GeckoDriver
+from operaDriver import OperaDriver
+from edgeDriver import EdgeDriver
+from _setting import setting
 
 import logging
 import os
@@ -32,7 +36,7 @@ class DriverUpdater():
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver. Defaults to empty string.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version. Defaults to empty string.
-            check_driver_is_up_to_date (bool)   : If true, it will check browser version before specific driver update/upgrade. Defaults to False.
+            check_browser_is_up_to_date (bool)  : If true, it will check browser version before specific driver update or upgrade. Defaults to False.
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
 
         Returns:
@@ -91,7 +95,7 @@ class DriverUpdater():
 
                 chrome_driver = ChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                             check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                            info_messages=info_messages, filename=filename, version=version,
+                                            filename=filename, version=version,
                                             check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = chrome_driver.main()
                 if not result:
@@ -102,7 +106,7 @@ class DriverUpdater():
 
                 gecko_driver = GeckoDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                        info_messages=info_messages, filename=filename, version=version,
+                                        filename=filename, version=version,
                                         check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = gecko_driver.main()
                 if not result:
@@ -113,7 +117,7 @@ class DriverUpdater():
 
                 opera_driver = OperaDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                        info_messages=info_messages, filename=filename, version=version,
+                                        filename=filename, version=version,
                                         check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = opera_driver.main()
                 if not result:
@@ -124,7 +128,7 @@ class DriverUpdater():
 
                 edge_driver = EdgeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                     check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                    info_messages=info_messages, filename=filename, version=version,
+                                    filename=filename, version=version,
                                     check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = edge_driver.main()
                 if not result:

@@ -43,10 +43,9 @@ class GeckoDriver():
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
             chmod (bool)                        : If true, it will make geckodriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
-            info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for geckodriver. If given, it will replace name for geckodriver.
             version (str)                       : Specific version for geckodriver. If given, it will downloads given version.
-            check_driver_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
+            check_browser_is_up_to_date (bool)  : If true, it will check firefox browser version before geckodriver update or upgrade.
         """
         self.setting = setting
 
@@ -57,13 +56,6 @@ class GeckoDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-
-        self.info_messages = bool(kwargs.get('info_messages'))
-
-        if self.info_messages:
-            logging.basicConfig(level=logging.INFO)
-        else:
-            logging.basicConfig(level=logging.ERROR)
 
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
                         Chrome/35.0.1916.47 Safari/537.36'
@@ -100,7 +92,7 @@ class GeckoDriver():
             
             WebDriverException: Occurs when current geckodriver could not start or critical error occured.
 
-            OSError: Occurs when chromedriver made for another CPU type
+            OSError: Occurs when geckodriver made for another CPU type
 
             Except: If unexpected error raised. 
 
@@ -722,7 +714,7 @@ class GeckoDriver():
                     return result, message
 
                 if not is_browser_up_to_date:
-                    message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
+                    message = f'Problem with updating firefox browser current_version: {current_version} latest_version: {latest_version}'
                     logging.info(message)
 
             result_run = True
@@ -742,7 +734,7 @@ class GeckoDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            browser_version (str)   : Current chrome browser version.
+            browser_version (str)   : Current firefox browser version.
 
         Raises:
             SessionNotCreatedException: Occurs when current geckodriver could not start.

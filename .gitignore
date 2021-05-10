@@ -5,3 +5,4 @@ selenium_driver_updater/test/__pycache__/*.pyc
 .DS_Store
 selenium_driver_updater/*.log
 selenium_driver_updater/util/__pycache__/*.pyc
+*.log

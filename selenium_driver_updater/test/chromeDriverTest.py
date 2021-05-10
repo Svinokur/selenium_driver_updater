@@ -50,7 +50,7 @@ class testChromeDriver(unittest.TestCase):
         print("%.3f" % t)
 
     #@unittest.skip('Temporary not needed')
-    def test01_get_result_by_request(self):
+    def test01_check_get_result_by_request(self):
         url = self.setting["ChromeDriver"]["LinkLastRelease"]
         request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
@@ -59,7 +59,7 @@ class testChromeDriver(unittest.TestCase):
         self.assertGreater(len(request_text), 0, request_text)
 
     #@unittest.skip('Temporary not needed')
-    def test02_get_result_by_request(self):
+    def test02_check_get_result_by_request(self):
         url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
         request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
@@ -68,7 +68,7 @@ class testChromeDriver(unittest.TestCase):
         self.assertGreater(len(request_text), 0, request_text)
     
     #@unittest.skip('Temporary not needed')
-    def test03_get_result_by_request(self):
+    def test03_check_get_result_by_request(self):
         result, message, latest_version = self.chrome_driver._ChromeDriver__get_latest_version_chrome_driver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)

@@ -43,10 +43,9 @@ class OperaDriver():
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
             chmod (bool)                        : If true, it will make operadriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
-            info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
             filename (str)                      : Specific name for operadriver. If given, it will replace name for operadriver. Defaults to empty string.
             version (str)                       : Specific version for operadriver. If given, it will downloads given version. Defaults to empty string.
-            check_driver_is_up_to_date (bool)   : If true, it will check opera browser version before operadriver update/upgrade.
+            check_browser_is_up_to_date (bool)  : If true, it will check opera browser version before operadriver update/upgrade.
         """
         self.setting = setting
 
@@ -57,13 +56,6 @@ class OperaDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-
-        self.info_messages = bool(kwargs.get('info_messages'))
-
-        if self.info_messages:
-            logging.basicConfig(level=logging.INFO)
-        else:
-            logging.basicConfig(level=logging.ERROR)
 
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
                         Chrome/35.0.1916.47 Safari/537.36'
