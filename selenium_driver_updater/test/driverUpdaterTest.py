@@ -55,6 +55,11 @@ class testDriverUpdater(unittest.TestCase):
         result, message = self.driver_updater._DriverUpdater__check_library_is_up_to_date()
         self.assertTrue(result, message)
     
+    #@unittest.skip('Temporary not needed')
+    def test03_check_is_python_version_compatible_for_library(self):
+        result, message = self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
+        self.assertTrue(result, message)
+    
     
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

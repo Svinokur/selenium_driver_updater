@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from _setting import setting
-from geckoDriver import GeckoDriver
+from _geckoDriver import GeckoDriver
 import time
 import requests
 import platform

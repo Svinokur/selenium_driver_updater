@@ -2,10 +2,10 @@ import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
-from chromeDriver import ChromeDriver
-from geckoDriver import GeckoDriver
-from operaDriver import OperaDriver
-from edgeDriver import EdgeDriver
+from _chromeDriver import ChromeDriver
+from _geckoDriver import GeckoDriver
+from _operaDriver import OperaDriver
+from _edgeDriver import EdgeDriver
 from _setting import setting
 
 import logging
@@ -61,15 +61,7 @@ class DriverUpdater():
         else:
             logging.basicConfig(level=logging.ERROR)
 
-        enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
-
-        if enable_library_update_check:
-
-            result, message = DriverUpdater.__check_library_is_up_to_date()
-            if not result:
-                logging.error(message)
-
-        path = os.path.abspath(path) + os.path.sep
+        path = str(os.path.abspath(path) + os.path.sep)
 
         driver_name =   DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
                         DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
@@ -78,18 +70,19 @@ class DriverUpdater():
 
         filename : str = str(kwargs.get('filename', '')).replace('.', '')
 
+        enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
+        upgrade = bool(kwargs.get('upgrade', False))
+        chmod = bool(kwargs.get('chmod', True))
+        check_driver_is_up_to_date = bool(kwargs.get('check_driver_is_up_to_date', False))
+        version = str(kwargs.get('version', ''))
+        check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date', False))
+
         try:
 
-            result, message = DriverUpdater.__check_all_input_parameteres(path=path, driver_name=driver_name)
+            result, message = DriverUpdater.__check_enviroment_and_variables(path=path, driver_name=driver_name, enable_library_update_check=enable_library_update_check)
             if not result:
                 logging.error(message)
                 return result, message, driver_path
-
-            upgrade = kwargs.get('upgrade', False)
-            chmod = kwargs.get('chmod', True)
-            check_driver_is_up_to_date = kwargs.get('check_driver_is_up_to_date', False)
-            version = kwargs.get('version', '')
-            check_browser_is_up_to_date = kwargs.get('check_browser_is_up_to_date', False)
 
             if DriverUpdater.chromedriver == driver_name:
 
@@ -221,6 +214,66 @@ class DriverUpdater():
             elif latest_version == current_version:
                 message = 'Your selenium-driver-updater library is up to date.'
                 logging.info(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    @staticmethod
+    def __check_is_python_version_compatible_for_library() -> Tuple[bool, str]:
+        
+
+        result_run : bool = False
+        message_run : str = ''
+        major = str(sys.version_info[0])
+        minor = str(sys.version_info[1])
+        patch = str(sys.version_info[2])
+
+        python_version = f"{major}.{minor}.{patch}"
+
+        try:
+
+            if major != "3":
+                message = (f"selenium-driver-updater works only on Python 3+, you are using {python_version} which is unsupported by this library, "
+                           f"you may have some troubles or errors if you will proceed.")
+                logging.warning(message)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    @staticmethod
+    def __check_enviroment_and_variables(path, driver_name, enable_library_update_check) -> Tuple[bool, str]:
+        
+
+        result_run : bool = False
+        message_run : str = ''
+        try:
+
+            result, message = DriverUpdater.__check_is_python_version_compatible_for_library()
+            if not result:
+                logging.error(message)
+                return result, message
+
+            if enable_library_update_check:
+
+                result, message = DriverUpdater.__check_library_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+            result, message = DriverUpdater.__check_all_input_parameteres(path=path, driver_name=driver_name)
+            if not result:
+                logging.error(message)
+                return result, message
 
             result_run = True
 

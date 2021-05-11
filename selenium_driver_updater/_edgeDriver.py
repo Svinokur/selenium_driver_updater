@@ -172,14 +172,15 @@ class EdgeDriver():
             soup = BeautifulSoup(request_text, 'html.parser')
 
             elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
+            stable_channel_text = 'stable ChannelCurrent'
 
             for element in elements:
-                if 'stable ChannelCurrent' in element.text:
+                if stable_channel_text in element.text:
                     stable_channel_element = element
                     break
 
             if not stable_channel_element:
-                message = 'Could not determine latest version of Edge Driver. Maybe the text stable ChannelCurrent is changed'
+                message = f'Could not determine latest version of Edge Driver. Maybe the text "{stable_channel_text}" is changed'
                 logging.error(message)
                 return result_run, message, latest_version
             

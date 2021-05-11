@@ -98,7 +98,7 @@ class ChromeDriver():
             status_code = request.status_code
 
             if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
+                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
                 return result_run, message, latest_version
 
             latest_version = str(request.text)
@@ -806,7 +806,7 @@ class ChromeDriver():
                     break
 
             if not latest_stable_version_element:
-                message = f'Could not determine latest version of Chrome Browser. Maybe the text {stable_channel_text} is changed'
+                message = f'Could not determine latest version of Chrome Browser. Maybe the text "{stable_channel_text}"" is changed'
                 logging.error(message)
                 return result_run, message, latest_version
 

@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from _setting import setting
-from edgeDriver import EdgeDriver
+from _edgeDriver import EdgeDriver
 import time
 import requests
 import platform
