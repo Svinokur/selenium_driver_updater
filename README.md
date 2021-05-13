@@ -34,6 +34,18 @@ print(filename)
 
 ```
 
+Or you can use library to download and update chromedriver and geckodriver binaries at the same time.
+```python
+from selenium_driver_updater import DriverUpdater
+import os
+base_dir = os.path.dirname(os.path.abspath(__file__))
+list_drivers = [DriverUpdater.chromedriver, DriverUpdater.geckodriver]
+
+result, message, filename = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
+print(filename)
+
+```
+
 # Supported Selenium Binaries
 
 ## Chromedriver (DriverUpdater.chromedriver)

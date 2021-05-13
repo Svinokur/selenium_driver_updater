@@ -36,8 +36,31 @@ class testGithubViewer(unittest.TestCase):
         print("%.3f" % t)
 
     #@unittest.skip('Temporary not needed')
-    def test01_check_get_latest_release_data_by_repo_name(self):
-        result, message, json_data = GithubViewer.get_latest_release_data_by_repo_name(repo_name = self.repo_name)
+    def test01_check_get_latest_release_data_by_repo_name_failure(self):
+        result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = 'mazilla/geckadruver')
+        self.assertFalse(result, json_data)
+        self.assertEqual(len(json_data),0, (len(json_data)))
+        self.assertGreater(len(message), 0, len(message))
+
+    #@unittest.skip('Temporary not needed')
+    def test02_check_get_latest_release_data_by_repo_name_failure(self):
+        result, message, json_data = self.github_viewer.get_specific_asset_by_repo_name(asset_name = 'mazillamac64.zip', 
+        repo_name = 'mazilla/geckadruver')
+        self.assertFalse(result, json_data)
+        self.assertEqual(len(json_data),0, (len(json_data)))
+        self.assertGreater(len(message), 0, len(message))
+
+    #@unittest.skip('Temporary not needed')
+    def test03_check_get_specific_asset_by_specific_version_by_repo_name_failure(self):
+        result, message, json_data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(version = '999.99.999', 
+        asset_name = 'mazillamac64.zip', repo_name='mazilla/geckadruver')
+        self.assertFalse(result, json_data)
+        self.assertEqual(len(json_data),0, (len(json_data)))
+        self.assertGreater(len(message), 0, len(message))
+
+    #@unittest.skip('Temporary not needed')
+    def test03_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):
+        result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = self.repo_name)
         self.assertTrue(result, message)
         self.assertIsNotNone(json_data,json_data)
         self.assertGreater(len(json_data), 0, len(json_data))
@@ -58,8 +81,8 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema_release))
     
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):
-        result, message, json_data = GithubViewer.get_specific_asset_by_repo_name(asset_name = self.specific_asset_name, 
+    def test04_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):
+        result, message, json_data = self.github_viewer.get_specific_asset_by_repo_name(asset_name = self.specific_asset_name, 
         repo_name=self.repo_name)
         self.assertTrue(result, message)
         self.assertIsNotNone(json_data,json_data)
@@ -71,8 +94,8 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNone(jsonschema.validate(instance=json_data[0].get('asset'), schema=schema))
 
     #@unittest.skip('Temporary not needed')
-    def test03_check_get_specific_asset_by_specific_version_by_repo_name_and_validate_json_schema(self):
-        result, message, json_data = GithubViewer.get_specific_asset_by_specific_version_by_repo_name(version = self.specific_version, 
+    def test05_check_get_specific_asset_by_specific_version_by_repo_name_and_validate_json_schema(self):
+        result, message, json_data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(version = self.specific_version, 
         asset_name = self.specific_asset_name, repo_name=self.repo_name)
         self.assertTrue(result, message)
         self.assertIsNotNone(json_data,json_data)

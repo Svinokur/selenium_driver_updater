@@ -14,8 +14,6 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 import requests
 
-import json
-
 class testDriverUpdater(unittest.TestCase): 
     """Class for unit-testing DriverUpdater class
 
@@ -36,10 +34,13 @@ class testDriverUpdater(unittest.TestCase):
 
         self.driver_updater = DriverUpdater
 
+        self.path = base_dir
+        self.driver_name = 'chromedriver'
+
     def tearDown(self):
         t = time.time() - self.startTime
         print("%.3f" % t)
-
+    
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
         url = self.setting["PyPi"]["urlProjectJson"]
@@ -51,13 +52,23 @@ class testDriverUpdater(unittest.TestCase):
         self.assertGreater(len(request_text), 0, request_text)
     
     #@unittest.skip('Temporary not needed')
-    def test02_check_library_is_up_to_date(self):
+    def test03_check_library_is_up_to_date(self):
         result, message = self.driver_updater._DriverUpdater__check_library_is_up_to_date()
         self.assertTrue(result, message)
     
     #@unittest.skip('Temporary not needed')
-    def test03_check_is_python_version_compatible_for_library(self):
+    def test04_check_is_python_version_compatible_for_library(self):
         result, message = self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
+        self.assertTrue(result, message)
+
+    #@unittest.skip('Temporary not needed')
+    def test05_check_all_input_parameteres(self):
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path, driver_name=self.driver_name)
+        self.assertTrue(result, message)
+
+    #@unittest.skip('Temporary not needed')
+    def test06_check_enviroment_and_variables(self):
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path, driver_name=self.driver_name, enable_library_update_check=True)
         self.assertTrue(result, message)
     
     

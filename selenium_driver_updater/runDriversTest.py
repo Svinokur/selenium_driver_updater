@@ -61,13 +61,18 @@ try:
    
     else:
 
+        failures = ''
+        errors = ''
+
         for failures in result.failures:
-            failures = str(failures) + "\n"
-            logging.error(failures)
+            failures = str(failures) + "\r\n"
+        
+        logging.error(failures)
 
         for errors in result.errors:
-            errors = str(errors) + "\n"
-            logging.error(errors)
+            errors = str(errors) + "\r\n"
+
+        logging.error(errors)
 
 except:
     message_run = f'Unexcepted error: {traceback.format_exc()}'
