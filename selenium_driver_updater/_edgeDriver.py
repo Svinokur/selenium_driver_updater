@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 from selenium import webdriver
 import requests
 import wget
@@ -101,7 +102,13 @@ class EdgeDriver():
 
         try:
 
-            if os.path.exists(self.edgedriver_path):
+            result, message, driver_version = self.__get_current_version_edgedriver_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of edgedriver via webdriver'
+                logging.info(message)
+            
+            if os.path.exists(self.edgedriver_path) and not result or not driver_version:
 
                 #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
                 desired_cap = {}
@@ -111,7 +118,7 @@ class EdgeDriver():
                 driver.close()
                 driver.quit()
         
-                logging.info(f'Current version of edgedriver: {driver_version}')
+            logging.info(f'Current version of edgedriver: {driver_version}')
 
             result_run = True
 
@@ -732,7 +739,13 @@ class EdgeDriver():
         
         try:
             
-            if os.path.exists(self.edgedriver_path):
+            result, message, browser_version = self.__get_current_version_edge_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of edge browser via edgedriver'
+                logging.info(message)
+            
+            if os.path.exists(self.edgedriver_path) and not result or not browser_version:
 
                 desired_cap = {}
 
@@ -741,7 +754,7 @@ class EdgeDriver():
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of edge browser: {browser_version}')
+            logging.info(f'Current version of edge browser: {browser_version}')
 
             result_run = True
 
@@ -884,3 +897,84 @@ class EdgeDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
+
+    def __get_current_version_edge_browser_selenium_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current edge browser version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current edge browser version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            edgebrowser_path = self.setting["EdgeBrowser"]["Path"]
+            if edgebrowser_path:
+
+                logging.info('Trying to get current version of edge browser via terminal')
+            
+                process = subprocess.Popen([edgebrowser_path, '--version'], stdout=subprocess.PIPE)
+        
+                browser_version = process.communicate()[0].decode('UTF-8')
+                browser_version = browser_version.replace(' \n', '').replace('Microsoft Edge ', '')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_current_version_edgedriver_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current edgedriver version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_version (str)    : Current edgedriver version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        driver_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.edgedriver_path):
+
+                logging.info('Trying to get current version of edgedriver via terminal')
+            
+                process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version = process.communicate()[0].decode('UTF-8')
+                driver_version = driver_version.split(' ')[1]
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, driver_version

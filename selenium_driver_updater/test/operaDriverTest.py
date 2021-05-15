@@ -137,14 +137,14 @@ class testOperaDriver(unittest.TestCase):
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
-    #@unittest.skip('Temporary not needed')
-    @unittest.skip('Temporary could not test it on Github Workflow')
+
+    #@unittest.skip('Temporary could not test it on Github Workflow')
     def test10_check_get_latest_opera_browser_for_current_os(self):
         result, message = self.opera_driver._OperaDriver__get_latest_opera_browser_for_current_os()
         self.assertTrue(result, message)
 
-    #@unittest.skip('Temporary not needed')
-    @unittest.skip('Temporary could not test it on Github Workflow')
+    
+    #@unittest.skip('Temporary could not test it on Github Workflow')
     def test11_check_compare_current_version_and_latest_version_opera_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.opera_driver._OperaDriver__compare_current_version_and_latest_version_opera_browser()
         self.assertTrue(result, message)
@@ -152,7 +152,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)
 
-        self.assertTrue(is_browser_is_up_to_date, is_browser_is_up_to_date)
+        self.assertIn(is_browser_is_up_to_date, [True, False], is_browser_is_up_to_date)
         
         self.assertGreater(len(current_version), 0, len(current_version))
         self.assertGreater(len(latest_version), 0, len(latest_version))

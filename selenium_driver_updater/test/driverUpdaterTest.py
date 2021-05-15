@@ -18,7 +18,7 @@ class testDriverUpdater(unittest.TestCase):
     """Class for unit-testing DriverUpdater class
 
     Attributes:
-        startTime (float)           : Time of starting unit-tests
+        startTime (float) : Time of starting unit-tests
     """
 
     def setUp(self):
@@ -40,9 +40,21 @@ class testDriverUpdater(unittest.TestCase):
     def tearDown(self):
         t = time.time() - self.startTime
         print("%.3f" % t)
+
+    #@unittest.skip('Temporary not needed')
+    def test01_check_all_input_parameteres_failure(self):
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path + 'hahaha', driver_name=self.driver_name)
+        self.assertFalse(result, message)
+        self.assertGreater(len(message), 0, len(message))
+
+    #@unittest.skip('Temporary not needed')
+    def test02_check_enviroment_and_variables_failure(self):
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path + 'hahaha', driver_name=self.driver_name, enable_library_update_check=True)
+        self.assertFalse(result, message)
+        self.assertGreater(len(message), 0, len(message))
     
     #@unittest.skip('Temporary not needed')
-    def test01_check_get_result_by_request(self):
+    def test03_check_get_result_by_request(self):
         url = self.setting["PyPi"]["urlProjectJson"]
         request = requests.get(url=url, headers=self.headers)
         status_code = request.status_code
@@ -52,22 +64,22 @@ class testDriverUpdater(unittest.TestCase):
         self.assertGreater(len(request_text), 0, request_text)
     
     #@unittest.skip('Temporary not needed')
-    def test03_check_library_is_up_to_date(self):
+    def test04_check_library_is_up_to_date(self):
         result, message = self.driver_updater._DriverUpdater__check_library_is_up_to_date()
         self.assertTrue(result, message)
     
     #@unittest.skip('Temporary not needed')
-    def test04_check_is_python_version_compatible_for_library(self):
+    def test05_check_is_python_version_compatible_for_library(self):
         result, message = self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test05_check_all_input_parameteres(self):
+    def test06_check_all_input_parameteres(self):
         result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path, driver_name=self.driver_name)
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_enviroment_and_variables(self):
+    def test07_check_enviroment_and_variables(self):
         result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path, driver_name=self.driver_name, enable_library_update_check=True)
         self.assertTrue(result, message)
     

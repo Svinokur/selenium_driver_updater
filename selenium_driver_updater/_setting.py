@@ -49,6 +49,9 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
+chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
+'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else ''
+
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else ''
 
@@ -56,6 +59,8 @@ chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdat
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
 
 
+firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
+'reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion' if platform.system() == 'Windows' else ''
 
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
 'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
@@ -65,6 +70,8 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 
 
 
+edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else ''
+
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
 
@@ -72,6 +79,7 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
 
+opera_browser_path = '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
 'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
@@ -80,12 +88,11 @@ opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Loca
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
 
-
 setting = dict(
     {
         "Program":
         {
-            'version'   : '2.12.0',
+            'version'   : '2.13.0',
         },
         "ChromeDriver":
         {   
@@ -117,24 +124,28 @@ setting = dict(
         },
         "ChromeBrowser":
         {
+            "Path"                      : chrome_browser_path,
             "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com',
             'ChromeBrowserUpdater'      : chrome_browser_updater,
             'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
         },
         "FirefoxBrowser":
         {
-            "LinkAllLatestReleases"     : 'https://www.mozilla.org/en-US/firefox/releases/',
-            'FirefoxBrowserUpdater'      : firefox_browser_updater,
-            'FirefoxBrowserUpdaterPath'  : firefox_browser_updater_path,
+            "Path"                          : firefox_browser_path,
+            "LinkAllLatestReleases"         : 'https://www.mozilla.org/en-US/firefox/releases/',
+            'FirefoxBrowserUpdater'         : firefox_browser_updater,
+            'FirefoxBrowserUpdaterPath'     : firefox_browser_updater_path,
         },
         "EdgeBrowser":
         {
+            "Path"                          : edge_browser_path,
             "LinkAllLatestRelease"          : 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel',
             'EdgeBrowserUpdater'            : edge_browser_updater,
             'EdgeBrowserUpdaterPath'        : edge_browser_updater_path,
         },
         "OperaBrowser":
         {
+            "Path"                          : opera_browser_path,
             'LinkAllReleases'               : 'https://blogs.opera.com/desktop/?s=changelog',
             "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
             "OperaBrowserUpdater"           : opera_browser_updater,

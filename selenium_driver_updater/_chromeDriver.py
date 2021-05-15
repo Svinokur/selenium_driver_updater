@@ -1,3 +1,4 @@
+import subprocess
 import requests
 import wget
 import os
@@ -27,6 +28,8 @@ from util.extractor import Extractor
 from bs4 import BeautifulSoup
 
 import pathlib
+
+import re
 
 class ChromeDriver():
 
@@ -330,7 +333,13 @@ class ChromeDriver():
         
         try:
             
-            if os.path.exists(self.chromedriver_path):
+            result, message, driver_version = self.__get_current_version_chrome_driver_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of chromedriver via webdriver'
+                logging.info(message)
+            
+            if os.path.exists(self.chromedriver_path) and not result or not driver_version:
 
                 chrome_options = webdriver.ChromeOptions()
         
@@ -341,7 +350,7 @@ class ChromeDriver():
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of chromedriver: {driver_version}')
+            logging.info(f'Current version of chromedriver: {driver_version}')
 
             result_run = True
 
@@ -732,8 +741,14 @@ class ChromeDriver():
         browser_version : str = ''
         
         try:
+
+            result, message, browser_version = self.__get_current_version_chrome_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of chrome browser via chromedriver'
+                logging.info(message)
             
-            if os.path.exists(self.chromedriver_path):
+            if os.path.exists(self.chromedriver_path) and not result or not browser_version:
 
                 chrome_options = webdriver.ChromeOptions()
         
@@ -744,7 +759,7 @@ class ChromeDriver():
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of chrome browser: {browser_version}')
+            logging.info(f'Current version of chrome browser: {browser_version}')
 
             result_run = True
 
@@ -1081,3 +1096,92 @@ class ChromeDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_equal, latest_version_chromedriver_main, latest_version_browser_main
+
+
+    def __get_current_version_chrome_browser_selenium_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current chrome browser version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current chrome browser version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            chromebrowser_path = self.setting["ChromeBrowser"]["Path"]
+            if chromebrowser_path:
+
+                logging.info('Trying to get current version of chrome browser via terminal')
+                
+                if platform.system() == 'Windows':
+
+                    process = subprocess.Popen(chromebrowser_path, stdout=subprocess.PIPE)
+        
+                    browser_version = process.communicate()[0].decode('UTF-8').strip().split(' ')[-1]
+
+                elif platform.system() == 'Darwin':
+                    process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)
+            
+                    browser_version = process.communicate()[0].decode('UTF-8')
+                    browser_version = browser_version.replace(' \n', '').replace('Google Chrome ', '')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_current_version_chrome_driver_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current chromedriver version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_version (str)    : Current chromedriver version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        driver_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.chromedriver_path):
+
+                logging.info('Trying to get current version of chromedriver via terminal')
+            
+                process = subprocess.Popen([self.chromedriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version = process.communicate()[0].decode('UTF-8')
+                driver_version = driver_version.split(' ')[1]
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, driver_version

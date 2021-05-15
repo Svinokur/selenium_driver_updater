@@ -1,3 +1,4 @@
+import subprocess
 from selenium import webdriver
 import wget
 import os
@@ -103,7 +104,13 @@ class GeckoDriver():
         driver_version : str = ''
         try:
             
-            if os.path.exists(self.geckodriver_path):
+            result, message, driver_version = self.__get_current_version_geckodriver_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of geckodriver via webdriver'
+                logging.info(message)
+            
+            if os.path.exists(self.geckodriver_path) and not result or not driver_version:
 
                 options = FirefoxOptions()
                 options.add_argument("--headless")
@@ -113,8 +120,7 @@ class GeckoDriver():
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of geckodriver: {driver_version}')
-
+            logging.info(f'Current version of geckodriver: {driver_version}')
 
             result_run = True
 
@@ -751,7 +757,13 @@ class GeckoDriver():
         
         try:
             
-            if os.path.exists(self.geckodriver_path):
+            result, message, browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of firefox browser via geckodriver'
+                logging.info(message)
+            
+            if os.path.exists(self.geckodriver_path) and not result or not browser_version:
 
                 options = FirefoxOptions()
                 options.add_argument("--headless")
@@ -761,7 +773,7 @@ class GeckoDriver():
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of firefox browser: {browser_version}')
+            logging.info(f'Current version of firefox browser: {browser_version}')
 
             result_run = True
 
@@ -912,3 +924,92 @@ class GeckoDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
+
+    def __get_current_version_firefox_browser_selenium_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current firefox browser version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current firefox browser version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            firefox_path = self.setting["FirefoxBrowser"]["Path"]
+            if firefox_path:
+
+                logging.info('Trying to get current version of firefox browser via terminal')
+
+                if platform.system() == 'Windows':
+
+                    process = subprocess.Popen(firefox_path, stdout=subprocess.PIPE)
+        
+                    browser_version = process.communicate()[0].decode('UTF-8')
+                    browser_version = browser_version.replace('   ', '').split(' ')[4]
+
+                elif platform.system() == 'Darwin':
+                    process = subprocess.Popen([firefox_path, '--version'], stdout=subprocess.PIPE)
+            
+                    browser_version = process.communicate()[0].decode('UTF-8')
+                    browser_version = browser_version.replace('\n', '').replace('Mozilla Firefox ', '')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_current_version_geckodriver_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current geckodriver version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_version (str)    : Current geckodriver version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        driver_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.geckodriver_path):
+
+                logging.info('Trying to get current version of geckodriver via terminal')
+            
+                process = subprocess.Popen([self.geckodriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version = process.communicate()[0].decode('UTF-8')
+                driver_version = driver_version.split(' ')[1]
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, driver_version

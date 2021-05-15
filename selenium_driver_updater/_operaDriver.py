@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 from selenium import webdriver
 import wget
 import os
@@ -92,7 +93,7 @@ class OperaDriver():
 
             WebDriverException: Occurs when current operadriver could not start or critical error occured
 
-            OSError: Occurs when chromedriver made for another CPU type
+            OSError: Occurs when operadriver made for another CPU type
 
             Except: If unexpected error raised. 
 
@@ -104,15 +105,20 @@ class OperaDriver():
 
         try:
 
-            if os.path.exists(self.operadriver_path):
+            result, message, driver_version = self.__get_current_version_operadriver_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of operadriver via webdriver'
+                logging.info(message)
+            
+            if os.path.exists(self.operadriver_path) and not result or not driver_version:
 
                 driver = webdriver.Opera(executable_path = self.operadriver_path)
                 driver_version = str(driver.capabilities['opera']['operadriverVersion'].split(' ')[0])
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of operadriver: {driver_version}')
-
+            logging.info(f'Current version of operadriver: {driver_version}')
 
             result_run = True
 
@@ -758,14 +764,20 @@ class OperaDriver():
         
         try:
             
-            if os.path.exists(self.operadriver_path):
+            result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of opera browser via operadriver'
+                logging.info(message)
+            
+            if os.path.exists(self.operadriver_path) and not result or not browser_version:
 
                 driver = webdriver.Opera(executable_path = self.operadriver_path)
                 browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
                 driver.close()
                 driver.quit()
 
-                logging.info(f'Current version of opera browser: {browser_version}')
+            logging.info(f'Current version of opera browser: {browser_version}')
 
             result_run = True
 
@@ -934,3 +946,84 @@ class OperaDriver():
             logging.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
+
+    def __get_current_version_opera_browser_selenium_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current opera browser version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            browser_version (str)   : Current opera browser version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        browser_version : str = ''
+        
+        try:
+            
+            operabrowser_path = self.setting["OperaBrowser"]["Path"]
+            if operabrowser_path:
+
+                logging.info('Trying to get current version of opera browser via terminal')
+            
+                process = subprocess.Popen([operabrowser_path, '--version'], stdout=subprocess.PIPE)
+        
+                browser_version = process.communicate()[0].decode('UTF-8')
+                browser_version = browser_version.replace('\n', '') 
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, browser_version
+
+    def __get_current_version_operadriver_via_terminal(self) -> Tuple[bool, str, str]:
+        """Gets current operadriver version via command in terminal
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_version (str)    : Current operadriver version.
+
+        Raises:
+
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        driver_version : str = ''
+        
+        try:
+            
+            if os.path.exists(self.operadriver_path):
+
+                logging.info('Trying to get current version of operadriver via terminal')
+            
+                process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version = process.communicate()[0].decode('UTF-8')
+                driver_version = driver_version.split(' ')[1]
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run, driver_version

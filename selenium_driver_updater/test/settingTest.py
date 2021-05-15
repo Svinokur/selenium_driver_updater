@@ -56,6 +56,9 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
+chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
+'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else ''
+
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else ''
 
@@ -63,6 +66,7 @@ chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdat
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
 
 
+firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else ''
 
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
 'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
@@ -71,6 +75,7 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 '/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
 
 
+edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -79,13 +84,13 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
 
+opera_browser_path = '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
 'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
-
 
 
 class testSetting(unittest.TestCase): 
@@ -117,10 +122,10 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
-        self.assertEqual(len(self.setting["ChromeBrowser"]), 3)
-        self.assertEqual(len(self.setting["FirefoxBrowser"]), 3)
-        self.assertEqual(len(self.setting["EdgeBrowser"]), 3)
-        self.assertEqual(len(self.setting["OperaBrowser"]), 4)
+        self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
+        self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
+        self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
+        self.assertEqual(len(self.setting["OperaBrowser"]), 5)
         self.assertEqual(len(self.setting["JsonSchema"]), 2)
         self.assertEqual(len(self.setting["Github"]), 2)
         self.assertEqual(len(self.setting["PyPi"]), 1)
@@ -128,7 +133,7 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.12.0")
+        self.assertEqual(self.setting["Program"]["version"], "2.13.0")
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -150,18 +155,22 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
 
+        self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com')
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"], chrome_browser_updater_path)
 
+        self.assertEqual(self.setting["FirefoxBrowser"]["Path"], firefox_browser_path)
         self.assertEqual(self.setting["FirefoxBrowser"]["LinkAllLatestReleases"], 'https://www.mozilla.org/en-US/firefox/releases/')
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"], firefox_browser_updater)
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"], firefox_browser_updater_path)
 
+        self.assertEqual(self.setting["EdgeBrowser"]["Path"], edge_browser_path)
         self.assertEqual(self.setting["EdgeBrowser"]["LinkAllLatestRelease"], 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel')
         self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"], edge_browser_updater)
         self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"], edge_browser_updater_path)
 
+        self.assertEqual(self.setting["OperaBrowser"]["Path"], opera_browser_path)
         self.assertEqual(self.setting["OperaBrowser"]["LinkAllReleases"], 'https://blogs.opera.com/desktop/?s=changelog')
         self.assertEqual(self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"], 'https://blogs.opera.com/desktop/changelog-for-{}/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)

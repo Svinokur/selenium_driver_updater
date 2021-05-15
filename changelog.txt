@@ -1,3 +1,14 @@
+[2.13.0] 15/05/2021
+This version provides innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# Improvements
+
+- Improved getting current version of chrome browser, firefox, opera browser and edge browser on MacOS 
+- Improved getting current version of chromebrowser and firefox on Windows
+- Improved getting current version of webdrivers in MacOS and Windows
+- Improved unit-tests (added checking with incorrect parameters - for failure test)
+
 [2.12.0] 13/05/2021
 This version provides innovations and improvements.
 This code was written and tested on Python 3.9.5
