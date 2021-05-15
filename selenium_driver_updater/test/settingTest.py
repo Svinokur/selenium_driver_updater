@@ -66,7 +66,8 @@ chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdat
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
 
 
-firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else ''
+firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
+'reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion' if platform.system() == 'Windows' else ''
 
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
 'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
@@ -133,7 +134,7 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.13.0")
+        self.assertEqual(self.setting["Program"]["version"], "2.13.1")
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
