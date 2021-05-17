@@ -25,8 +25,8 @@ import stat
 
 from util.extractor import Extractor
 from util.github_viewer import GithubViewer
+from util.requests_getter import RequestsGetter
 
-import requests
 from bs4 import BeautifulSoup
 import re
 
@@ -76,6 +76,8 @@ class GeckoDriver():
         self.github_viewer = GithubViewer
 
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
+
+        self.requests_getter = RequestsGetter
 
     def __get_current_version_geckodriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current geckodriver version
@@ -816,15 +818,12 @@ class GeckoDriver():
         try:
             
             url = self.setting["FirefoxBrowser"]["LinkAllLatestReleases"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
             element_releases_list = soup.findAll('ol', attrs={'class' : 'c-release-list'})[0]
 
             all_releases_elements = element_releases_list.findAll('a', attrs={'href' : re.compile('/releasenotes/')})

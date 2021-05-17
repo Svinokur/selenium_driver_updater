@@ -1,14 +1,13 @@
 from typing import Any, Tuple
-import requests
 import traceback
 import logging
-import json
 
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from _setting import setting
+from util.requests_getter import RequestsGetter
 
 class GithubViewer():
 
@@ -39,15 +38,10 @@ class GithubViewer():
 
         try:
 
-            request = requests.get(url, headers=GithubViewer._headers)
-            request_text = request.text
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
-                return result_run, message, json_data
-
-            json_data = json.loads(str(request_text))
+            result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
+            if not result:
+                logging.error(message)
+                return result, message, json_data
 
             result_run = True
 
@@ -84,15 +78,10 @@ class GithubViewer():
 
         try:
 
-            request = requests.get(url, headers=GithubViewer._headers)
-            request_text = request.text
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
-                return result_run, message, data
-                
-            json_data = json.loads(str(request_text))
+            result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
+            if not result:
+                logging.error(message)
+                return result, message, json_data
 
             version = json_data.get('name')
 
@@ -146,15 +135,10 @@ class GithubViewer():
 
         try:
 
-            request = requests.get(url=url, headers=GithubViewer._headers)
-            request_text = request.text
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
-                return result_run, message, data
-                
-            json_data = json.loads(str(request_text))
+            result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
+            if not result:
+                logging.error(message)
+                return result, message, json_data
 
             for release in json_data:
                 if version == release.get('name') or version in release.get('tag_name'):

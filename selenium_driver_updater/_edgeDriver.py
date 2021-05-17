@@ -28,6 +28,7 @@ from bs4 import BeautifulSoup
 import stat
 
 from util.extractor import Extractor
+from util.requests_getter import RequestsGetter
 
 import pathlib
 
@@ -73,6 +74,8 @@ class EdgeDriver():
         self.extractor = Extractor
 
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
+
+        self.requests_getter = RequestsGetter
 
     def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current edgedriver version
@@ -167,16 +170,13 @@ class EdgeDriver():
 
         try:
             
-            request = requests.get(self.setting['EdgeDriver']['LinkLastRelease'], headers=self.headers)
-            request_text = request.text
+            url = self.setting['EdgeDriver']['LinkLastRelease']
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request_text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
 
             elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
             stable_channel_text = 'stable ChannelCurrent'
@@ -511,6 +511,9 @@ class EdgeDriver():
             else:
 
                 result, message, driver_path = self.__download_edgedriver_for_specific_version(version=self.version)
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
 
             result_run = True
 
@@ -594,13 +597,10 @@ class EdgeDriver():
             logging.info(f'Started download edgedriver specific_version: {version}')
 
             url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(version)
-            request = requests.get(url=url, headers=self.headers)
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'The wrong version was specified. url: {url} status_code: {status_code} version: {version}'
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+            if not result:
                 logging.error(message)
-                return result_run, message, file_name
+                return result, message, file_name
 
             out_path = self.path + url.split('/')[4]
 
@@ -797,15 +797,12 @@ class EdgeDriver():
         try:
 
             url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
             latest_version = soup.findAll('h2')[0].text.split(': ')[0].split(' ')[1]
             
             logging.info(f'Latest version of edge browser: {latest_version}')

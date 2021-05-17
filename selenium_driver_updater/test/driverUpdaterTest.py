@@ -9,10 +9,12 @@ from driverUpdater import DriverUpdater
 from _setting import setting
 import time
 import os
+from util.requests_getter import RequestsGetter
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-import requests
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class testDriverUpdater(unittest.TestCase): 
     """Class for unit-testing DriverUpdater class
@@ -21,18 +23,15 @@ class testDriverUpdater(unittest.TestCase):
         startTime (float) : Time of starting unit-tests
     """
 
+    @classmethod
+    def setUpClass(cls):
+        cls.setting = setting
+
+        cls.driver_updater = DriverUpdater
+        cls.requests_getter = RequestsGetter
+
     def setUp(self):
-
-        user_agent : str = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/35.0.1916.47 Safari/537.36'
-
-        self.headers = {'User-Agent': user_agent}
-
-        self.setting = setting
-
         self.startTime : float = time.time()
-
-        self.driver_updater = DriverUpdater
 
         self.path = base_dir
         self.driver_name = 'chromedriver'
@@ -56,12 +55,10 @@ class testDriverUpdater(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_check_get_result_by_request(self):
         url = self.setting["PyPi"]["urlProjectJson"]
-        request = requests.get(url=url, headers=self.headers)
-        status_code = request.status_code
-        request_text = request.text
-
+        result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+        self.assertTrue(result, message)
         self.assertEqual(status_code, 200, status_code)
-        self.assertGreater(len(request_text), 0, request_text)
+        self.assertGreaterEqual(len(json_data), 0, len(json_data))
     
     #@unittest.skip('Temporary not needed')
     def test04_check_library_is_up_to_date(self):

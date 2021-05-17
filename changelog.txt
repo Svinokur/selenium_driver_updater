@@ -1,3 +1,22 @@
+[2.14.0] 17/05/2021
+This version provides innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added default folder path - if path does not specified
+- Added unit-tests by requests_getter module
+
+# Improvements
+
+- Improved functions decomposition
+- Improved unit-tests (added checking with incorrect parameters - for failure test)
+
+# Fixes
+
+- Fixed an issue if edgedriver return result was false, without printing an error message
+- Fixed an issue with slow downloading of specific version of edgedriver
+
 [2.13.1] 15/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

@@ -1,5 +1,4 @@
 import subprocess
-import requests
 import wget
 import os
 import traceback
@@ -24,12 +23,11 @@ from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
 from util.extractor import Extractor
+from util.requests_getter import RequestsGetter
 
 from bs4 import BeautifulSoup
 
 import pathlib
-
-import re
 
 class ChromeDriver():
 
@@ -74,6 +72,8 @@ class ChromeDriver():
         
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
+        self.requests_getter = RequestsGetter
+
     def __get_latest_version_chrome_driver(self, no_messages : bool = False) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
 
@@ -97,14 +97,12 @@ class ChromeDriver():
         try:
             
             url = self.setting["ChromeDriver"]["LinkLastRelease"]
-            request = requests.get(url=url, headers=self.headers)
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            latest_version = str(request.text)
+            latest_version = str(json_data)
 
             if not no_messages:
 
@@ -597,13 +595,10 @@ class ChromeDriver():
             logging.info(f'Started download chromedriver specific_version: {version}')
 
             url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(version)
-            request = requests.get(url, headers=self.headers)
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'The wrong version was specified. url: {url} status_code: {status_code} version: {version}'
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+            if not result:
                 logging.error(message)
-                return result_run, message, file_name
+                return result, message, file_name
 
             out_path = self.path + url.split('/')[4]
 
@@ -803,15 +798,12 @@ class ChromeDriver():
         try:
             
             url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
             elements_news = soup.findAll('div', attrs={'class' : 'post-body'})
             stable_channel_text = 'The Stable channel has been updated to '
 
@@ -1014,14 +1006,12 @@ class ChromeDriver():
         try:
             
             url = self.setting["ChromeDriver"]["LinkLastRelease"]
-            request = requests.get(url=url, headers=self.headers)
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version_previous
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
-                return result_run, message, latest_version_previous
-
-            latest_version = str(request.text)
+            latest_version = str(json_data)
 
             logging.info(f'Latest version of chromedriver: {latest_version}')
 
@@ -1032,14 +1022,12 @@ class ChromeDriver():
             latest_version_main_previous = int(latest_version_main) - 1
 
             url = self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_version_main_previous)
-            request = requests.get(url=url, headers=self.headers)
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version_previous
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code : {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            latest_version_previous = str(request.text)
+            latest_version_previous = str(json_data)
 
             logging.info(f'Latest previous version of chromedriver: {latest_version_previous}')
 

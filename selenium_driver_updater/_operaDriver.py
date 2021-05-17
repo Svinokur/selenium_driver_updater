@@ -26,6 +26,7 @@ from shutil import copyfile
 
 from util.extractor import Extractor
 from util.github_viewer import GithubViewer
+from util.requests_getter import RequestsGetter
 
 from bs4 import BeautifulSoup
 import requests
@@ -76,6 +77,8 @@ class OperaDriver():
         self.github_viewer = GithubViewer
 
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
+
+        self.requests_getter = RequestsGetter
 
     def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
         """Gets current operadriver version
@@ -822,15 +825,12 @@ class OperaDriver():
         try:
             
             url = self.setting["OperaBrowser"]["LinkAllReleases"]
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
             changelogs = soup.findAll('h1', attrs={'class' : 'entry-title'})
 
             for changelog in changelogs:
@@ -846,15 +846,12 @@ class OperaDriver():
 
 
             url = self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"].format(latest_main_version)
-            request = requests.get(url=url, headers=self.headers)
-            request_text = request.text
-            status_code = request.status_code
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
 
-            if status_code != 200:
-                message = f'status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message, latest_version
-
-            soup = BeautifulSoup(request_text, 'html.parser')
+            soup = BeautifulSoup(json_data, 'html.parser')
             latest_version = soup.findAll('h4')[0].text.split(' – ')[0]
             
             logging.info(f'Latest version of opera browser: {latest_version}')

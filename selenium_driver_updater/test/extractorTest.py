@@ -11,6 +11,9 @@ import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 class testExtractor(unittest.TestCase): 
     """Class for unit-testing Extractor class
 
@@ -22,8 +25,11 @@ class testExtractor(unittest.TestCase):
         startTime (float)           : Time of starting unit-tests
     """
 
+    @classmethod
+    def setUpClass(cls):
+        cls.extractor = Extractor
+
     def setUp(self):
-        self.extractor = Extractor
         self.out_path : str = base_dir + os.path.sep + 'archive' + os.path.sep
         self.zip_archive_path : str = self.out_path + 'geckodriver-v0.29.0-win64.zip'
         self.tar_archive_path : str = self.out_path + 'geckodriver-v0.29.1-macos-aarch64.tar.gz'

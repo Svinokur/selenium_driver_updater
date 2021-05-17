@@ -13,9 +13,9 @@ import os
 import traceback
 from typing import Tuple, Union
 
-import requests
-import json
 import time
+
+from util.requests_getter import RequestsGetter
 
 class DriverUpdater():
 
@@ -25,12 +25,12 @@ class DriverUpdater():
     edgedriver = 'edgedriver'
         
     @staticmethod
-    def install(path : str, driver_name : Union[str, list[str]], **kwargs):
+    def install(driver_name : Union[str, list[str]], **kwargs):
         """Function for install or update Selenium driver binary
 
         Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium driver binary. Must be folder path.
             driver_name (Union[str, list[str]]) : Specified driver name/names which will be downloaded or updated. Like "DriverUpdater.chromedriver" or etc.
+            path (str)                          : Specified path which will used for downloading or updating Selenium driver binary. Must be folder path.
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
             chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
@@ -63,6 +63,8 @@ class DriverUpdater():
         else:
             logging.basicConfig(level=logging.ERROR)
 
+        path = kwargs.get('path', sys.path[0])
+        logging.info('You have not specified the path - so used default folder path instead') if not kwargs.get('path') else ''
         path = str(os.path.abspath(path) + os.path.sep)
 
         filename : str = str(kwargs.get('filename', '')).replace('.', '')
@@ -207,15 +209,10 @@ class DriverUpdater():
         try:
             
             url = setting["PyPi"]["urlProjectJson"]
-            request = requests.get(url=url)
-            status_code = request.status_code
-
-            if status_code != 200:
-                message = f'Could not determine latest version of library, status_code not equal 200 status_code: {status_code} request_text: {request.text}'
-                return result_run, message
-
-            request_text = request.text
-            json_data = json.loads(request_text)
+            result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
+            if not result:
+                logging.error(message)
+                return result, message
 
             current_version = setting["Program"]["version"]
             latest_version = json_data.get('info').get('version')

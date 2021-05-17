@@ -92,7 +92,7 @@ setting = dict(
     {
         "Program":
         {
-            'version'   : '2.13.1',
+            'version'   : '2.14.0',
         },
         "ChromeDriver":
         {   
