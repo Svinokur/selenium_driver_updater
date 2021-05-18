@@ -105,23 +105,25 @@ class EdgeDriver():
 
         try:
 
-            result, message, driver_version = self.__get_current_version_edgedriver_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of edgedriver via webdriver'
-                logging.info(message)
-            
-            if os.path.exists(self.edgedriver_path) and not result or not driver_version:
+            if os.path.exists(self.edgedriver_path):
 
-                #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
-                desired_cap = {}
+                result, message, driver_version = self.__get_current_version_edgedriver_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of edgedriver via webdriver'
+                    logging.info(message)
+                
+                if not result or not driver_version:
 
-                driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
-                driver_version = str(driver.capabilities['msedge']['msedgedriverVersion'].split(' ')[0])
-                driver.close()
-                driver.quit()
+                    #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
+                    desired_cap = {}
+
+                    driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
+                    driver_version = str(driver.capabilities['msedge']['msedgedriverVersion'].split(' ')[0])
+                    driver.close()
+                    driver.quit()
         
-            logging.info(f'Current version of edgedriver: {driver_version}')
+                logging.info(f'Current version of edgedriver: {driver_version}')
 
             result_run = True
 
@@ -238,7 +240,7 @@ class EdgeDriver():
 
         return result_run, message_run
 
-    def __get_latest_edgedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
+    def __get_latest_edgedriver_for_current_os(self) -> Tuple[bool, str, str]:
         """Download latest edgedriver to folder
 
         Returns:
@@ -259,6 +261,11 @@ class EdgeDriver():
         driver_notes_path : str = self.path + 'Driver_Notes'
 
         try:
+
+            result, message, latest_version = self.__get_latest_version_edgedriver()
+            if not result:
+                logging.error(message)
+                return result, message, file_name
             
             logging.info(f'Started download edgedriver latest_version: {latest_version}')
 
@@ -347,13 +354,6 @@ class EdgeDriver():
                 if is_driver_up_to_date:
                     return True, message, self.edgedriver_path
 
-            else:
-
-                result, message, latest_version = self.__get_latest_version_edgedriver()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
             if self.upgrade:
 
                 result, message = self.__delete_current_edgedriver_for_current_os()
@@ -361,7 +361,7 @@ class EdgeDriver():
                     logging.error(message)
                     return result, message, driver_path
 
-            result, message, driver_path = self.__get_latest_edgedriver_for_current_os(latest_version)
+            result, message, driver_path = self.__get_latest_edgedriver_for_current_os()
             if not result:
                 logging.error(message)
                 return result, message, driver_path

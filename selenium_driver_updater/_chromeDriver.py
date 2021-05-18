@@ -150,11 +150,8 @@ class ChromeDriver():
 
         return result_run, message_run
 
-    def __get_latest_chromedriver_for_current_os(self, latest_version : str) -> Tuple[bool, str, str]:
+    def __get_latest_chromedriver_for_current_os(self) -> Tuple[bool, str, str]:
         """Downloads latest chromedriver to specific path
-
-        Args:
-            latest_version (str)    : Latest version of chromedriver.
 
         Returns:
             Tuple of bool, str and str
@@ -172,6 +169,11 @@ class ChromeDriver():
         file_name : str = ''
         
         try:
+
+            result, message, latest_version = self.__get_latest_version_chrome_driver()
+            if not result:
+                logging.error(message)
+                return result, message, file_name
 
             logging.info(f'Started download chromedriver latest_version: {latest_version}')
 
@@ -258,13 +260,6 @@ class ChromeDriver():
                 if is_driver_up_to_date:
                     return True, message, self.chromedriver_path
 
-            else:
-
-                result, message, latest_version = self.__get_latest_version_chrome_driver()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
             if self.upgrade:
 
                 result, message = self.__delete_current_chromedriver_for_current_os()
@@ -272,7 +267,7 @@ class ChromeDriver():
                     logging.error(message)
                     return result, message, driver_path
 
-            result, message, driver_path = self.__get_latest_chromedriver_for_current_os(latest_version)
+            result, message, driver_path = self.__get_latest_chromedriver_for_current_os()
             if not result:
                 logging.error(message)
                 return result, message, driver_path
@@ -291,7 +286,7 @@ class ChromeDriver():
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
-                    message = f'Problem with updating chromedriver current_version : {current_version} latest_version : {latest_version}'
+                    message = f'Problem with updating chromedriver current_version: {current_version} latest_version: {latest_version}'
                     logging.error(message)
                     return result_run, message, driver_path
 
@@ -330,25 +325,27 @@ class ChromeDriver():
         driver_version : str = ''
         
         try:
+
+            if os.path.exists(self.chromedriver_path):
             
-            result, message, driver_version = self.__get_current_version_chrome_driver_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of chromedriver via webdriver'
-                logging.info(message)
+                result, message, driver_version = self.__get_current_version_chrome_driver_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of chromedriver via webdriver'
+                    logging.info(message)
+                
+                if not result or not driver_version:
+
+                    chrome_options = webdriver.ChromeOptions()
             
-            if os.path.exists(self.chromedriver_path) and not result or not driver_version:
+                    chrome_options.add_argument('--headless')
 
-                chrome_options = webdriver.ChromeOptions()
-        
-                chrome_options.add_argument('--headless')
+                    driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
+                    driver_version = str(driver.capabilities['chrome']['chromedriverVersion'].split(" ")[0])
+                    driver.close()
+                    driver.quit()
 
-                driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
-                driver_version = str(driver.capabilities['chrome']['chromedriverVersion'].split(" ")[0])
-                driver.close()
-                driver.quit()
-
-            logging.info(f'Current version of chromedriver: {driver_version}')
+                logging.info(f'Current version of chromedriver: {driver_version}')
 
             result_run = True
 

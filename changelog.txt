@@ -1,3 +1,11 @@
+[2.15.0] 18/05/2021
+This version provides some minor improvements.
+This code was written and tested on Python 3.9.5
+
+# Improvements
+
+- Improved overall code optimization
+
 [2.14.0] 17/05/2021
 This version provides innovations and improvements.
 This code was written and tested on Python 3.9.5
