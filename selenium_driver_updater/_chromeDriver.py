@@ -802,7 +802,7 @@ class ChromeDriver():
 
             soup = BeautifulSoup(json_data, 'html.parser')
             elements_news = soup.findAll('div', attrs={'class' : 'post-body'})
-            stable_channel_text = 'The Stable channel has been updated to '
+            stable_channel_text = 'The Stable channel is being updated to '
 
             for news in elements_news:
                 if stable_channel_text in news.text:
@@ -810,11 +810,11 @@ class ChromeDriver():
                     break
 
             if not latest_stable_version_element:
-                message = f'Could not determine latest version of Chrome Browser. Maybe the text "{stable_channel_text}"" is changed'
+                message = f'Could not determine latest version of Chrome Browser. Maybe the text "{stable_channel_text}" is changed'
                 logging.error(message)
                 return result_run, message, latest_version
 
-            latest_version = latest_stable_version_element.split(stable_channel_text)[1].split(' for Windows')[0] #maybe add more safely execution of version?
+            latest_version = latest_stable_version_element.split(stable_channel_text)[1].split(' ')[0] #maybe add more safely execution of version?
 
             if not no_messages:
 
