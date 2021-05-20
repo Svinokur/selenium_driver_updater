@@ -1,3 +1,16 @@
+[2.16.0] 20/05/2021
+This version provides some improvements and fixes.
+This code was written and tested on Python 3.9.5
+
+# Improvements
+
+- Improved getting latest version of webdriver browsers
+
+# Fixes
+
+- Fixed an issue with incorrect determination latest version of chrome browser
+- Fixed an issue with incorrect determination latest version of opera browser in some OS's
+
 [2.15.1] 19/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

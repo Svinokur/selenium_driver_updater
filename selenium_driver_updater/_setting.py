@@ -92,7 +92,8 @@ setting = dict(
     {
         "Program":
         {
-            'version'   : '2.15.1',
+            'version'                   : '2.16.0',
+            'wedriverVersionPattern'    : '[0-9]+.[0-9]+.[0-9]+.[0-9]+',
         },
         "ChromeDriver":
         {   
@@ -125,7 +126,7 @@ setting = dict(
         "ChromeBrowser":
         {
             "Path"                      : chrome_browser_path,
-            "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com',
+            "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com/search?max-results=20',
             'ChromeBrowserUpdater'      : chrome_browser_updater,
             'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
         },
@@ -146,7 +147,7 @@ setting = dict(
         "OperaBrowser":
         {
             "Path"                          : opera_browser_path,
-            'LinkAllReleases'               : 'https://blogs.opera.com/desktop/?s=changelog',
+            'LinkAllReleases'               : 'https://blogs.opera.com/desktop/?s=Stable+update',
             "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
             "OperaBrowserUpdater"           : opera_browser_updater,
             'OperaBrowserUpdaterPath'       : opera_browser_updater_path,

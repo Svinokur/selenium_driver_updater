@@ -29,6 +29,8 @@ from bs4 import BeautifulSoup
 
 import pathlib
 
+import re
+
 class ChromeDriver():
 
     _tmp_folder_path = 'tmp'
@@ -801,20 +803,20 @@ class ChromeDriver():
                 return result, message, latest_version
 
             soup = BeautifulSoup(json_data, 'html.parser')
-            elements_news = soup.findAll('div', attrs={'class' : 'post-body'})
-            stable_channel_text = 'The Stable channel is being updated to '
+            elements_news = soup.findAll('div', attrs={'class' : 'post'})
+            stable_channel_header_text = 'Stable Channel Update for Desktop'
 
             for news in elements_news:
-                if stable_channel_text in news.text:
+                if stable_channel_header_text in news.text:
                     latest_stable_version_element = news.text.replace('\n', '').replace('\xa0', '')
                     break
 
             if not latest_stable_version_element:
-                message = f'Could not determine latest version of Chrome Browser. Maybe the text "{stable_channel_text}" is changed'
+                message = f'Could not determine latest stable channel post of Chrome Browser. Maybe the text "{stable_channel_header_text}" is changed'
                 logging.error(message)
                 return result_run, message, latest_version
 
-            latest_version = latest_stable_version_element.split(stable_channel_text)[1].split(' ')[0] #maybe add more safely execution of version?
+            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_stable_version_element)[0]
 
             if not no_messages:
 

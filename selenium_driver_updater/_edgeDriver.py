@@ -32,6 +32,8 @@ from util.requests_getter import RequestsGetter
 
 import pathlib
 
+import re
+
 class EdgeDriver():
 
     _tmp_folder_path = 'tmp'
@@ -194,7 +196,8 @@ class EdgeDriver():
                 return result_run, message, latest_version
             
             latest_version_element = stable_channel_element.findAll('p', attrs={'class' : 'driver-download__meta'})[0].text
-            latest_version = latest_version_element.split(':')[1][1:]
+            
+            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
 
             logging.info(f'Latest version of edgedriver: {latest_version}')
 
@@ -803,7 +806,9 @@ class EdgeDriver():
                 return result, message, latest_version
 
             soup = BeautifulSoup(json_data, 'html.parser')
-            latest_version = soup.findAll('h2')[0].text.split(': ')[0].split(' ')[1]
+            latest_version_element = soup.findAll('h2')[0].text
+
+            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
             
             logging.info(f'Latest version of edge browser: {latest_version}')
 

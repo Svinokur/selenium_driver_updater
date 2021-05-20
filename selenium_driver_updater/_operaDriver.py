@@ -29,9 +29,10 @@ from util.github_viewer import GithubViewer
 from util.requests_getter import RequestsGetter
 
 from bs4 import BeautifulSoup
-import requests
 
 import pathlib
+
+import re
 
 class OperaDriver():
 
@@ -819,8 +820,7 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         latest_version : str = ''
-        latest_main_version : str = ''
-        all_changelog = []
+        latest_version_element : str = ''
 
         try:
             
@@ -834,25 +834,23 @@ class OperaDriver():
             changelogs = soup.findAll('h1', attrs={'class' : 'entry-title'})
 
             for changelog in changelogs:
-                version = changelog.text.replace('\n', '').replace(' ', '').split('Changelogfor')[1]
-                all_changelog.append(version)
+                latest_version_element = changelog.text.replace('\n', '')
+                
+                if 'macos' in changelog.text.lower() and platform.system() == 'Darwin':
+                    break
 
-            latest_main_version = max(all_changelog)
+                elif 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
+                    continue
 
-            if not latest_main_version:
-                message = f'Latest main version of opera browser could not be determinated. Maybe the text Changelogfor is changed.'
+                else:
+                    break
+
+            if not latest_version_element:
+                message = f'Latest main version of opera browser could not be determinated. Maybe the element is changed.'
                 logging.error(message)
                 return result_run, message, latest_version
 
-
-            url = self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"].format(latest_main_version)
-            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
-            if not result:
-                logging.error(message)
-                return result, message, latest_version
-
-            soup = BeautifulSoup(json_data, 'html.parser')
-            latest_version = soup.findAll('h4')[0].text.split(' – ')[0]
+            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
             
             logging.info(f'Latest version of opera browser: {latest_version}')
 

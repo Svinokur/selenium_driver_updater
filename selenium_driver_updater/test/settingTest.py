@@ -118,7 +118,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
-        self.assertEqual(len(self.setting["Program"]), 1)
+        self.assertEqual(len(self.setting["Program"]), 2)
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
@@ -134,7 +134,8 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.15.1")
+        self.assertEqual(self.setting["Program"]["version"], "2.16.0")
+        self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], '[0-9]+.[0-9]+.[0-9]+.[0-9]+')
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -157,7 +158,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
-        self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com')
+        self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search?max-results=20')
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"], chrome_browser_updater_path)
 
@@ -172,7 +173,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"], edge_browser_updater_path)
 
         self.assertEqual(self.setting["OperaBrowser"]["Path"], opera_browser_path)
-        self.assertEqual(self.setting["OperaBrowser"]["LinkAllReleases"], 'https://blogs.opera.com/desktop/?s=changelog')
+        self.assertEqual(self.setting["OperaBrowser"]["LinkAllReleases"], 'https://blogs.opera.com/desktop/?s=Stable+update')
         self.assertEqual(self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"], 'https://blogs.opera.com/desktop/changelog-for-{}/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
