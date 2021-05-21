@@ -66,14 +66,14 @@ class testGeckoDriver(unittest.TestCase):
         print("%.3f" % t)
 
     #@unittest.skip('Temporary not needed')
-    def test01_check_get_current_version_geckodriver_selenium(self):
+    def test01_check_get_current_version_geckodriver_selenium_failure(self):
         result, message, current_version = self.gecko_driver_failure._GeckoDriver__get_current_version_geckodriver_selenium()
         self.assertTrue(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        self.assertGreaterEqual(len(message), 0, len(message))
         self.assertEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_specific_version_geckodriver_for_current_os(self):
+    def test02_check_get_specific_version_geckodriver_for_current_os_failure(self):
         result, message, file_name = self.gecko_driver_failure._GeckoDriver__get_specific_version_geckodriver_for_current_os(version=self.specific_version_failure)
         self.assertFalse(result, result)
         self.assertGreater(len(message), 0, len(message))

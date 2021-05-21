@@ -109,20 +109,22 @@ class OperaDriver():
 
         try:
 
-            result, message, driver_version = self.__get_current_version_operadriver_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of operadriver via webdriver'
-                logging.info(message)
-            
-            if os.path.exists(self.operadriver_path) and not result or not driver_version:
+            if os.path.exists(self.operadriver_path):
 
-                driver = webdriver.Opera(executable_path = self.operadriver_path)
-                driver_version = str(driver.capabilities['opera']['operadriverVersion'].split(' ')[0])
-                driver.close()
-                driver.quit()
+                result, message, driver_version = self.__get_current_version_operadriver_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of operadriver via webdriver'
+                    logging.info(message)
+                
+                if not result or not driver_version:
 
-            logging.info(f'Current version of operadriver: {driver_version}')
+                    driver = webdriver.Opera(executable_path = self.operadriver_path)
+                    driver_version = str(driver.capabilities['opera']['operadriverVersion'].split(' ')[0])
+                    driver.close()
+                    driver.quit()
+
+                logging.info(f'Current version of operadriver: {driver_version}')
 
             result_run = True
 
@@ -767,21 +769,23 @@ class OperaDriver():
         browser_version : str = ''
         
         try:
-            
-            result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of opera browser via operadriver'
-                logging.info(message)
-            
-            if os.path.exists(self.operadriver_path) and not result or not browser_version:
 
-                driver = webdriver.Opera(executable_path = self.operadriver_path)
-                browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
-                driver.close()
-                driver.quit()
+            if os.path.exists(self.operadriver_path):
+            
+                result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of opera browser via operadriver'
+                    logging.info(message)
+                
+                if not result or not browser_version:
 
-            logging.info(f'Current version of opera browser: {browser_version}')
+                    driver = webdriver.Opera(executable_path = self.operadriver_path)
+                    browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
+                    driver.close()
+                    driver.quit()
+
+                logging.info(f'Current version of opera browser: {browser_version}')
 
             result_run = True
 
@@ -962,6 +966,7 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         browser_version : str = ''
+        browser_version_terminal : str = ''
         
         try:
             
@@ -969,11 +974,23 @@ class OperaDriver():
             if operabrowser_path:
 
                 logging.info('Trying to get current version of opera browser via terminal')
-            
-                process = subprocess.Popen([operabrowser_path, '--version'], stdout=subprocess.PIPE)
+
+                if platform.system() == 'Windows':
+
+                    process = subprocess.Popen(operabrowser_path, stdout=subprocess.PIPE)
         
-                browser_version = process.communicate()[0].decode('UTF-8')
-                browser_version = browser_version.replace('\n', '') 
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+                    find_string_terminal = re.findall("Opera.*", browser_version_terminal)
+                    
+                    browser_version_terminal = find_string_terminal[0] if len(find_string_terminal) > 0 else ''
+
+                elif platform.system() == 'Darwin':
+                    process = subprocess.Popen([operabrowser_path, '--version'], stdout=subprocess.PIPE)
+        
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
+                browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 
@@ -1003,6 +1020,7 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
+        driver_version_terminal : str = ''
         
         try:
             
@@ -1012,8 +1030,10 @@ class OperaDriver():
             
                 process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
         
-                driver_version = process.communicate()[0].decode('UTF-8')
-                driver_version = driver_version.split(' ')[1]
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+                
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

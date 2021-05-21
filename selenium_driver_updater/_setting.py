@@ -70,7 +70,8 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 
 
 
-edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else ''
+edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
+'reg query "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -79,7 +80,8 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
 
-opera_browser_path = '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
+opera_browser_path = r'REG QUERY "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Windows\CurrentVersion\Uninstall"' if platform.system() == 'Windows' else \
+'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
 'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
@@ -92,7 +94,7 @@ setting = dict(
     {
         "Program":
         {
-            'version'                   : '2.16.0',
+            'version'                   : '2.17.0',
             'wedriverVersionPattern'    : '[0-9]+.[0-9]+.[0-9]+.[0-9]+',
         },
         "ChromeDriver":
@@ -108,6 +110,7 @@ setting = dict(
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : geckodriver_platform_last_release,
             "LinkAllReleases"           : 'https://api.github.com/repos/mozilla/geckodriver/releases',
+            'geckodriverVersionPattern' : "[0-9]+.[0-9]+.[0-9]+",
         },
         "OperaDriver":
         {

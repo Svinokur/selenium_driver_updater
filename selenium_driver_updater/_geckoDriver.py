@@ -105,24 +105,26 @@ class GeckoDriver():
         message_run : str = ''
         driver_version : str = ''
         try:
+
+            if os.path.exists(self.geckodriver_path):
             
-            result, message, driver_version = self.__get_current_version_geckodriver_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of geckodriver via webdriver'
-                logging.info(message)
-            
-            if os.path.exists(self.geckodriver_path) and not result or not driver_version:
+                result, message, driver_version = self.__get_current_version_geckodriver_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of geckodriver via webdriver'
+                    logging.info(message)
+                
+                if not result or not driver_version:
 
-                options = FirefoxOptions()
-                options.add_argument("--headless")
+                    options = FirefoxOptions()
+                    options.add_argument("--headless")
 
-                driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
-                driver_version = str(driver.capabilities['moz:geckodriverVersion'])
-                driver.close()
-                driver.quit()
+                    driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
+                    driver_version = str(driver.capabilities['moz:geckodriverVersion'])
+                    driver.close()
+                    driver.quit()
 
-            logging.info(f'Current version of geckodriver: {driver_version}')
+                logging.info(f'Current version of geckodriver: {driver_version}')
 
             result_run = True
 
@@ -758,24 +760,26 @@ class GeckoDriver():
         browser_version : str = ''
         
         try:
+
+            if os.path.exists(self.geckodriver_path):
             
-            result, message, browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
-            if not result:
-                logging.error(message)
-                message = 'Trying to get current version of firefox browser via geckodriver'
-                logging.info(message)
-            
-            if os.path.exists(self.geckodriver_path) and not result or not browser_version:
+                result, message, browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
+                if not result:
+                    logging.error(message)
+                    message = 'Trying to get current version of firefox browser via geckodriver'
+                    logging.info(message)
+                
+                if not result or not browser_version:
 
-                options = FirefoxOptions()
-                options.add_argument("--headless")
+                    options = FirefoxOptions()
+                    options.add_argument("--headless")
 
-                driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
-                browser_version = str(driver.capabilities['browserVersion'])
-                driver.close()
-                driver.quit()
+                    driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
+                    browser_version = str(driver.capabilities['browserVersion'])
+                    driver.close()
+                    driver.quit()
 
-            logging.info(f'Current version of firefox browser: {browser_version}')
+                logging.info(f'Current version of firefox browser: {browser_version}')
 
             result_run = True
 
@@ -944,6 +948,7 @@ class GeckoDriver():
         result_run : bool = False
         message_run : str = ''
         browser_version : str = ''
+        browser_version_terminal : str = ''
         
         try:
             
@@ -956,14 +961,15 @@ class GeckoDriver():
 
                     process = subprocess.Popen(firefox_path, stdout=subprocess.PIPE)
         
-                    browser_version = process.communicate()[0].decode('UTF-8')
-                    browser_version = browser_version.replace('   ', '').split(' ')[4]
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
                 elif platform.system() == 'Darwin':
                     process = subprocess.Popen([firefox_path, '--version'], stdout=subprocess.PIPE)
             
-                    browser_version = process.communicate()[0].decode('UTF-8')
-                    browser_version = browser_version.replace('\n', '').replace('Mozilla Firefox ', '')
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], browser_version_terminal)
+                browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 
@@ -993,6 +999,7 @@ class GeckoDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
+        driver_version_terminal : str = ''
         
         try:
             
@@ -1002,8 +1009,10 @@ class GeckoDriver():
             
                 process = subprocess.Popen([self.geckodriver_path, '--version'], stdout=subprocess.PIPE)
         
-                driver_version = process.communicate()[0].decode('UTF-8')
-                driver_version = driver_version.split(' ')[1]
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+                
+                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

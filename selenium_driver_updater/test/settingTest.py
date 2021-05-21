@@ -76,7 +76,8 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 '/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
 
 
-edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else ''
+edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
+'reg query "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -85,7 +86,8 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
 
-opera_browser_path = '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
+opera_browser_path = r'REG QUERY "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Windows\CurrentVersion\Uninstall"' if platform.system() == 'Windows' else \
+'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
 'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
@@ -120,7 +122,7 @@ class testSetting(unittest.TestCase):
     def test02_checkCountParams(self):
         self.assertEqual(len(self.setting["Program"]), 2)
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
-        self.assertEqual(len(self.setting["GeckoDriver"]), 4)
+        self.assertEqual(len(self.setting["GeckoDriver"]), 5)
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
@@ -134,7 +136,7 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.16.0")
+        self.assertEqual(self.setting["Program"]["version"], "2.17.0")
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], '[0-9]+.[0-9]+.[0-9]+.[0-9]+')
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
@@ -146,6 +148,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], geckodriver_platform_last_release)
         self.assertEqual(self.setting["GeckoDriver"]["LinkAllReleases"], 'https://api.github.com/repos/mozilla/geckodriver/releases')
+        self.assertEqual(self.setting["GeckoDriver"]["geckodriverVersionPattern"], "[0-9]+.[0-9]+.[0-9]+")
 
         self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)

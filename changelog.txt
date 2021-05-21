@@ -1,3 +1,19 @@
+[2.17.0] 21/05/2021
+This version provides some improvements and minor fixes.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added getting current versions of edge and opera browsers via terminal on Windows
+
+# Improvements
+
+- Improved getting current versions of webdrivers and webdrivers browsers on different OS's
+
+# Fixes
+
+- Fixed some issues with unit-tests
+
 [2.16.0] 20/05/2021
 This version provides some improvements and fixes.
 This code was written and tested on Python 3.9.5

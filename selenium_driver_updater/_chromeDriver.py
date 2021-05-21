@@ -1105,6 +1105,7 @@ class ChromeDriver():
         result_run : bool = False
         message_run : str = ''
         browser_version : str = ''
+        browser_version_terminal : str = ''
         
         try:
             
@@ -1117,13 +1118,15 @@ class ChromeDriver():
 
                     process = subprocess.Popen(chromebrowser_path, stdout=subprocess.PIPE)
         
-                    browser_version = process.communicate()[0].decode('UTF-8').strip().split(' ')[-1]
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
                 elif platform.system() == 'Darwin':
                     process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)
             
-                    browser_version = process.communicate()[0].decode('UTF-8')
-                    browser_version = browser_version.replace(' \n', '').replace('Google Chrome ', '')
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
+                browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 
@@ -1153,6 +1156,7 @@ class ChromeDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
+        driver_version_terminal : str = ''
         
         try:
             
@@ -1162,8 +1166,10 @@ class ChromeDriver():
             
                 process = subprocess.Popen([self.chromedriver_path, '--version'], stdout=subprocess.PIPE)
         
-                driver_version = process.communicate()[0].decode('UTF-8')
-                driver_version = driver_version.split(' ')[1]
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 
