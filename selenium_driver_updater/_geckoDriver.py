@@ -265,10 +265,9 @@ class GeckoDriver():
             logging.info(f'Started download geckodriver by url: {url}')
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Geckodriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
 
@@ -306,8 +305,6 @@ class GeckoDriver():
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-            time.sleep(3)
 
             if os.path.exists(file_name):
                 os.remove(file_name)
@@ -619,10 +616,9 @@ class GeckoDriver():
             logging.info(f'Started download geckodriver by url: {url}')
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Geckodriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
 
@@ -660,8 +656,6 @@ class GeckoDriver():
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-            time.sleep(3)
 
             if os.path.exists(file_name):
                 os.remove(file_name)

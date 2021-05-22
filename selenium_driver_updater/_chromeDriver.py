@@ -188,10 +188,9 @@ class ChromeDriver():
             logging.info(f'Started download chromedriver by url: {url}')
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Chromedriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
                 
@@ -214,11 +213,8 @@ class ChromeDriver():
                     logging.error(message)
                     return result, message, file_name
 
-            time.sleep(6)
-
             if os.path.exists(file_name):
                 os.remove(file_name)
-
             
             file_name = self.chromedriver_path
 
@@ -607,10 +603,9 @@ class ChromeDriver():
             logging.info(f'Started download chromedriver by url: {url}')
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Chromedriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
 
@@ -633,12 +628,9 @@ class ChromeDriver():
                     logging.error(message)
                     return result, message, file_name
 
-            time.sleep(3)
-
             if os.path.exists(file_name):
                 os.remove(file_name)
 
-            
             file_name = self.chromedriver_path
 
             logging.info(f'Chromedriver was successfully unpacked by path: {file_name}')
@@ -852,7 +844,7 @@ class ChromeDriver():
             logging.info(message)
 
             os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
-            time.sleep(15) #wait for the updating
+            time.sleep(60) #wait for the updating
             
             message = f'Chrome browser was successfully updated to the latest version.'
             logging.info(message)

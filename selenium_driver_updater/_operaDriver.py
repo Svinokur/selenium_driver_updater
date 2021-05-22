@@ -266,7 +266,7 @@ class OperaDriver():
 
             logging.info(f'Operadriver was downloaded to path: {file_name}')
 
-            time.sleep(2)
+            #time.sleep(2)
 
             archive_path = file_name
             out_path = self.path
@@ -275,7 +275,7 @@ class OperaDriver():
                 logging.error(message)
                 return result, message, file_name
 
-            time.sleep(3)
+            #time.sleep(3)
 
             archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
             archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
@@ -643,10 +643,9 @@ class OperaDriver():
             logging.info(f'Started download operadriver by url: {url}')
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Operadriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             archive_path = file_name
             out_path = self.path
@@ -654,8 +653,6 @@ class OperaDriver():
             if not result:
                 logging.error(message)
                 return result, message, file_name
-
-            time.sleep(3)
 
             archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
             archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
@@ -839,11 +836,8 @@ class OperaDriver():
 
             for changelog in changelogs:
                 latest_version_element = changelog.text.replace('\n', '')
-                
-                if 'macos' in changelog.text.lower() and platform.system() == 'Darwin':
-                    break
 
-                elif 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
+                if 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
                     continue
 
                 else:
@@ -888,7 +882,7 @@ class OperaDriver():
             logging.info(message)
 
             os.system(self.setting["OperaBrowser"]["OperaBrowserUpdater"])
-            time.sleep(15) #wait for the updating
+            time.sleep(60) #wait for the updating
             
             message = f'Opera browser was successfully updated to the latest version.'
             logging.info(message)

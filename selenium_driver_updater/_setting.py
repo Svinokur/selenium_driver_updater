@@ -89,12 +89,14 @@ opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Pr
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
+class info:
+    version = "2.18.0"
 
 setting = dict(
     {
         "Program":
         {
-            'version'                   : '2.17.0',
+            'version'                   : info.version,
             'wedriverVersionPattern'    : '[0-9]+.[0-9]+.[0-9]+.[0-9]+',
         },
         "ChromeDriver":

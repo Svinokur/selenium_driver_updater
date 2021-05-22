@@ -1,3 +1,19 @@
+[2.18.0] 22/05/2021
+This version provides some improvements and optimizations.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added bigger timeout while updating webdrivers browsers
+
+# Improvements
+
+- Improved overall code optimization
+
+# Operations
+
+- Speeded up all webdrivers download
+
 [2.17.0] 21/05/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5

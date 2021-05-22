@@ -281,10 +281,9 @@ class EdgeDriver():
                 os.remove(out_path)
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Edgedriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
                 
@@ -308,8 +307,6 @@ class EdgeDriver():
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-            time.sleep(3)
 
             if os.path.exists(file_name):
                 os.remove(file_name)
@@ -613,10 +610,9 @@ class EdgeDriver():
                 os.remove(out_path)
 
             file_name = wget.download(url=url, out=out_path)
+            time.sleep(2)
 
             logging.info(f'Edgedriver was downloaded to path: {file_name}')
-
-            time.sleep(2)
 
             if not self.filename:
                 
@@ -639,8 +635,6 @@ class EdgeDriver():
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-            time.sleep(3)
 
             if os.path.exists(file_name):
                 os.remove(file_name)
@@ -844,7 +838,7 @@ class EdgeDriver():
             logging.info(message)
 
             os.system(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"])
-            time.sleep(15) #wait for the updating
+            time.sleep(60) #wait for the updating
             
             message = f'Edge browser was successfully updated to the latest version.'
             logging.info(message)

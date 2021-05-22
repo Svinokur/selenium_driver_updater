@@ -17,8 +17,8 @@ class Extractor():
         """Extract all members in specific zip archive
 
         Args:
-            archive_path (str)  : Path to specific archive.
-            out_path (str)      : Out path, where all members of archive will be gathered.
+            archive_path (str)      : Path to specific archive.
+            out_path (str)          : Out path, where all members of archive will be gathered.
             delete_archive (bool)   : Delete archive after unzip or not. Defaults to True.
 
         Returns:
@@ -51,8 +51,8 @@ class Extractor():
         """Extract all members in specific tar.gz archive
 
         Args:
-            archive_path (str)  : Path to specific archive.
-            out_path (str)      : Out path, where all members of archive will be gathered.
+            archive_path (str)      : Path to specific archive.
+            out_path (str)          : Out path, where all members of archive will be gathered.
             delete_archive (bool)   : Delete archive after unzip or not. Defaults to True.
 
         Returns:

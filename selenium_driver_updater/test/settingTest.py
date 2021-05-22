@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from _setting import setting
+from _setting import info
 
 base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
 
@@ -136,7 +137,7 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test03_checkValuesParams(self):
 
-        self.assertEqual(self.setting["Program"]["version"], "2.17.0")
+        self.assertEqual(self.setting["Program"]["version"], info.version)
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], '[0-9]+.[0-9]+.[0-9]+.[0-9]+')
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
