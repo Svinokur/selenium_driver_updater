@@ -524,12 +524,10 @@ class OperaDriver():
 
             if self.check_browser_is_up_to_date:
 
-                if os.path.exists(self.operadriver_path):
-
-                    result, message = self.__check_if_opera_browser_is_up_to_date()
-                    if not result:
-                        logging.error(message)
-                        return result, message, driver_path
+                result, message = self.__check_if_opera_browser_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
 
             if not self.version:
 
@@ -766,23 +764,21 @@ class OperaDriver():
         browser_version : str = ''
         
         try:
-
-            if os.path.exists(self.operadriver_path):
             
-                result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
-                if not result:
-                    logging.error(message)
-                    message = 'Trying to get current version of opera browser via operadriver'
-                    logging.info(message)
-                
-                if not result or not browser_version:
+            result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of opera browser via operadriver'
+                logging.info(message)
+            
+            if os.path.exists(self.operadriver_path) and not result or not browser_version:
 
-                    driver = webdriver.Opera(executable_path = self.operadriver_path)
-                    browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
-                    driver.close()
-                    driver.quit()
+                driver = webdriver.Opera(executable_path = self.operadriver_path)
+                browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
+                driver.close()
+                driver.quit()
 
-                logging.info(f'Current version of opera browser: {browser_version}')
+            logging.info(f'Current version of opera browser: {browser_version}')
 
             result_run = True
 

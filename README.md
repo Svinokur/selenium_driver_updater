@@ -81,6 +81,7 @@ print(filename)
 
 - Windows
 - MacOS
+- Linux (Tested on Ubuntu 20.04)
 
 ## Firefox Browser
 

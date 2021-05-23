@@ -1,3 +1,19 @@
+[2.19.0] 23/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added support for updating chromium browser for Linux
+
+# Improvements
+
+- Improved getting current version of firefox on different Windows versions
+
+# Fixes
+
+- Fixed an issue when webdriver browser was not checked if webdriver was not exists
+
 [2.18.0] 22/05/2021
 This version provides some improvements and optimizations.
 This code was written and tested on Python 3.9.5

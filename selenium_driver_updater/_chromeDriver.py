@@ -471,12 +471,10 @@ class ChromeDriver():
 
             if self.check_browser_is_up_to_date:
 
-                if os.path.exists(self.chromedriver_path):
-
-                    result, message = self.__check_if_chrome_browser_is_up_to_date()
-                    if not result:
-                        logging.error(message)
-                        return result, message, driver_path
+                result, message = self.__check_if_chrome_browser_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
 
             if not self.version:
 
@@ -663,12 +661,12 @@ class ChromeDriver():
         try:
             
             chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
-            if not chromebrowser_updater_path:
+            if not chromebrowser_updater_path and platform.system() != 'Linux':
                 message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
                 logging.info(message)
                 return True, message
 
-            if not os.path.exists(chromebrowser_updater_path):
+            if not os.path.exists(chromebrowser_updater_path) and platform.system() != 'Linux':
                 message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
@@ -837,14 +835,27 @@ class ChromeDriver():
         """
         result_run : bool = False
         message_run : str = ''
+        is_admin : bool = True if os.getuid() == 0 else False
         
         try:
 
             message = f'Trying to update chrome browser to the latest version.'
             logging.info(message)
 
-            os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
-            time.sleep(60) #wait for the updating
+            if platform.system() == 'Linux':
+
+                if is_admin:
+                    os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+
+                elif not is_admin:
+                    message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
+                    logging.error(message)
+                    return True, message_run
+            
+            else:
+
+                os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+                time.sleep(60) #wait for the updating
             
             message = f'Chrome browser was successfully updated to the latest version.'
             logging.info(message)
@@ -928,7 +939,7 @@ class ChromeDriver():
                 logging.error(message)
                 return result, message, is_driver_up_to_date, latest_previous_version
             
-            message = (f' Problem with chromedriver latest_version_driver : {latest_version_driver} latest_version_browser : {latest_version_browser}\n'
+            message = (f' Problem with chromedriver latest_version_driver: {latest_version_driver} latest_version_browser: {latest_version_browser}\n'
                         f' It often happen when new version of chromedriver released, but new version of chrome browser is not\n'
                         f' Trying to download the latest previous version of chromedriver')
             logging.error(message)
@@ -1065,7 +1076,7 @@ class ChromeDriver():
             latest_version_chromedriver_main = latest_version_chromedriver.split('.')[0]
             latest_version_browser_main = latest_version_browser.split('.')[0]
 
-            if latest_version_chromedriver_main == latest_version_browser_main:
+            if int(latest_version_chromedriver_main) >= int(latest_version_browser_main):
                 is_equal = True
 
             result_run = True
@@ -1116,6 +1127,14 @@ class ChromeDriver():
                     process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)
             
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                elif platform.system() == 'Linux':
+
+                    
+                    process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)
+            
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
 
                 find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
                 browser_version = find_string[0] if len(find_string) > 0 else ''

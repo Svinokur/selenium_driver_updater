@@ -494,12 +494,10 @@ class EdgeDriver():
 
             if self.check_browser_is_up_to_date:
 
-                if os.path.exists(self.edgedriver_path):
-
-                    result, message = self.__check_if_edge_browser_is_up_to_date()
-                    if not result:
-                        logging.error(message)
-                        return result, message, driver_path
+                result, message = self.__check_if_edge_browser_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
 
             if not self.version:
 
@@ -735,25 +733,23 @@ class EdgeDriver():
         browser_version : str = ''
         
         try:
-
-            if os.path.exists(self.edgedriver_path):
             
-                result, message, browser_version = self.__get_current_version_edge_browser_selenium_via_terminal()
-                if not result:
-                    logging.error(message)
-                    message = 'Trying to get current version of edge browser via edgedriver'
-                    logging.info(message)
-                
-                if not result or not browser_version:
+            result, message, browser_version = self.__get_current_version_edge_browser_selenium_via_terminal()
+            if not result:
+                logging.error(message)
+                message = 'Trying to get current version of edge browser via edgedriver'
+                logging.info(message)
+            
+            if os.path.exists(self.edgedriver_path) and not result or not browser_version:
 
-                    desired_cap = {}
+                desired_cap = {}
 
-                    driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
-                    browser_version = str(driver.capabilities['browserVersion'])
-                    driver.close()
-                    driver.quit()
+                driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
+                browser_version = str(driver.capabilities['browserVersion'])
+                driver.close()
+                driver.quit()
 
-                logging.info(f'Current version of edge browser: {browser_version}')
+            logging.info(f'Current version of edge browser: {browser_version}')
 
             result_run = True
 
