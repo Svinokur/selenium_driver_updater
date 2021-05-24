@@ -55,6 +55,10 @@ print(filename)
 - MacOS
 - MacOS with M1
 
+## Chromium ChromeDriver (DriverUpdater.chromium_chromedriver)
+
+- Linux
+
 ## Geckodriver (DriverUpdater.geckodriver)
 
 - Windows
@@ -71,7 +75,6 @@ print(filename)
 ## Edgedriver (DriverUpdater.edgedriver)
 
 - Windows
-- Linux
 - MacOS
 - ARM
 
@@ -83,15 +86,21 @@ print(filename)
 - MacOS
 - Linux (Tested on Ubuntu 20.04)
 
+## Chromium Browser
+
+- Linux (Tested on Ubuntu 20.04)
+
 ## Firefox Browser
 
 - Windows
 - MacOS
+- Linux (Tested on Ubuntu 20.04)
 
 ## Opera Browser
 
 - Windows
 - MacOS
+- Linux (Tested on Ubuntu 20.04)
 
 ## Edge Browser
 

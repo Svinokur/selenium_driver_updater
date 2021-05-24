@@ -6,6 +6,7 @@ from _chromeDriver import ChromeDriver
 from _geckoDriver import GeckoDriver
 from _operaDriver import OperaDriver
 from _edgeDriver import EdgeDriver
+from _chromiumChromeDriver import ChromiumChromeDriver
 from _setting import setting
 
 import logging
@@ -23,6 +24,7 @@ class DriverUpdater():
     geckodriver = 'geckodriver'
     operadriver = 'operadriver'
     edgedriver = 'edgedriver'
+    chromium_chromedriver = 'chromium-chromedriver'
         
     @staticmethod
     def install(driver_name : Union[str, list[str]], **kwargs):
@@ -155,7 +157,13 @@ class DriverUpdater():
 
             if type(driver_name) == str:
 
-                if not driver_name:
+                driver_name_check =      DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
+                                        DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
+                                        DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
+                                        DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else \
+                                        DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver_name else ''
+
+                if not driver_name_check:
                     message = f'Unknown driver name was specified current driver_name is: {driver_name}'
                     logging.error(message)
                     return result_run, message
@@ -167,7 +175,8 @@ class DriverUpdater():
                     driver_name_list =      DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver else \
                                             DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver else \
                                             DriverUpdater.operadriver if DriverUpdater.operadriver == driver else \
-                                            DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver else '' 
+                                            DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver else \
+                                            DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver else ''
 
                     if not driver_name_list:
                         message = f'Unknown driver name was specified at index: {driver_name.index(driver)} current name of driver is: {driver}'
@@ -403,6 +412,17 @@ class DriverUpdater():
                                     filename=filename, version=version,
                                     check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = edge_driver.main()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            elif DriverUpdater.chromium_chromedriver == driver_name:
+
+                chromium_chromedriver = ChromiumChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
+                                    check_driver_is_up_to_date=check_driver_is_up_to_date, 
+                                    filename=filename, version=version,
+                                    check_browser_is_up_to_date=check_browser_is_up_to_date)
+                result, message, driver_path = chromium_chromedriver.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path

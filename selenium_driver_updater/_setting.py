@@ -42,7 +42,6 @@ operadriver_name_platform_release = f"operadriver_win{os_bit}" if platform.syste
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
 edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_edgedriver + "edgedriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release_edgedriver + "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
                                 latest_release_edgedriver + "edgedriver_arm64.zip"
                                 
@@ -51,11 +50,11 @@ edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windo
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
-"chromium-browser" if platform.system() == 'Linux' else ''
+"google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
-"sudo apt-get install chromium-browser" if platform.system() == 'Linux' else ''
+"sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
@@ -63,10 +62,12 @@ chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdat
 
 firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion',
-'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Mozilla\Mozilla Firefox" /v CurrentVersion'] if platform.system() == 'Windows' else ''
+'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Mozilla\Mozilla Firefox" /v CurrentVersion'] if platform.system() == 'Windows' else\
+"firefox" if platform.system() == 'Linux' else ''
 
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
-'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else ''
+'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else\
+"sudo apt-get install firefox" if platform.system() == 'Linux' else ''
 
 firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else \
 '/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
@@ -84,16 +85,24 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 
 
 opera_browser_path = r'REG QUERY "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Windows\CurrentVersion\Uninstall"' if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
+'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
+"opera" if platform.system() == 'Linux' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
-'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
+'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else\
+"sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
 
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
+chromiumbrowser_path = "chromium-browser"
+
+chromiumbrowser_updater = "sudo apt-get install chromium-browser"
+
+chromiumchromedriver_updater = "sudo apt-get install chromedriver"
+
 class info:
-    version = "2.19.0"
+    version = "3.0.0"
 
 setting = dict(
     {
@@ -131,6 +140,10 @@ setting = dict(
             "LinkLastReleaseFile"       : edgedriver_latest_release, 
             "LastReleasePlatform"       : edgedriver_platform_release,
         },
+        "ChromiumChromeDriver":
+        {
+            'ChromiumChromeDriverUpdater'    : chromiumchromedriver_updater,
+        },
         "ChromeBrowser":
         {
             "Path"                      : chrome_browser_path,
@@ -159,6 +172,11 @@ setting = dict(
             "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
             "OperaBrowserUpdater"           : opera_browser_updater,
             'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
+        },
+        "ChromiumBrowser":
+        {
+            "Path"                      : chromiumbrowser_path,
+            'ChromiumBrowserUpdater'    : chromiumbrowser_updater,
         },
         "JsonSchema":
         {

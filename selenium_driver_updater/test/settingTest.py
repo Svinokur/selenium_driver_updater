@@ -50,7 +50,6 @@ operadriver_name_platform_release = f"operadriver_win{os_bit}" if platform.syste
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
 edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_edgedriver + "edgedriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release_edgedriver + "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
                                 latest_release_edgedriver + "edgedriver_arm64.zip"
                                 
@@ -59,11 +58,11 @@ edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windo
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
-"chromium-browser" if platform.system() == 'Linux' else ''
+"google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
-"sudo apt-get install chromium-browser" if platform.system() == 'Linux' else ''
+"sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
@@ -91,13 +90,21 @@ edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\Micro
 
 
 opera_browser_path = r'REG QUERY "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Windows\CurrentVersion\Uninstall"' if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else ''
+'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
+"opera" if platform.system() == 'Linux' else ''
 
 opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
-'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else ''
+'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else\
+"sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
 
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
+
+chromiumbrowser_path = "chromium-browser"
+
+chromiumbrowser_updater = "sudo apt-get install chromium-browser"
+
+chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 
 class testSetting(unittest.TestCase): 
@@ -120,7 +127,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 12)
+        self.assertEqual(len(self.setting), 14)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
@@ -129,10 +136,14 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["GeckoDriver"]), 5)
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
+        self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
+
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
         self.assertEqual(len(self.setting["OperaBrowser"]), 5)
+        self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
+
         self.assertEqual(len(self.setting["JsonSchema"]), 2)
         self.assertEqual(len(self.setting["Github"]), 2)
         self.assertEqual(len(self.setting["PyPi"]), 1)
@@ -164,6 +175,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
 
+        self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
+
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search?max-results=20')
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
@@ -184,6 +197,10 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"], 'https://blogs.opera.com/desktop/changelog-for-{}/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
+
+        self.assertEqual(self.setting["ChromiumBrowser"]["Path"], chromiumbrowser_path)
+        self.assertEqual(self.setting["ChromiumBrowser"]["ChromiumBrowserUpdater"], chromiumbrowser_updater)
+
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')

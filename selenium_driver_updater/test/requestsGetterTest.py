@@ -22,9 +22,12 @@ class testRequestsGetter(unittest.TestCase):
         startTime (float)           : Time of starting unit-tests
     """
 
+    @classmethod
+    def setUpClass(cls):
+        cls.setting = setting
+        cls.requests_getter = RequestsGetter
+
     def setUp(self):
-        self.requests_getter = RequestsGetter
-        self.setting = setting
 
         self.startTime : float = time.time()
 

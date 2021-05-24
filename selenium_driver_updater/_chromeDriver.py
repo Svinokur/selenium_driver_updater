@@ -45,7 +45,7 @@ class ChromeDriver():
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version.
-            check_driver_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
+            check_browser_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
         """
         self.setting = setting
 
@@ -56,11 +56,6 @@ class ChromeDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/35.0.1916.47 Safari/537.36'
-
-        self.headers = {'User-Agent': user_agent}
         
         specific_filename = str(kwargs.get('filename'))
         self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
@@ -69,11 +64,10 @@ class ChromeDriver():
         self.chromedriver_path : str =  self.path + self.setting['ChromeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
-
-        self.extractor = Extractor
         
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
+        self.extractor = Extractor
         self.requests_getter = RequestsGetter
 
     def __get_latest_version_chrome_driver(self, no_messages : bool = False) -> Tuple[bool, str, str]:
@@ -1076,7 +1070,7 @@ class ChromeDriver():
             latest_version_chromedriver_main = latest_version_chromedriver.split('.')[0]
             latest_version_browser_main = latest_version_browser.split('.')[0]
 
-            if int(latest_version_chromedriver_main) >= int(latest_version_browser_main):
+            if int(latest_version_chromedriver_main) <= int(latest_version_browser_main):
                 is_equal = True
 
             result_run = True
@@ -1129,7 +1123,6 @@ class ChromeDriver():
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
                 elif platform.system() == 'Linux':
-
                     
                     process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)
             

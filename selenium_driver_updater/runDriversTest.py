@@ -18,6 +18,9 @@ from test import edgeDriverTest
 from test import githubViewerTest
 from test import extractorTest
 from test import requestsGetterTest
+from test import chromiumChromeDriverTest
+
+import platform
 
 #refresh logger sometimes issue with writing log file
 for handler in logging.root.handlers[:]:
@@ -47,8 +50,13 @@ try:
     testSuite.addTest(unittest.makeSuite(driverUpdaterTest.testDriverUpdater))
     testSuite.addTest(unittest.makeSuite(chromeDriverTest.testChromeDriver))
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
-    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it on Github Workflow
-    testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
+    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it in Github Workflow
+
+    if platform.system() != 'Linux':
+        testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
+
+    #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver)) Temporary could not test it in Github Workflow
+
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))

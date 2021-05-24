@@ -59,11 +59,6 @@ class OperaDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) \
-                        Chrome/35.0.1916.47 Safari/537.36'
-
-        self.headers = {'User-Agent': user_agent}
         
         specific_filename = str(kwargs.get('filename'))
         self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
@@ -73,12 +68,10 @@ class OperaDriver():
 
         self.version = str(kwargs.get('version'))
 
-        self.extractor = Extractor
-
-        self.github_viewer = GithubViewer
-
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
+        self.extractor = Extractor
+        self.github_viewer = GithubViewer
         self.requests_getter = RequestsGetter
 
     def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
