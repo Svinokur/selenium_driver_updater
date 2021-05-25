@@ -625,7 +625,10 @@ class ChromiumChromeDriver():
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
-        is_admin : bool = True if os.getuid() == 0 else False
+        try:
+            is_admin : bool = True if os.getuid() == 0 else False
+        except:
+            is_admin : bool = False
         
         try:
 

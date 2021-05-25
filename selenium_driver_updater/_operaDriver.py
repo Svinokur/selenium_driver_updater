@@ -864,14 +864,32 @@ class OperaDriver():
         """
         result_run : bool = False
         message_run : str = ''
+        try:
+            is_admin : bool = True if os.getuid() == 0 else False
+        except:
+            is_admin : bool = False
+            
+        update_command : str = self.setting["OperaBrowser"]["OperaBrowserUpdater"]
         
         try:
 
             message = f'Trying to update opera browser to the latest version.'
             logging.info(message)
 
-            os.system(self.setting["OperaBrowser"]["OperaBrowserUpdater"])
-            time.sleep(60) #wait for the updating
+            if platform.system() == 'Linux':
+
+                if is_admin:
+                    os.system(update_command)
+
+                elif not is_admin:
+                    message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
+                    logging.error(message)
+                    return True, message_run
+            
+            else:
+
+                os.system(update_command)
+                time.sleep(60) #wait for the updating
             
             message = f'Opera browser was successfully updated to the latest version.'
             logging.info(message)

@@ -829,7 +829,12 @@ class ChromeDriver():
         """
         result_run : bool = False
         message_run : str = ''
-        is_admin : bool = True if os.getuid() == 0 else False
+        try:
+            is_admin : bool = True if os.getuid() == 0 else False
+        except:
+            is_admin : bool = False
+            
+        update_command : str = self.setting["ChromeBrowser"]["ChromeBrowserUpdater"]
         
         try:
 
@@ -839,7 +844,7 @@ class ChromeDriver():
             if platform.system() == 'Linux':
 
                 if is_admin:
-                    os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+                    os.system(update_command)
 
                 elif not is_admin:
                     message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
@@ -848,7 +853,7 @@ class ChromeDriver():
             
             else:
 
-                os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
+                os.system(update_command)
                 time.sleep(60) #wait for the updating
             
             message = f'Chrome browser was successfully updated to the latest version.'
