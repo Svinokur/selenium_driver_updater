@@ -1,0 +1,89 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1622020582.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"ref",
+		"node_id",
+		"url",
+		"object"
+	],
+	"properties": {
+		"ref": {
+			"$id": "#root/ref", 
+			"title": "Ref", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"refs/tags/0.3.0"
+			],
+			"pattern": "^.*$"
+		},
+		"node_id": {
+			"$id": "#root/node_id", 
+			"title": "Node_id", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"MDM6UmVmMjUzNTQzOTM6cmVmcy90YWdzLzAuMy4w"
+			],
+			"pattern": "^.*$"
+		},
+		"url": {
+			"$id": "#root/url", 
+			"title": "Url", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"https://api.github.com/repos/mozilla/geckodriver/git/refs/tags/0.3.0"
+			],
+			"pattern": "^.*$"
+		},
+		"object": {
+			"$id": "#root/object", 
+			"title": "Object", 
+			"type": "object",
+			"required": [
+				"sha",
+				"type",
+				"url"
+			],
+			"properties": {
+				"sha": {
+					"$id": "#root/object/sha", 
+					"title": "Sha", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"dfa297cb97ccfddd7fd8cb2d37d3c5ef3cef4720"
+					],
+					"pattern": "^.*$"
+				},
+				"type": {
+					"$id": "#root/object/type", 
+					"title": "Type", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"commit"
+					],
+					"pattern": "^.*$"
+				},
+				"url": {
+					"$id": "#root/object/url", 
+					"title": "Url", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"https://api.github.com/repos/mozilla/geckodriver/git/commits/dfa297cb97ccfddd7fd8cb2d37d3c5ef3cef4720"
+					],
+					"pattern": "^.*$"
+				}
+			}
+		}
+
+	}
+}
+

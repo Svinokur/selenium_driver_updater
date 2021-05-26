@@ -409,6 +409,9 @@ class GeckoDriver():
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
+            if not current_version:
+                return True, message_run, is_driver_up_to_date, current_version, latest_version
+
             result, message, latest_version = self.__get_latest_version_geckodriver()
             if not result:
                 logging.error(message)

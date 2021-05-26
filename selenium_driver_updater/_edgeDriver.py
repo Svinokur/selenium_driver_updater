@@ -112,7 +112,12 @@ class EdgeDriver():
                     desired_cap = {}
 
                     driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
-                    driver_version = str(driver.capabilities['msedge']['msedgedriverVersion'].split(' ')[0])
+                    
+                    driver_version_selenium = str(driver.capabilities['msedge']['msedgedriverVersion'])
+
+                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_selenium)
+                    driver_version = find_string[0] if len(find_string) > 0 else driver_version_selenium.split(' ')[0]
+
                     driver.close()
                     driver.quit()
         
@@ -409,6 +414,9 @@ class EdgeDriver():
             if not result:
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
+
+            if not current_version:
+                return True, message_run, is_driver_up_to_date, current_version, latest_version
 
             result, message, latest_version = self.__get_latest_version_edgedriver()
             if not result:
@@ -958,17 +966,15 @@ class EdgeDriver():
         driver_version_terminal : str = ''
         
         try:
-            
-            if os.path.exists(self.edgedriver_path):
 
-                logging.info('Trying to get current version of edgedriver via terminal')
-            
-                process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
+            logging.info('Trying to get current version of edgedriver via terminal')
         
-                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+            process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
+    
+            driver_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
-                driver_version = find_string[0] if len(find_string) > 0 else ''
+            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+            driver_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

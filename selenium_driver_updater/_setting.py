@@ -7,7 +7,7 @@ os_bit = platform.architecture()[0][:-3]
 
 latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
 
-chromedriver_latest_release =   latest_release + f"chromedriver_win32.zip" if platform.system() == 'Windows' else\
+chromedriver_latest_release =   latest_release + "chromedriver_win32.zip" if platform.system() == 'Windows' else\
                                 latest_release + "chromedriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release + "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
                                 latest_release + "chromedriver_mac64.zip"
@@ -47,6 +47,20 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
                                 
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
+
+url_release_phantomjs = "https://bitbucket.org/ariya/phantomjs/downloads/"
+os_bit_linux = 'x84_64' if os_bit == '64' else "i686"
+phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
+                                url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
+                                url_release_phantomjs + "phantomjs-{}-macosx.zip"
+
+phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' else\
+                                "phantomjs"
+
+
+#
+# BROWSERS AND THEIR UPDATERS
+#                                 
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
@@ -102,7 +116,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 class info:
-    version = "3.1.0"
+    version = "3.2.0"
 
 setting = dict(
     {
@@ -144,10 +158,15 @@ setting = dict(
         {
             'ChromiumChromeDriverUpdater'    : chromiumchromedriver_updater,
         },
+        "PhantomJS":
+        {   
+            "LinkLastReleaseFile" : phantomjs_latest_release,
+            "LastReleasePlatform" : phantomjs_platform_release,
+        },
         "ChromeBrowser":
         {
             "Path"                      : chrome_browser_path,
-            "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com/search?max-results=20',
+            "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com/search/label/Stable%20updates',
             'ChromeBrowserUpdater'      : chrome_browser_updater,
             'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
         },
@@ -180,13 +199,15 @@ setting = dict(
         },
         "JsonSchema":
         {
-            "githubAssetSchema"     : base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json',
-            "githubReleaseSchema"   : base_dir + 'schemas' + os.path.sep + 'github_release_schema.json',
+            "githubAssetSchema"         : base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json',
+            "githubReleaseSchema"       : base_dir + 'schemas' + os.path.sep + 'github_release_schema.json',
+            "githubReleaseTagSchema"    : base_dir + 'schemas' + os.path.sep + 'github_release_tag_schema.json',
         },
         "Github":
         {
             "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
             "linkAllReleasesBySpecificRepoName"     : 'https://api.github.com/repos/{}/releases',
+            "linkAllReleasesTags"                   : 'https://api.github.com/repos/{}/git/refs/tags',
         },
         "PyPi":
         {

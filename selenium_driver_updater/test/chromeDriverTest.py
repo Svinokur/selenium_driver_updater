@@ -85,7 +85,7 @@ class testChromeDriver(unittest.TestCase):
         self.assertGreaterEqual(len(message), 0, len(message))
         self.assertFalse(is_driver_is_up_to_date, is_driver_is_up_to_date)
         self.assertEqual(len(current_version), 0, len(current_version))
-        self.assertGreater(len(latest_version), 0, len(latest_version))
+        self.assertEqual(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
     def test04_check_chromedriver_is_up_to_date_failure(self):

@@ -19,6 +19,7 @@ from test import githubViewerTest
 from test import extractorTest
 from test import requestsGetterTest
 from test import chromiumChromeDriverTest
+from test import phantomJSTest
 
 import platform
 
@@ -60,6 +61,7 @@ try:
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
+    testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
     
     
     runner = unittest.TextTestRunner(verbosity=2, failfast=True)

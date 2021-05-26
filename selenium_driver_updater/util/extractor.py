@@ -144,3 +144,36 @@ class Extractor():
             logging.error(message_run)
 
         return result_run, message_run
+
+    @staticmethod
+    def extract_all_tar_bz2_archive(archive_path : str, out_path : str, delete_archive : bool = True) -> Tuple[bool, str]:
+        """Extract all members in specific tar.bz2 archive
+
+        Args:
+            archive_path (str)      : Path to specific archive.
+            out_path (str)          : Out path, where all members of archive will be gathered.
+            delete_archive (bool)   : Delete archive after unzip or not. Defaults to True.
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+        """
+        result_run : bool = False
+        message_run : str = '' 
+        try:
+
+            with tarfile.open(archive_path, "r:bz2") as tar_ref:
+                tar_ref.extractall(out_path)
+
+            if os.path.exists(archive_path) and delete_archive:
+                os.remove(archive_path)
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run

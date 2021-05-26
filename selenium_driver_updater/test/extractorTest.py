@@ -11,6 +11,8 @@ import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+import shutil
+
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -33,6 +35,7 @@ class testExtractor(unittest.TestCase):
         self.out_path : str = base_dir + os.path.sep + 'archive' + os.path.sep
         self.zip_archive_path : str = self.out_path + 'geckodriver-v0.29.0-win64.zip'
         self.tar_archive_path : str = self.out_path + 'geckodriver-v0.29.1-macos-aarch64.tar.gz'
+        self.tar_bz2_archive_path : str = self.out_path + 'phantomjs-2.1.1-linux-x86_64.tar.bz2'
         self.startTime : float = time.time()
 
     def tearDown(self):
@@ -106,6 +109,16 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(os.path.exists(geckodriver_path))
         os.remove(geckodriver_path)
         self.assertFalse(os.path.exists(geckodriver_path))
+
+    #@unittest.skip('Temporary not needed')
+    def test09_check_extract_all_tar_bz2_archive(self):
+        result, message = Extractor.extract_all_tar_bz2_archive(archive_path=self.tar_bz2_archive_path,out_path=self.out_path, delete_archive = False)
+        self.assertTrue(result, message)
+
+        phantom_path = self.out_path + 'phantomjs-2.1.1-linux-x86_64'
+        self.assertTrue(os.path.exists(phantom_path))
+        shutil.rmtree(phantom_path)
+        self.assertFalse(os.path.exists(phantom_path))
     
     
 if __name__ == '__main__':

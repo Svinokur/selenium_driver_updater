@@ -113,7 +113,12 @@ class OperaDriver():
                 if not result or not driver_version:
 
                     driver = webdriver.Opera(executable_path = self.operadriver_path)
-                    driver_version = str(driver.capabilities['opera']['operadriverVersion'].split(' ')[0])
+
+                    driver_version_selenium = str(driver.capabilities['opera']['operadriverVersion'])
+
+                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_selenium)
+                    driver_version = find_string[0] if len(find_string) > 0 else driver_version_selenium.split(' ')[0]
+
                     driver.close()
                     driver.quit()
 
@@ -396,6 +401,9 @@ class OperaDriver():
             if not result:
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
+
+            if not current_version:
+                return True, message_run, is_driver_up_to_date, current_version, latest_version
 
             result, message, latest_version = self.__get_latest_version_operadriver()
             if not result:

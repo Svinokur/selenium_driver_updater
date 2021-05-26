@@ -18,13 +18,14 @@ class RequestsGetter():
     _headers = {'User-Agent': user_agent}
 
     @staticmethod
-    def get_result_by_request(url : str, is_json : bool = False, return_text : bool = True) -> Tuple[bool, str, int, Any]:
+    def get_result_by_request(url : str, is_json : bool = False, return_text : bool = True, no_error_status_code : bool = False) -> Tuple[bool, str, int, Any]:
         """Gets html text and status_code from the specified url by get request
 
         Args:
             url (str)                   : Url which we will use for getting information
             cookies                     : Specific cookies for request
             is_json (bool)              : Transorm request.text to json or not. Defaults to False.
+            no_error_status_code (bool) : If true, it will not return result False if status_code not equal to 200.
 
         Returns:
             Tuple[bool, str, int, Any]
@@ -54,9 +55,14 @@ class RequestsGetter():
             status_code = request.status_code
 
             if status_code != 200:
-                message_run = f'url: {url} status_code: {status_code} not equal 200 request_text: {request.text}'
-                logging.error(message_run)
-                return result_run, message_run, status_code, request.text
+                
+                if no_error_status_code:
+                    return True, message_run, status_code, request.text
+                
+                else:
+                    message_run = f'url: {url} status_code: {status_code} not equal 200 request_text: {request.text}'
+                    logging.error(message_run)
+                    return result_run, message_run, status_code, request.text
 
             if return_text:
                 if is_json:

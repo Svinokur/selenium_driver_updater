@@ -56,6 +56,20 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
+url_release_phantomjs = "https://bitbucket.org/ariya/phantomjs/downloads/"
+os_bit_linux = 'x84_64' if os_bit == '64' else "i686"
+phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
+                                url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
+                                url_release_phantomjs + "phantomjs-{}-macosx.zip"
+
+phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' else\
+                                "phantomjs"
+
+
+#
+# UPDATERS
+#                 
+
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
@@ -130,7 +144,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_checkCountMainParam(self):
-        self.assertEqual(len(self.setting), 14)
+        self.assertEqual(len(self.setting), 15)
 
     #@unittest.skip('Temporary not needed')
     def test02_checkCountParams(self):
@@ -140,6 +154,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["OperaDriver"]), 5)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
+        self.assertEqual(len(self.setting["PhantomJS"]), 2)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
@@ -147,8 +162,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["OperaBrowser"]), 5)
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
 
-        self.assertEqual(len(self.setting["JsonSchema"]), 2)
-        self.assertEqual(len(self.setting["Github"]), 2)
+        self.assertEqual(len(self.setting["JsonSchema"]), 3)
+        self.assertEqual(len(self.setting["Github"]), 3)
         self.assertEqual(len(self.setting["PyPi"]), 1)
     
     #@unittest.skip('Temporary not needed')
@@ -180,8 +195,11 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
 
+        self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
+        self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], phantomjs_platform_release)
+
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
-        self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search?max-results=20')
+        self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
         self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"], chrome_browser_updater_path)
 
@@ -207,9 +225,11 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')
+        self.assertEqual(self.setting["JsonSchema"]["githubReleaseTagSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_tag_schema.json')
 
         self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
         self.assertEqual(self.setting["Github"]["linkAllReleasesBySpecificRepoName"], 'https://api.github.com/repos/{}/releases')
+        self.assertEqual(self.setting["Github"]["linkAllReleasesTags"], 'https://api.github.com/repos/{}/git/refs/tags')
 
         self.assertEqual(self.setting["PyPi"]["urlProjectJson"], 'https://pypi.python.org/pypi/selenium-driver-updater/json')
 

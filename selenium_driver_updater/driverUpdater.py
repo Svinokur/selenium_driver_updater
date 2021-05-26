@@ -7,6 +7,7 @@ from _geckoDriver import GeckoDriver
 from _operaDriver import OperaDriver
 from _edgeDriver import EdgeDriver
 from _chromiumChromeDriver import ChromiumChromeDriver
+from _phantomJS import PhantomJS
 from _setting import setting
 
 import logging
@@ -25,6 +26,7 @@ class DriverUpdater():
     operadriver = 'operadriver'
     edgedriver = 'edgedriver'
     chromium_chromedriver = 'chromium-chromedriver'
+    phantomjs = 'phantomjs'
         
     @staticmethod
     def install(driver_name : Union[str, list[str]], **kwargs):
@@ -157,11 +159,12 @@ class DriverUpdater():
 
             if type(driver_name) == str:
 
-                driver_name_check =      DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
+                driver_name_check =     DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
                                         DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
                                         DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
                                         DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else \
-                                        DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver_name else ''
+                                        DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver_name else \
+                                        DriverUpdater.phantomjs if DriverUpdater.phantomjs == driver_name else ''
 
                 if not driver_name_check:
                     message = f'Unknown driver name was specified current driver_name is: {driver_name}'
@@ -176,7 +179,8 @@ class DriverUpdater():
                                             DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver else \
                                             DriverUpdater.operadriver if DriverUpdater.operadriver == driver else \
                                             DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver else \
-                                            DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver else ''
+                                            DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver else \
+                                            DriverUpdater.phantomjs if DriverUpdater.phantomjs == driver else ''
 
                     if not driver_name_list:
                         message = f'Unknown driver name was specified at index: {driver_name.index(driver)} current name of driver is: {driver}'
@@ -223,17 +227,24 @@ class DriverUpdater():
                 logging.error(message)
                 return result, message
 
-            current_version = setting["Program"]["version"]
+            current_version = setting["Program"]["version"].replace('b', '')
             latest_version = json_data.get('info').get('version')
 
-            if latest_version != current_version:
+            current_version_tuple = tuple(map(int, (current_version.split("."))))
+            latest_version_tuple = tuple(map(int, (latest_version.split("."))))
+
+            if latest_version_tuple > current_version_tuple:
                 message = ('Your selenium-driver-updater library is out of date, please update it. '
                            f'current_version: {current_version} latest_version: {latest_version} ')
                 logging.warning(message)
 
-            elif latest_version == current_version:
+            elif latest_version_tuple == current_version_tuple:
                 message = 'Your selenium-driver-updater library is up to date.'
                 logging.info(message)
+            
+            else:
+                message = 'Unable to compare the latest version and current version of the library, maybe you are using a beta version.'
+                logging.error(message)
 
             result_run = True
 
@@ -418,11 +429,19 @@ class DriverUpdater():
 
             elif DriverUpdater.chromium_chromedriver == driver_name:
 
-                chromium_chromedriver = ChromiumChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
-                                    check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                    filename=filename, version=version,
-                                    check_browser_is_up_to_date=check_browser_is_up_to_date)
+                chromium_chromedriver = ChromiumChromeDriver(check_driver_is_up_to_date=check_driver_is_up_to_date, 
+                                                            check_browser_is_up_to_date=check_browser_is_up_to_date)
                 result, message, driver_path = chromium_chromedriver.main()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            elif DriverUpdater.phantomjs == driver_name:
+
+                phantomjs = PhantomJS(path=path, upgrade=upgrade, chmod=chmod, 
+                                    check_driver_is_up_to_date=check_driver_is_up_to_date, 
+                                    filename=filename, version=version)
+                result, message, driver_path = phantomjs.main()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path

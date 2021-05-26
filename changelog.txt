@@ -1,3 +1,25 @@
+[3.2.0] 26/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added support for PhantomJS
+- Added properly comparing of latest and current version of library
+- Added unit-tests by PhantomJS
+
+# Improvements
+
+- Improved getting latest version of chrome browser
+- Improved getting current version of drivers via its capabilities
+- Improved overall code optimization
+- Improved unit-tests by extractor and github_viewer
+
+# Fixes
+
+- Fixed an issue with getting latest version of webdriver twice, if driver was not exists
+- Fixed an issue with incorrect return of path, if chromedriver main version was not equals to chrome browser main version
+
 [3.1.0] 25/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

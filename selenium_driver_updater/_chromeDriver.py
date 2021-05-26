@@ -333,7 +333,12 @@ class ChromeDriver():
                     chrome_options.add_argument('--headless')
 
                     driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
-                    driver_version = str(driver.capabilities['chrome']['chromedriverVersion'].split(" ")[0])
+
+                    driver_version_selenium = str(driver.capabilities['chrome']['chromedriverVersion'])
+
+                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_selenium)
+                    driver_version = find_string[0] if len(find_string) > 0 else driver_version_selenium.split(" ")[0]
+
                     driver.close()
                     driver.quit()
 
@@ -389,6 +394,9 @@ class ChromeDriver():
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
+            if not current_version:
+                return True, message_run, is_driver_up_to_date, current_version, latest_version
+
             result, message, latest_version = self.__get_latest_version_chrome_driver()
             if not result:
                 logging.error(message)
@@ -432,7 +440,7 @@ class ChromeDriver():
                 st = os.stat(self.chromedriver_path)
                 os.chmod(self.chromedriver_path, st.st_mode | stat.S_IEXEC)
 
-                logging.info('Needed rights for chromedriver was successfully issued')
+                logging.info('Needed rights for chromedriver were successfully issued')
 
             result_run = True
 
@@ -487,7 +495,7 @@ class ChromeDriver():
 
                 if not is_equal:
 
-                    result, message, is_driver_up_to_date, latest_previous_version = self.__get_previous_latest_version_chromedriver()
+                    result, message, driver_path = self.__get_previous_latest_version_chromedriver()
                     if not result:
                         logging.error(message)
                         return result, message, driver_path
@@ -930,13 +938,14 @@ class ChromeDriver():
         message_run : str = ''
         is_driver_up_to_date : bool = False
         latest_previous_version : str = ''
+        driver_path : str = ''
         
         try:
 
             result, message, is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
             if not result:
                 logging.error(message)
-                return result, message, is_driver_up_to_date, latest_previous_version
+                return result, message, driver_path
             
             message = (f' Problem with chromedriver latest_version_driver: {latest_version_driver} latest_version_browser: {latest_version_browser}\n'
                         f' It often happen when new version of chromedriver released, but new version of chrome browser is not\n'
@@ -948,28 +957,28 @@ class ChromeDriver():
                 result, message = self.__delete_current_chromedriver_for_current_os()
                 if not result:
                     logging.error(message)
-                    return result, message, is_driver_up_to_date, latest_previous_version
+                    return result, message, driver_path
 
             result, message, latest_previous_version = self.__get_latest_previous_version_chromedriver_via_requests()
             if not result:
                 logging.error(message)
-                return result, message, is_driver_up_to_date, latest_previous_version
+                return result, message, driver_path
 
             result, message, driver_path = self.__get_specific_version_chromedriver_for_current_os(latest_previous_version)
             if not result:
                 logging.error(message)
-                return result, message, is_driver_up_to_date, latest_previous_version
+                return result, message, driver_path
 
             if self.chmod:
 
                 result, message = self.__chmod_driver()
                 if not result:
-                    return result, message, is_driver_up_to_date, latest_previous_version
+                    return result, message, driver_path
 
             result, message, current_version = self.__get_current_version_chrome_selenium()
             if not result:
                 logging.error(message)
-                return result, message, is_driver_up_to_date, latest_previous_version
+                return result, message, driver_path
 
             if current_version == latest_previous_version:
                 is_driver_up_to_date = True
@@ -982,7 +991,7 @@ class ChromeDriver():
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
-        return result_run, message_run, is_driver_up_to_date, latest_previous_version
+        return result_run, message_run, driver_path
 
     def __get_latest_previous_version_chromedriver_via_requests(self) -> Tuple[bool, str, str]:
         """Gets latest chromedriver version
@@ -1168,17 +1177,15 @@ class ChromeDriver():
         driver_version_terminal : str = ''
         
         try:
-            
-            if os.path.exists(self.chromedriver_path):
 
-                logging.info('Trying to get current version of chromedriver via terminal')
-            
-                process = subprocess.Popen([self.chromedriver_path, '--version'], stdout=subprocess.PIPE)
+            logging.info('Trying to get current version of chromedriver via terminal')
         
-                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+            process = subprocess.Popen([self.chromedriver_path, '--version'], stdout=subprocess.PIPE)
+    
+            driver_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
-                driver_version = find_string[0] if len(find_string) > 0 else ''
+            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+            driver_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

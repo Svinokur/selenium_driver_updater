@@ -78,6 +78,12 @@ print(filename)
 - MacOS
 - ARM
 
+## PhantomJS (DriverUpdater.phantomjs)
+
+- Windows
+- MacOS
+- Linux
+
 # Supported browsers for updates
 
 ## Chrome Browser

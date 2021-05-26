@@ -512,7 +512,7 @@ class ChromiumChromeDriver():
             
             
 
-            logging.info('Trying to get current version of chrome browser via terminal')
+            logging.info('Trying to get current version of chromium browser via terminal')
     
             process = subprocess.Popen(self.setting["ChromiumBrowser"]["Path"] + ' --version', stdout=subprocess.PIPE, shell=True)
     
