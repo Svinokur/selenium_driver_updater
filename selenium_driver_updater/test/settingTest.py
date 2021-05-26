@@ -57,7 +57,7 @@ edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windo
                              "msedgedriver"
 
 url_release_phantomjs = "https://bitbucket.org/ariya/phantomjs/downloads/"
-os_bit_linux = 'x84_64' if os_bit == '64' else "i686"
+os_bit_linux = 'x86_64' if os_bit == '64' else "i686"
 phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
                                 url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
                                 url_release_phantomjs + "phantomjs-{}-macosx.zip"
