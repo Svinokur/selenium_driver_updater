@@ -454,8 +454,8 @@ class PhantomJS():
                 logging.error(message)
                 return result_run, message, file_name
 
-            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '') + os.path.sep
-            archive_path_folder_bin = self.path + url.split('/')[6].replace('.zip', '') + os.path.sep + 'bin' +  os.path.sep
+            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
+            archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
             driver_archive_path = archive_path_folder_bin + self.setting["PhantomJS"]["LastReleasePlatform"]
 
             if not self.filename:
@@ -645,8 +645,8 @@ class PhantomJS():
                 logging.error(message)
                 return result_run, message, file_name
 
-            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '') + os.path.sep
-            archive_path_folder_bin = self.path + url.split('/')[6].replace('.zip', '') + os.path.sep + 'bin' +  os.path.sep
+            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
+            archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
             driver_archive_path = archive_path_folder_bin + self.setting["PhantomJS"]["LastReleasePlatform"]
 
             if not self.filename:

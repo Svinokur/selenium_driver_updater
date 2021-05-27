@@ -58,10 +58,11 @@ try:
 
     #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver)) Temporary could not test it in Github Workflow
 
+    testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
+
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
-    testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
     
     
     runner = unittest.TextTestRunner(verbosity=2, failfast=True)

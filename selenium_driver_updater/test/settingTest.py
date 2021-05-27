@@ -133,8 +133,12 @@ class testSetting(unittest.TestCase):
 
     """
 
+    @classmethod
+    def setUpClass(cls):
+
+        cls.setting = setting
+
     def setUp(self):
-        self.setting = setting
         
         self.startTime : float = time.time()
 
@@ -143,11 +147,11 @@ class testSetting(unittest.TestCase):
         print("%.3f" % t)
 
     #@unittest.skip('Temporary not needed')
-    def test01_checkCountMainParam(self):
+    def test01_check_count_main_param(self):
         self.assertEqual(len(self.setting), 15)
 
     #@unittest.skip('Temporary not needed')
-    def test02_checkCountParams(self):
+    def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 2)
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
         self.assertEqual(len(self.setting["GeckoDriver"]), 5)
@@ -167,7 +171,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["PyPi"]), 1)
     
     #@unittest.skip('Temporary not needed')
-    def test03_checkValuesParams(self):
+    def test03_check_values_params(self):
 
         self.assertEqual(self.setting["Program"]["version"], info.version)
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], '[0-9]+.[0-9]+.[0-9]+.[0-9]+')

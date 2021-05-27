@@ -1,5 +1,13 @@
-[3.3.0] 27/05/2021
+[3.3.1] 27/05/2021
 This version provides some minor fixes.
+This code was written and tested on Python 3.9.5
+
+# Fixes
+
+- Fixed an issue with incorrect downloading and renaming phantomjs driver on Linux
+
+[3.3.0] 27/05/2021
+This version provides some innovations and minor fixes.
 This code was written and tested on Python 3.9.5
 
 # New
