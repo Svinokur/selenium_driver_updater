@@ -48,37 +48,67 @@ print(filename)
 
 # Supported Selenium Binaries
 
-## Chromedriver (DriverUpdater.chromedriver)
+### ``Chromedriver`` 
+#### ``DriverUpdater.chromedriver``
+
+For installing or updating [chromedriver binary](https://chromedriver.chromium.org)
+
+All supported OS for this driver are:
 
 - Windows
 - Linux
 - MacOS
 - MacOS with M1
 
-## Chromium ChromeDriver (DriverUpdater.chromium_chromedriver)
+### ``Chromium ChromeDriver`` 
+#### ``DriverUpdater.chromium_chromedriver``
+
+For installing or updating [chromium_chromedriver binary](https://chromedriver.chromium.org)
+
+All supported OS's for this driver are:
 
 - Linux
 
-## Geckodriver (DriverUpdater.geckodriver)
+### ``Geckodriver`` 
+#### ``DriverUpdater.geckodriver``
+
+For installing or updating [geckodriver binary](https://github.com/mozilla/geckodriver/releases)
+
+All supported OS's for this driver are:
 
 - Windows
 - Linux
 - MacOS
 - MacOS with M1
 
-## Operadriver (DriverUpdater.operadriver)
+### ``Operadriver`` 
+#### ``DriverUpdater.operadriver``
+
+For installing or updating [operadriver binary](https://github.com/operasoftware/operachromiumdriver)
+
+All supported OS's for this driver are:
 
 - Windows
 - Linux
 - MacOS
 
-## Edgedriver (DriverUpdater.edgedriver)
+### ``Edgedriver`` 
+#### ``DriverUpdater.edgedriver``
+
+For installing or updating [edgedriver binary](https://developer.microsoft.com/ru-ru/microsoft-edge/tools/webdriver/)
+
+All supported OS's for this driver are:
 
 - Windows
 - MacOS
 - ARM
 
-## PhantomJS (DriverUpdater.phantomjs)
+### ``PhantomJS`` 
+#### ``DriverUpdater.phantomjs``
+
+For installing or updating [phantomjs binary](https://phantomjs.org/)
+
+All supported OS's for this driver are:
 
 - Windows
 - MacOS
@@ -86,29 +116,49 @@ print(filename)
 
 # Supported browsers for updates
 
-## Chrome Browser
+### ``Chrome Browser``
+
+For updating [chrome browser](https://www.google.com/chrome/)
+
+All supported OS's for this browser are:
 
 - Windows
 - MacOS
 - Linux (Tested on Ubuntu 20.04)
 
-## Chromium Browser
+### ``Chromium Browser``
+
+For updating [chromium browser](https://www.chromium.org/getting-involved/download-chromium)
+
+All supported OS's for this browser are:
 
 - Linux (Tested on Ubuntu 20.04)
 
-## Firefox Browser
+### ``Firefox Browser``
+
+For updating [firefox browser](https://www.mozilla.org/en-US/firefox/)
+
+All supported OS's for this browser are:
 
 - Windows
 - MacOS
 - Linux (Tested on Ubuntu 20.04)
 
-## Opera Browser
+### ``Opera Browser``
+
+For updating [opera browser](https://www.opera.com)
+
+All supported OS's for this browser are:
 
 - Windows
 - MacOS
 - Linux (Tested on Ubuntu 20.04)
 
-## Edge Browser
+### ``Edge Browser``
+
+For updating [edge browser](https://www.microsoft.com/en-us/edge)
+
+All supported OS's for this browser are:
 
 - Windows
 - MacOS

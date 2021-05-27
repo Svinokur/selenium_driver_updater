@@ -67,6 +67,8 @@ class ChromeDriver():
         
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
+        self.info_messages = bool(kwargs.get('info_messages'))
+
         self.extractor = Extractor
         self.requests_getter = RequestsGetter
 
@@ -181,7 +183,11 @@ class ChromeDriver():
 
             logging.info(f'Started download chromedriver by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
+
             time.sleep(2)
 
             logging.info(f'Chromedriver was downloaded to path: {file_name}')
@@ -602,7 +608,10 @@ class ChromeDriver():
 
             logging.info(f'Started download chromedriver by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
             logging.info(f'Chromedriver was downloaded to path: {file_name}')

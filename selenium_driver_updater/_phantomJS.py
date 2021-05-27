@@ -40,15 +40,15 @@ class PhantomJS():
     _tmp_folder_path = 'tmp'
     
     def __init__(self, path : str, **kwargs):
-        """Class for working with Selenium chromedriver binary
+        """Class for working with Selenium phantomjs binary
 
         Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium chromedriver binary. Must be folder path.
+            path (str)                          : Specified path which will used for downloading or updating Selenium phantomjs binary. Must be folder path.
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
+            chmod (bool)                        : If true, it will make phantomjs binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
-            filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver.
-            version (str)                       : Specific version for chromedriver. If given, it will downloads given version.
+            filename (str)                      : Specific name for phantomjs. If given, it will replace name for phantomjs.
+            version (str)                       : Specific version for phantomjs. If given, it will downloads given version.
         """
         self.setting = setting
 
@@ -67,6 +67,8 @@ class PhantomJS():
         self.phantomjs_path : str =  self.path + self.setting["PhantomJS"]["LastReleasePlatform"] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
+
+        self.info_messages = bool(kwargs.get('info_messages'))
 
         self.extractor = Extractor
         self.github_viewer = GithubViewer
@@ -182,7 +184,7 @@ class PhantomJS():
         return result_run, message_run, driver_version
 
     def __get_latest_version_phantomjs(self) -> Tuple[bool, str, str]:
-        """Gets latest chromedriver version
+        """Gets latest phantomjs version
 
 
         Returns:
@@ -190,7 +192,7 @@ class PhantomJS():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            latest_version (str)    : Latest version of chromedriver.
+            latest_version (str)    : Latest version of phantomjs.
             
         Raises:
             Except: If unexpected error raised. 
@@ -412,7 +414,10 @@ class PhantomJS():
 
             logging.info(f'Started download phantomjs by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
             logging.info(f'PhantomJS was downloaded to path: {file_name}')
@@ -480,7 +485,7 @@ class PhantomJS():
         return result_run, message_run, file_name
 
     def __chmod_driver(self) -> Tuple[bool, str]:
-        """Tries to give phantomjs needed permissions
+        """Tries to give phantomjs binary needed permissions
 
         Returns:
             Tuple of bool and str
@@ -600,7 +605,10 @@ class PhantomJS():
 
             logging.info(f'Started download phantomjs by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
             logging.info(f'PhantomJS was downloaded to path: {file_name}')
@@ -717,6 +725,20 @@ class PhantomJS():
         return result_run, message_run, driver_path
     
     def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates phantomjs binary or
+        downloads specific version of phantomjs.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where phantomjs was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''

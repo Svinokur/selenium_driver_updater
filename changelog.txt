@@ -1,3 +1,17 @@
+[3.3.0] 27/05/2021
+This version provides some minor fixes.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added support for some lower versions of Python (3.8 and lower).
+If you are have some issues with library on lowers versions please report it in repository.
+
+# Fixes
+
+- Fixed an issue if info_messages was False, but progress bar was not hidden.
+- Fixed an issue with incorrect return of drivers path if multiply drivers were given.
+
 [3.2.1] 26/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

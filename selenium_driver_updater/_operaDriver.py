@@ -70,6 +70,8 @@ class OperaDriver():
 
         self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
+        self.info_messages = bool(kwargs.get('info_messages'))
+
         self.extractor = Extractor
         self.github_viewer = GithubViewer
         self.requests_getter = RequestsGetter
@@ -260,11 +262,14 @@ class OperaDriver():
 
             logging.info(f'Started download operadriver by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
 
             logging.info(f'Operadriver was downloaded to path: {file_name}')
 
-            #time.sleep(2)
+            time.sleep(2)
 
             archive_path = file_name
             out_path = self.path
@@ -272,8 +277,6 @@ class OperaDriver():
             if not result:
                 logging.error(message)
                 return result, message, file_name
-
-            #time.sleep(3)
 
             archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
             archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
@@ -641,7 +644,10 @@ class OperaDriver():
 
             logging.info(f'Started download operadriver by url: {url}')
 
-            file_name = wget.download(url=url, out=out_path)
+            if self.info_messages:
+                file_name = wget.download(url=url, out=out_path)
+            else:
+                file_name = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
             logging.info(f'Operadriver was downloaded to path: {file_name}')

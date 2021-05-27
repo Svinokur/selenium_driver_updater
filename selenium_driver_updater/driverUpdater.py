@@ -13,7 +13,7 @@ from _setting import setting
 import logging
 import os
 import traceback
-from typing import Tuple, Union
+from typing import Tuple
 
 import time
 
@@ -29,7 +29,7 @@ class DriverUpdater():
     phantomjs = 'phantomjs'
         
     @staticmethod
-    def install(driver_name : Union[str, list[str]], **kwargs):
+    def install(driver_name, **kwargs):
         """Function for install or update Selenium driver binary
 
         Args:
@@ -92,12 +92,14 @@ class DriverUpdater():
                 result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver_name, path=path, upgrade=upgrade, chmod=chmod, 
                                                 check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                                 filename=filename, version=version,
-                                                check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                                check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
 
             elif type(driver_name) == list:
+
+                list_of_paths : list[str] = []
                 
                 for driver in driver_name:
 
@@ -106,10 +108,14 @@ class DriverUpdater():
                     result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, path=path, upgrade=upgrade, chmod=chmod, 
                                                 check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                                 filename=filename, version=version,
-                                                check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                                check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                     if not result:
                         logging.error(message)
                         return result, message, driver_path
+
+                    list_of_paths.append(driver_path)
+
+                driver_path = list_of_paths
 
             result_run = True
 
@@ -293,7 +299,7 @@ class DriverUpdater():
         return result_run, message_run
 
     @staticmethod
-    def __check_enviroment_and_variables(path : str, driver_name : Union[str, list[str]], enable_library_update_check : bool) -> Tuple[bool, str]:
+    def __check_enviroment_and_variables(path : str, driver_name, enable_library_update_check : bool) -> Tuple[bool, str]:
         """Private function for checking all input parameters and enviroment
 
         Args:
@@ -379,6 +385,7 @@ class DriverUpdater():
         filename = kwargs.get('filename')
         version = kwargs.get('version')
         check_browser_is_up_to_date = kwargs.get('check_browser_is_up_to_date')
+        info_messages = kwargs.get('info_messages')
         driver_path : str = ''
 
         try:
@@ -388,7 +395,7 @@ class DriverUpdater():
                 chrome_driver = ChromeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                             check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                             filename=filename, version=version,
-                                            check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                            check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 result, message, driver_path = chrome_driver.main()
                 if not result:
                     logging.error(message)
@@ -399,7 +406,7 @@ class DriverUpdater():
                 gecko_driver = GeckoDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                         filename=filename, version=version,
-                                        check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                        check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 result, message, driver_path = gecko_driver.main()
                 if not result:
                     logging.error(message)
@@ -410,7 +417,7 @@ class DriverUpdater():
                 opera_driver = OperaDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                         check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                         filename=filename, version=version,
-                                        check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                        check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 result, message, driver_path = opera_driver.main()
                 if not result:
                     logging.error(message)
@@ -421,7 +428,7 @@ class DriverUpdater():
                 edge_driver = EdgeDriver(path=path, upgrade=upgrade, chmod=chmod, 
                                     check_driver_is_up_to_date=check_driver_is_up_to_date, 
                                     filename=filename, version=version,
-                                    check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                    check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 result, message, driver_path = edge_driver.main()
                 if not result:
                     logging.error(message)
@@ -430,7 +437,7 @@ class DriverUpdater():
             elif DriverUpdater.chromium_chromedriver == driver_name:
 
                 chromium_chromedriver = ChromiumChromeDriver(check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                                            check_browser_is_up_to_date=check_browser_is_up_to_date)
+                                                            check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                 result, message, driver_path = chromium_chromedriver.main()
                 if not result:
                     logging.error(message)
@@ -440,7 +447,7 @@ class DriverUpdater():
 
                 phantomjs = PhantomJS(path=path, upgrade=upgrade, chmod=chmod, 
                                     check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                    filename=filename, version=version)
+                                    filename=filename, version=version, info_messages=info_messages)
                 result, message, driver_path = phantomjs.main()
                 if not result:
                     logging.error(message)

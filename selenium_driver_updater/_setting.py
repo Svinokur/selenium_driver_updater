@@ -116,7 +116,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 class info:
-    version = "3.2.1"
+    version = "3.3.0"
 
 setting = dict(
     {

@@ -621,6 +621,20 @@ class ChromiumChromeDriver():
 
     
     def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates chromium chromedriver binary or
+        downloads specific version of chromium chromedriver.
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where chromium chromedriver was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
         
         result_run : bool = False
         message_run : str = ''
