@@ -42,13 +42,13 @@ class testDriverUpdater(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_all_input_parameteres_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path + 'hahaha', driver_name=self.driver_name)
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path + 'hahaha', driver_name=self.driver_name, filename='hi')
         self.assertFalse(result, message)
         self.assertGreater(len(message), 0, len(message))
 
     #@unittest.skip('Temporary not needed')
     def test02_check_enviroment_and_variables_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path + 'hahaha', driver_name=self.driver_name, enable_library_update_check=True)
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path + 'hahaha', driver_name=self.driver_name, enable_library_update_check=True, filename='hi')
         self.assertFalse(result, message)
         self.assertGreater(len(message), 0, len(message))
     
@@ -72,12 +72,12 @@ class testDriverUpdater(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test06_check_all_input_parameteres(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path, driver_name=self.driver_name)
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path, driver_name=self.driver_name, filename=self.driver_name)
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
     def test07_check_enviroment_and_variables(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path, driver_name=self.driver_name, enable_library_update_check=True)
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path, driver_name=self.driver_name, enable_library_update_check=True, filename=self.driver_name)
         self.assertTrue(result, message)
     
     

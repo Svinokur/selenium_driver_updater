@@ -59,7 +59,7 @@ class DriverUpdater():
         #Initialize all variables
         result_run : bool = False
         message_run : str = ''
-        driver_path : str = ''
+        driver_path = ''
 
         info_messages = bool(kwargs.get('info_messages', True))
         if info_messages:
@@ -71,7 +71,8 @@ class DriverUpdater():
         logging.info('You have not specified the path - so used default folder path instead') if not kwargs.get('path') else ''
         path = str(os.path.abspath(path) + os.path.sep)
 
-        filename : str = str(kwargs.get('filename', '')).replace('.', '')
+        filename : str = str(kwargs.get('filename', '')).replace('.', '') if type(kwargs.get('filename', '')) == str else\
+                         kwargs.get('filename', '') if type(kwargs.get('filename', '')) == list else ''
 
         enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
         upgrade = bool(kwargs.get('upgrade', False))
@@ -82,7 +83,7 @@ class DriverUpdater():
 
         try:
 
-            result, message = DriverUpdater.__check_enviroment_and_variables(path=path, driver_name=driver_name, enable_library_update_check=enable_library_update_check)
+            result, message = DriverUpdater.__check_enviroment_and_variables(path=path, driver_name=driver_name, enable_library_update_check=enable_library_update_check, filename=filename)
             if not result:
                 logging.error(message)
                 return result, message, driver_path
@@ -105,9 +106,12 @@ class DriverUpdater():
 
                     time.sleep(1) #small sleep
 
+                    filename_driver = str(filename[driver_name.index(driver)]) if len(filename) > driver_name.index(driver) and filename else ''
+                    filename_driver.replace('.', '')
+
                     result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, path=path, upgrade=upgrade, chmod=chmod, 
                                                 check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                                filename=filename, version=version,
+                                                filename=filename_driver, version=version,
                                                 check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages)
                     if not result:
                         logging.error(message)
@@ -126,7 +130,7 @@ class DriverUpdater():
         return result_run, message_run, driver_path
 
     @staticmethod
-    def __check_all_input_parameteres(path, driver_name) -> Tuple[bool, str]:
+    def __check_all_input_parameteres(path, driver_name, filename) -> Tuple[bool, str]:
         """Private function for checking all input parameters
 
         Args:
@@ -177,6 +181,13 @@ class DriverUpdater():
                     logging.error(message)
                     return result_run, message
 
+                if filename:
+
+                    if type(filename) != str:
+                        message = f'Unknown type of filename was specificed type(filename): {type(filename)}, but must be str, if one driver is given'
+                        logging.error(message)
+                        return result_run, message
+
             elif type(driver_name) == list:
 
                 for driver in driver_name:
@@ -190,6 +201,13 @@ class DriverUpdater():
 
                     if not driver_name_list:
                         message = f'Unknown driver name was specified at index: {driver_name.index(driver)} current name of driver is: {driver}'
+                        logging.error(message)
+                        return result_run, message
+
+                if filename:
+
+                    if type(filename) != list:
+                        message = f'Unknown type of filename was specificed type(filename): {type(filename)}, but must be list[str], if multiply drivers were given'
                         logging.error(message)
                         return result_run, message
 
@@ -299,7 +317,7 @@ class DriverUpdater():
         return result_run, message_run
 
     @staticmethod
-    def __check_enviroment_and_variables(path : str, driver_name, enable_library_update_check : bool) -> Tuple[bool, str]:
+    def __check_enviroment_and_variables(path : str, driver_name, enable_library_update_check : bool, filename) -> Tuple[bool, str]:
         """Private function for checking all input parameters and enviroment
 
         Args:
@@ -334,7 +352,7 @@ class DriverUpdater():
                     logging.error(message)
                     return result, message
 
-            result, message = DriverUpdater.__check_all_input_parameteres(path=path, driver_name=driver_name)
+            result, message = DriverUpdater.__check_all_input_parameteres(path=path, driver_name=driver_name, filename=filename)
             if not result:
                 logging.error(message)
                 return result, message
