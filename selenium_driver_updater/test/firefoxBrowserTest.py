@@ -29,7 +29,7 @@ class testFirefoxBrowser(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'geckodriver'
+        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'geckodriver_test'
 
         cls.firefoxbrowser = FirefoxBrowser(path=path, check_browser_is_up_to_date = True)
         

@@ -18,7 +18,7 @@ class testRequestsGetter(unittest.TestCase):
 
     Attributes:
         requests_getter             : Initialize class RequestsGetter
-        setting (dict[str])     : Dict of all additional parametres
+        setting (dict[str])         : Dict of all additional parametres
         startTime (float)           : Time of starting unit-tests
     """
 
