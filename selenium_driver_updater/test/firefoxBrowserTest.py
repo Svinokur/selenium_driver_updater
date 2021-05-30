@@ -12,6 +12,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 import time
 import logging
+import platform
 logging.basicConfig(level=logging.INFO)
 
 class testFirefoxBrowser(unittest.TestCase): 
@@ -22,14 +23,17 @@ class testFirefoxBrowser(unittest.TestCase):
         chrome_driver           : Initialize class ChromeDriver
         startTime (float)       : Time of starting unit-tests
         setting (dict[str])     : Dict of all additional parametres
-        specific_version (str)  : Specific version of chromedriver to test
+        specific_version (str)  : Specific version of geckodriver to test
     """
 
     @classmethod
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'geckodriver_test'
+        driver_name : str = "geckodriver_test.exe" if platform.system() == 'Windows' else\
+                                        "geckodriver_test"
+
+        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
 
         cls.firefoxbrowser = FirefoxBrowser(path=path, check_browser_is_up_to_date = True)
         

@@ -13,6 +13,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 import time
 import logging
+import platform
 logging.basicConfig(level=logging.INFO)
 
 class testEdgeBrowser(unittest.TestCase): 
@@ -30,7 +31,10 @@ class testEdgeBrowser(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'edgedriver_test'
+        driver_name : str = "edgedriver_test.exe" if platform.system() == 'Windows' else\
+                                        "edgedriver_test"
+
+        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
 
         cls.edgebrowser = EdgeBrowser(path=path, check_browser_is_up_to_date = True)
 

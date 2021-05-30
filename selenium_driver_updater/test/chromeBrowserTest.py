@@ -13,6 +13,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 import time
 import logging
+import platform
 logging.basicConfig(level=logging.INFO)
 
 class testChromeBrowser(unittest.TestCase): 
@@ -30,7 +31,10 @@ class testChromeBrowser(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'chromedriver_test'
+        driver_name : str = "chromedriver_test.exe" if platform.system() == 'Windows' else\
+                                        "chromedriver_test"
+
+        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
 
         cls.chromebrowser = ChromeBrowser(path=path, check_browser_is_up_to_date = True)
         cls.requests_getter = RequestsGetter

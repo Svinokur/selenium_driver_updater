@@ -7,12 +7,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 
 from _setting import setting
 from browsers._operaBrowser import OperaBrowser
-import time
 from util.requests_getter import RequestsGetter
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 import logging
+import platform
+import time
 logging.basicConfig(level=logging.INFO)
 
 class testOperaBrowser(unittest.TestCase): 
@@ -30,7 +31,10 @@ class testOperaBrowser(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + 'operadriver_test'
+        driver_name : str = "operadriver_test.exe" if platform.system() == 'Windows' else\
+                                        "operadriver_test"
+
+        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
 
         cls.operabrowser = OperaBrowser(path=path, check_browser_is_up_to_date = True)
         cls.requests_getter = RequestsGetter
