@@ -51,22 +51,14 @@ class testChromiumChromeDriver(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_result_by_request(self):
-        url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
-        result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
-        self.assertTrue(result, message)
-        self.assertEqual(status_code, 200, status_code)
-        self.assertGreaterEqual(len(json_data), 0, len(json_data))
-
-    #@unittest.skip('Temporary not needed')
-    def test03_check_get_current_version_chromium_chromedriver(self):
+    def test02_check_get_current_version_chromium_chromedriver(self):
         result, message, current_version = self.chromium_chromedriver._ChromiumChromeDriver__get_current_version_chromium_chromedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
     
     #@unittest.skip('Temporary not needed')
-    def test04_check_get_latest_version_chromium_chromedriver(self):
+    def test03_check_get_latest_version_chromium_chromedriver(self):
         result, message, latest_version = self.chromium_chromedriver._ChromiumChromeDriver__get_latest_version_chromium_chromedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
@@ -92,27 +84,8 @@ class testChromiumChromeDriver(unittest.TestCase):
         self.assertGreater(len(current_version), 0, len(current_version))
         self.assertGreater(len(latest_version), 0, len(latest_version))
     
-    #@unittest.skip('Temporary not needed')
-    def test06_check_get_current_version_chromiumbrowser_selenium(self):
-        result, message, current_version = self.chromium_chromedriver._ChromiumChromeDriver__get_current_version_chromiumbrowser_selenium()
-        self.assertTrue(result, message)
-        self.assertIsNotNone(current_version, current_version)
-        self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
-    #@unittest.skip('Temporary not needed')
-    def test07_check_get_latest_version_chromiumbrowser(self):
-        result, message, latest_version = self.chromium_chromedriver._ChromiumChromeDriver__get_latest_version_chromiumbrowser()
-        self.assertTrue(result, message)
-        self.assertIsNotNone(latest_version, latest_version)
-        self.assertGreater(len(latest_version), 0, len(latest_version))
-    
-    #@unittest.skip('Temporary not needed')
-    def test08_check_get_latest_chromium_browser_for_current_os(self):
-        result, message = self.chromium_chromedriver._ChromiumChromeDriver__get_latest_chromium_browser_for_current_os()
-        self.assertTrue(result, message)
-    
      #@unittest.skip('Temporary not needed')
-    def test09_check_chromedriver_is_up_to_date(self):
+    def test06_check_chromedriver_is_up_to_date(self):
         result, message, filename = self.chromium_chromedriver.main()
         self.assertTrue(result, message)
         self.assertGreaterEqual(len(filename), 0, len(filename))

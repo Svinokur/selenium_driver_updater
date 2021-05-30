@@ -10,7 +10,7 @@ import os
 
 import platform
 
-from typing import Any, Tuple
+from typing import Tuple
 
 import sys
 import os.path
@@ -306,24 +306,10 @@ class PhantomJS():
                 if is_driver_up_to_date:
                     return True, message, self.phantomjs_path
 
-            
-            if self.upgrade:
-
-                result, message = self.__delete_current_phantomjs_for_current_os()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-            result, message, driver_path = self.__get_latest_phantomjs_for_current_os()
+            result, message, driver_path = self.__download_driver()
             if not result:
                 logging.error(message)
                 return result, message, driver_path
-
-            if self.chmod:
-
-                result, message = self.__chmod_driver()
-                if not result:
-                    return result, message, driver_path
             
             if self.check_driver_is_up_to_date:
 
@@ -378,111 +364,6 @@ class PhantomJS():
             logging.error(message_run)
 
         return result_run, message_run
-
-    def __get_latest_phantomjs_for_current_os(self) -> Tuple[bool, str, str]:
-        """Downloads latest phantomjs to specific path
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path where phantomjs was downloaded or updated.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        file_name : str = ''
-        
-        try:
-
-            result, message, latest_version = self.__get_latest_version_phantomjs()
-            if not result:
-                logging.error(message)
-                return result, message, file_name
-
-            logging.info(f'Started download phantomjs latest_version: {latest_version}')
-
-            url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_version)
-            out_path = self.path + url.split('/')[6]
-
-            if os.path.exists(out_path):
-                os.remove(out_path)
-
-            logging.info(f'Started download phantomjs by url: {url}')
-
-            if self.info_messages:
-                file_name = wget.download(url=url, out=out_path)
-            else:
-                file_name = wget.download(url=url, out=out_path, bar=None)
-            time.sleep(2)
-
-            logging.info(f'PhantomJS was downloaded to path: {file_name}')
-
-            if file_name.endswith('.zip'):
-
-                archive_path = file_name
-                out_path = self.path
-                result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            elif file_name.endswith('.tar.bz2'):
-
-                archive_path = file_name
-                out_path = self.path
-                result, message = self.extractor.extract_all_tar_bz2_archive(archive_path=archive_path, out_path=out_path)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            elif file_name.endswith('.tar.gz'):
-
-                archive_path = file_name
-                out_path = self.path
-                result, message = self.extractor.extract_all_tar_gz_archive(archive_path=archive_path, out_path=out_path)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            else:
-                message = f'Unknown archive format was specified file_name: {file_name}'
-                logging.error(message)
-                return result_run, message, file_name
-
-            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
-            archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
-            driver_archive_path = archive_path_folder_bin + self.setting["PhantomJS"]["LastReleasePlatform"]
-
-            if not self.filename:
-
-                copyfile(driver_archive_path, self.path + self.setting["PhantomJS"]["LastReleasePlatform"])
-
-            else:
-
-                result, message = self.__rename_driver(archive_folder_path=archive_path_folder_bin, archive_driver_path=driver_archive_path)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-            if os.path.exists(archive_path_folder):
-                shutil.rmtree(archive_path_folder)
-            
-            file_name = self.phantomjs_path
-
-            logging.info(f'PhantomJS was successfully unpacked by path: {file_name}')
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, file_name
 
     def __chmod_driver(self) -> Tuple[bool, str]:
         """Tries to give phantomjs binary needed permissions
@@ -562,8 +443,51 @@ class PhantomJS():
             logging.error(message_run)
 
         return result_run, message_run
+    
+    def main(self) -> Tuple[bool, str, str]:
+        """Main function, checks for the latest version, downloads or updates phantomjs binary or
+        downloads specific version of phantomjs.
 
-    def __get_specific_version_phantomjs_for_current_os(self, version : str) -> Tuple[bool, str, str]:
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where phantomjs was downloaded or updated.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+        result_run : bool = False
+        message_run : str = ''
+        driver_path : str = ''
+        
+        try:
+
+            if not self.version:
+
+                result, message, driver_path = self.__check_if_phantomjs_is_up_to_date()
+                if not result:
+                    logging.error(message)
+                    return result, message, driver_path
+
+            else:
+
+                result, message, driver_path = self.__download_driver(version=self.version)
+            if not result:
+                logging.error(message)
+                return result, message, driver_path
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run, driver_path
+
+    def __download_driver(self, version : str = ''):
         """Download specific version of phantomjs to folder
 
         Returns:
@@ -585,18 +509,37 @@ class PhantomJS():
 
         try:
 
-            logging.info(f'Started download phantomjs specific_version: {version}')
+            if self.upgrade:
 
-            url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(version)
-            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text = False, no_error_status_code=True)
-            if not result:
-                logging.error(message)
-                return result, message, file_name
+                result, message = self.__delete_current_phantomjs_for_current_os()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+            
+            if version:
 
-            if status_code != 200:
-                message = f'Specific binary was not found, wrong version was specified. version: {version}'
-                logging.error(message)
-                return result_run, message, file_name
+                logging.info(f'Started download phantomjs: {version}')
+
+                url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(version)
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text = False, no_error_status_code=True)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                if status_code != 200:
+                    message = f'Specific binary was not found, wrong version was specified. version: {version}'
+                    logging.error(message)
+                    return result_run, message, file_name
+
+            else:
+                result, message, latest_version = self.__get_latest_version_phantomjs()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started download phantomjs latest_version: {latest_version}')
+
+                url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_version)
 
             out_path = self.path + url.split('/')[6]
 
@@ -667,6 +610,12 @@ class PhantomJS():
 
             logging.info(f'PhantomJS was successfully unpacked by path: {file_name}')
 
+            if self.chmod:
+
+                result, message = self.__chmod_driver()
+                if not result:
+                    return result, message, file_name
+
             result_run = True
 
         except:
@@ -674,95 +623,3 @@ class PhantomJS():
             logging.error(message_run)
 
         return result_run, message_run, file_name
-
-    def __download_phantomjs_for_specific_version(self, version : str) -> Tuple[bool, str, str]:
-        """Downloads specific version of phantomjs
-
-        Args:
-            version (str)    : Specific version of phantomjs.
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_path (str)       : Path where phantomjs was downloaded or updated.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        driver_path : str = ''
-        
-        try:
-
-            if self.upgrade:
-
-                result, message = self.__delete_current_phantomjs_for_current_os()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-            result, message, driver_path = self.__get_specific_version_phantomjs_for_current_os(version=version)
-            if not result:
-                logging.error(message)
-                return result, message, driver_path
-
-            if self.chmod:
-
-                result, message = self.__chmod_driver()
-                if not result:
-                    return result, message, driver_path
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, driver_path
-    
-    def main(self) -> Tuple[bool, str, str]:
-        """Main function, checks for the latest version, downloads or updates phantomjs binary or
-        downloads specific version of phantomjs.
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_path (str)       : Path where phantomjs was downloaded or updated.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        driver_path : str = ''
-        
-        try:
-
-            if not self.version:
-
-                result, message, driver_path = self.__check_if_phantomjs_is_up_to_date()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-            else:
-
-                result, message, driver_path = self.__download_phantomjs_for_specific_version(version=self.version)
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, driver_path

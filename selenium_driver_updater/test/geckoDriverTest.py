@@ -73,8 +73,8 @@ class testGeckoDriver(unittest.TestCase):
         self.assertEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_specific_version_geckodriver_for_current_os_failure(self):
-        result, message, file_name = self.gecko_driver_failure._GeckoDriver__get_specific_version_geckodriver_for_current_os(version=self.specific_version_failure)
+    def test02_check_download_driver(self):
+        result, message, file_name = self.gecko_driver_failure._GeckoDriver__download_driver(version=self.specific_version_failure)
         self.assertFalse(result, result)
         self.assertGreater(len(message), 0, len(message))
         self.assertEqual(len(file_name), 0, len(file_name))
@@ -112,12 +112,12 @@ class testGeckoDriver(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test07_check_get_specific_version_geckodriver_for_current_os(self):
+    def test07_check_download_driver(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
-        result, message, file_name = self.gecko_driver._GeckoDriver__get_specific_version_geckodriver_for_current_os(version=self.specific_version)
+        result, message, file_name = self.gecko_driver._GeckoDriver__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
@@ -146,8 +146,8 @@ class testGeckoDriver(unittest.TestCase):
         self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
 
     #@unittest.skip('Temporary not needed')
-    def test10_check_get_latest_geckodriver_for_current_os(self):
-        result, message, file_name = self.gecko_driver._GeckoDriver__get_latest_geckodriver_for_current_os()
+    def test10_check_download_driver(self):
+        result, message, file_name = self.gecko_driver._GeckoDriver__download_driver()
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
@@ -175,33 +175,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertGreater(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test13_check_get_latest_version_firefox_browser(self):
-        result, message, latest_version = self.gecko_driver._GeckoDriver__get_latest_version_firefox_browser()
-        self.assertTrue(result, message)
-        self.assertIsNotNone(latest_version, latest_version)
-        self.assertGreater(len(latest_version), 0, len(latest_version))
-
-    
-    #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test14_check_get_latest_firefox_browser_for_current_os(self):
-        result, message = self.gecko_driver._GeckoDriver__get_latest_firefox_browser_for_current_os()
-        self.assertTrue(result, message)
-    
-    #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test15_check_compare_current_version_and_latest_version_firefox_browser(self):
-        result, message, is_browser_is_up_to_date, current_version, latest_version = self.gecko_driver._GeckoDriver__compare_current_version_and_latest_version_firefox_browser()
-        self.assertTrue(result, message)
-        self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
-        self.assertIsNotNone(current_version, current_version)
-        self.assertIsNotNone(latest_version, latest_version)
-
-        self.assertIn(is_browser_is_up_to_date, [True, False], is_browser_is_up_to_date)
-        
-        self.assertGreater(len(current_version), 0, len(current_version))
-        self.assertGreater(len(latest_version), 0, len(latest_version))
-
-    #@unittest.skip('Temporary not needed')
-    def test16_check_geckodriver_is_up_to_date(self):
+    def test13_check_geckodriver_is_up_to_date(self):
         result, message, filename = self.gecko_driver.main()
         self.assertTrue(result, message)
         self.assertGreater(len(filename), 0, len(filename))

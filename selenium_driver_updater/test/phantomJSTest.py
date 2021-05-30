@@ -70,8 +70,8 @@ class testPhantomJS(unittest.TestCase):
         self.assertEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_specific_version_phantomjs_for_current_os(self):
-        result, message, current_version = self.phantomjs_failure._PhantomJS__get_specific_version_phantomjs_for_current_os(version=self.specific_version_failure)
+    def test02_check_download_driver(self):
+        result, message, current_version = self.phantomjs_failure._PhantomJS__download_driver(version=self.specific_version_failure)
         self.assertFalse(result, message)
         self.assertGreaterEqual(len(message), 0, len(message))
         self.assertEqual(len(current_version), 0, len(current_version))
@@ -106,12 +106,12 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_get_specific_version_phantomjs_for_current_os(self):
+    def test06_check_download_driver(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
 
-        result, message, file_name = self.phantomjs._PhantomJS__get_specific_version_phantomjs_for_current_os(version=self.specific_version)
+        result, message, file_name = self.phantomjs._PhantomJS__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
@@ -128,13 +128,13 @@ class testPhantomJS(unittest.TestCase):
 
 
     #@unittest.skip('Temporary not needed')
-    def test07_check_get_latest_phantomjs_for_current_os(self):
+    def test07_check_download_driver(self):
         result, message, latest_version = self.phantomjs._PhantomJS__get_latest_version_phantomjs()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
-        result, message, file_name = self.phantomjs._PhantomJS__get_latest_phantomjs_for_current_os()
+        result, message, file_name = self.phantomjs._PhantomJS__download_driver()
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))

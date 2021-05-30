@@ -1,3 +1,20 @@
+[3.5.0] 30/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added support for edgedriver on Linux
+
+# Improvements
+
+- Improved overall code optimization
+- Improved unit-tests
+
+# Operations
+
+- Separated drivers and browsers into different files
+
 [3.4.0] 28/05/2021
 This version provides some innovations.
 This code was written and tested on Python 3.9.5

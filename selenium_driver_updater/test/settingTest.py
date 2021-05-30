@@ -51,6 +51,7 @@ operadriver_name_platform_release = f"operadriver_win{os_bit}" if platform.syste
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
 edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 latest_release_edgedriver + "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
+                                latest_release_edgedriver + "edgedriver_linux64" if platform.system() == 'Linux' else\
                                 latest_release_edgedriver + "edgedriver_arm64.zip"
                                 
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\

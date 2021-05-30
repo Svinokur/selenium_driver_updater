@@ -101,6 +101,7 @@ All supported OS's for this driver are:
 
 - Windows
 - MacOS
+- Linux
 - ARM
 
 ### ``PhantomJS`` 

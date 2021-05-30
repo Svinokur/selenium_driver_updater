@@ -11,14 +11,24 @@ import traceback
 
 from test import settingTest
 from test import driverUpdaterTest
+
 from test import chromeDriverTest
+from test import chromeBrowserTest
+
 from test import geckoDriverTest
+from test import firefoxBrowserTest
+
 from test import operaDriverTest
+
 from test import edgeDriverTest
+from test import edgeBrowserTest
+
 from test import githubViewerTest
 from test import extractorTest
 from test import requestsGetterTest
+
 from test import chromiumChromeDriverTest
+
 from test import phantomJSTest
 
 import platform
@@ -49,12 +59,19 @@ try:
     testSuite = unittest.TestSuite()
     testSuite.addTest(unittest.makeSuite(settingTest.testSetting))
     testSuite.addTest(unittest.makeSuite(driverUpdaterTest.testDriverUpdater))
+
     testSuite.addTest(unittest.makeSuite(chromeDriverTest.testChromeDriver))
+    testSuite.addTest(unittest.makeSuite(chromeBrowserTest.testChromeBrowser))
+
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
+    testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
+
     #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it in Github Workflow
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
+        testSuite.addTest(unittest.makeSuite(edgeBrowserTest.testEdgeBrowser))
+
 
     #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver)) Temporary could not test it in Github Workflow
 

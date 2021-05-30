@@ -23,7 +23,7 @@ keywords = ['chromedriver', 'operadriver',
  
 setup(
   name='selenium_driver_updater',
-  version='3.4.0',
+  version='3.5.0',
   description='Download or update your Selenium driver binaries and their browsers automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown', 
@@ -33,6 +33,6 @@ setup(
   license='MIT', 
   classifiers=classifiers,
   keywords=keywords,
-  packages=['selenium_driver_updater', 'selenium_driver_updater/util'],
+  packages=['selenium_driver_updater', 'selenium_driver_updater/util', 'selenium_driver_updater/browsers'],
   install_requires=['wget', 'requests', 'selenium', 'beautifulsoup4'] 
 )
