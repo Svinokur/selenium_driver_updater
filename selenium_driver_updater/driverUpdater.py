@@ -258,7 +258,7 @@ class DriverUpdater():
             latest_version_tuple = tuple(map(int, (latest_version.split("."))))
 
             if latest_version_tuple > current_version_tuple:
-                message = ('Your selenium-driver-updater library is out of date, please update it via "pip install selenium-driver-updater --upgrade"'
+                message = ('Your selenium-driver-updater library is out of date, please update it via "pip install selenium-driver-updater --upgrade" '
                            f'current_version: {current_version} latest_version: {latest_version} ')
                 logging.warning(message)
 

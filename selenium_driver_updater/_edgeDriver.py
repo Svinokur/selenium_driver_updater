@@ -333,9 +333,15 @@ class EdgeDriver():
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
-                    message = f'Problem with updating edgedriver current_version : {current_version} latest_version : {latest_version}'
+                    message = f'Problem with updating edgedriver current_version: {current_version} latest_version: {latest_version}'
                     logging.error(message)
-                    return result_run, message, driver_path
+                    message = 'Trying to download previous latest version of edgedriver'
+                    logging.info(message)
+
+                    result, message, driver_path = self.__download_driver(previous_version=True)
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
 
             result_run = True
 
@@ -469,7 +475,79 @@ class EdgeDriver():
         
         return result_run, message_run, driver_version
 
-    def __download_driver(self, version : str = ''):
+    def __get_latest_previous_version_edgedriver_via_requests(self) -> Tuple[bool, str, str]:
+        """Gets previous latest edgedriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            latest_version_previous (str)   : Latest previous version of edgedriver.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_previous_version : str = ''
+        specific_previous_release = None
+
+        try:
+
+            result, message, latest_version = self.__get_latest_version_edgedriver()
+            if not result:
+                logging.error(message)
+                return result, message, latest_previous_version
+
+            latest_version_main = int(latest_version.split('.')[0])
+            latest_previous_version_main = str(latest_version_main-1)
+
+            url = self.setting['EdgeDriver']['LinkLastRelease']
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
+            if not result:
+                logging.error(message)
+                return result, message, latest_version
+
+            soup = BeautifulSoup(json_data, 'html.parser')
+
+            element_section_downloads = soup.findAll('section', attrs={'id' : 'downloads'})[0]
+
+            element_all_previous_releases = element_section_downloads.findAll('div', attrs={'class' : 'module'})
+
+            previous_version_text =f'Release {latest_previous_version_main}Version'
+            for release in element_all_previous_releases:
+                if previous_version_text in release.text:
+                    specific_previous_release = release.text
+                    break
+
+            if not specific_previous_release:
+                message = f'Cannot determine latest previous version of edgedriver, maybe the text "{previous_version_text}" is changed.'
+                logging.error(message)
+                return False, message, latest_previous_version
+
+            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], specific_previous_release)
+            latest_previous_version = find_string[0] if len(find_string) > 0 else ''
+
+            if not latest_previous_version:
+                message = f'Cannot determine latest previous version of edgedriver, maybe latest_previous_version_main: {latest_previous_version_main} is not exists.'
+                logging.error(message)
+                return False, message, latest_previous_version
+
+            logging.info(f'Latest previous version of edgedriver: {latest_previous_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run, latest_previous_version
+
+    def __download_driver(self, version : str = '', previous_version : bool = False):
         """Download specific version of phantomjs to folder
 
         Returns:
@@ -510,6 +588,17 @@ class EdgeDriver():
 
                 logging.info(f'Started download edgedriver specific_version: {version}')
 
+            elif previous_version:
+
+                result, message, latest_previous_version = self.__get_latest_previous_version_edgedriver_via_requests()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started download edgedriver latest_previous_version: {latest_previous_version}')
+
+                url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_previous_version)
+
             else:
 
                 result, message, latest_version = self.__get_latest_version_edgedriver()
@@ -521,7 +610,8 @@ class EdgeDriver():
 
                 url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_version)
 
-            out_path = self.path + url.split('/')[4]
+            archive_name = url.split("/")[len(url.split("/"))-1]
+            out_path = self.path + archive_name
 
             logging.info(f'Started download edgedriver by url: {url}')
 

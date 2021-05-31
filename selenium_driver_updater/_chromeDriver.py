@@ -123,7 +123,7 @@ class ChromeDriver():
                         f' Trying to download the latest previous version of chromedriver')
                     logging.error(message)
 
-                    result, message, driver_path = self.__get_previous_latest_version_chromedriver()
+                    result, message, driver_path = self.__download_driver(previous_version=True)
                     if not result:
                         logging.error(message)
                         return result, message, driver_path
@@ -233,58 +233,15 @@ class ChromeDriver():
 
                 if not is_driver_up_to_date:
 
+                    message = f'Problem with updating chromedriver current_version: {current_version} latest_version: {latest_version}'
+                    logging.error(message)
+                    message = 'Trying to download previous latest version of chromedriver'
+                    logging.info(message)
+
                     result, message, driver_path = self.__download_driver(previous_version=True)
                     if not result:
                         logging.error(message)
                         return result, message, driver_path
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, driver_path
-
-    def __get_previous_latest_version_chromedriver(self):
-        """Gets previous latest version of chromedriver
-
-        Returns:
-            Tuple of bool, str and bool
-
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            is_driver_up_to_date (bool) : If true current version of chromedriver is successfully updated. Defaults to False.
-            
-        Raises:
-            Except: If unexpected error raised. 
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-        latest_previous_version : str = ''
-        driver_path : str = ''
-        
-        try:
-
-            result, message, is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
-            if not result:
-                logging.error(message)
-                return result, message, driver_path
-
-            result, message, driver_path = self.__download_driver(previous_version=True)
-            if not result:
-                logging.error(message)
-                return result, message, driver_path
-
-            result, message, current_version = self.__get_current_version_chrome_selenium()
-            if not result:
-                logging.error(message)
-                return result, message, driver_path
-
-            if current_version == latest_previous_version:
-                message = f'Successfully downgraded to the latest previous version of chromedriver: {latest_previous_version}'
-                logging.info(message)
 
             result_run = True
 
@@ -531,7 +488,7 @@ class ChromeDriver():
         return result_run, message_run
 
     def __get_latest_previous_version_chromedriver_via_requests(self) -> Tuple[bool, str, str]:
-        """Gets latest chromedriver version
+        """Gets previous latest chromedriver version
 
 
         Returns:
@@ -658,15 +615,13 @@ class ChromeDriver():
 
             if version:
 
-                logging.info(f'Started download chromedriver specific_version: {version}')
-
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(version)
                 result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-                url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(version)
+                logging.info(f'Started download chromedriver specific_version: {version}')
 
             elif previous_version:
 
@@ -674,10 +629,10 @@ class ChromeDriver():
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-                logging.info(f'Started download chromedriver latest_previous_version: {latest_previous_version}')
                 
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_previous_version)
+
+                logging.info(f'Started download chromedriver latest_previous_version: {latest_previous_version}')
 
             else:
 
@@ -686,11 +641,12 @@ class ChromeDriver():
                     logging.error(message)
                     return result, message, file_name
 
-                logging.info(f'Started download chromedriver latest_version: {latest_version}')
-
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
 
-            out_path = self.path + url.split('/')[4]
+                logging.info(f'Started download chromedriver latest_version: {latest_version}')
+
+            archive_name = url.split("/")[len(url.split("/"))-1]
+            out_path = self.path + archive_name
 
             if os.path.exists(out_path):
                 os.remove(out_path)

@@ -16,20 +16,20 @@ chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Wind
                                 "chromedriver"
 
 
-
-geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' else\
-                    f"linux{os_bit}" if platform.system() == "Linux" else\
-                    "macos-aarch64" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                    "macos"
+latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/{}/'
+geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_geckodriver + "geckodriver-{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+                                latest_release_geckodriver + "geckodriver-{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
+                                latest_release_geckodriver + "geckodriver-{}-macos.tar.gz"
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
 
 
-
-operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                "operadriver_linux64.zip" if platform.system() == "Linux" else\
-                                "operadriver_mac64.zip"
+latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/{}/'
+operadriver_latest_release =    latest_release_operadriver + f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_operadriver + "operadriver_linux64.zip" if platform.system() == "Linux" else\
+                                latest_release_operadriver + "operadriver_mac64.zip"
 
 operadriver_platform_release = "operadriver.exe" if platform.system() == 'Windows' else\
                                     "operadriver"
@@ -117,7 +117,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 class info:
-    version = "3.5.2"
+    version = "3.6.0"
 
 setting = dict(
     {
@@ -138,7 +138,6 @@ setting = dict(
             "LinkLastRelease"           : 'https://api.github.com/repos/mozilla/geckodriver/releases/latest',
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : geckodriver_platform_last_release,
-            "LinkAllReleases"           : 'https://api.github.com/repos/mozilla/geckodriver/releases',
             'geckodriverVersionPattern' : "[0-9]+.[0-9]+.[0-9]+",
         },
         "OperaDriver":
@@ -146,7 +145,6 @@ setting = dict(
             "LinkLastRelease"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest',
             "LinkLastReleasePlatform"   : operadriver_latest_release, 
             "LastReleasePlatform"       : operadriver_platform_release, 
-            "LinkAllReleases"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases',
             "NamePlatformRelease"       : operadriver_name_platform_release,
         },
         "EdgeDriver":
@@ -161,8 +159,9 @@ setting = dict(
         },
         "PhantomJS":
         {   
-            "LinkLastReleaseFile" : phantomjs_latest_release,
-            "LastReleasePlatform" : phantomjs_platform_release,
+            "LinkLastReleaseFile"   : phantomjs_latest_release,
+            "LastReleasePlatform"   : phantomjs_platform_release,
+            "LinkAllReleases"       : 'https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads',
         },
         "ChromeBrowser":
         {
@@ -207,7 +206,6 @@ setting = dict(
         "Github":
         {
             "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
-            "linkAllReleasesBySpecificRepoName"     : 'https://api.github.com/repos/{}/releases',
             "linkAllReleasesTags"                   : 'https://api.github.com/repos/{}/git/refs/tags',
         },
         "PyPi":

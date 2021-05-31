@@ -309,9 +309,15 @@ class GeckoDriver():
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
-                    message = f'Problem with updating geckodriver current_version : {current_version} latest_version : {latest_version}'
+                    message = f'Problem with updating geckodriver current_version: {current_version} latest_version: {latest_version}'
                     logging.error(message)
-                    return result_run, message, driver_path
+                    message = 'Trying to download previous latest version of geckodriver'
+                    logging.info(message)
+
+                    result, message, driver_path = self.__download_driver(previous_version=True)
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
 
             result_run = True
 
@@ -447,7 +453,51 @@ class GeckoDriver():
         
         return result_run, message_run, driver_version
 
-    def __download_driver(self, version : str = ''):
+    def __get_latest_previous_version_geckodriver_via_requests(self) -> Tuple[bool, str, str]:
+        """Gets previous latest geckodriver version
+
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            latest_version_previous (str)   : Latest previous version of geckodriver.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_previous_version : str = ''
+
+        try:
+
+            repo_name = GeckoDriver._repo_name
+            result, message, json_data = self.github_viewer.get_all_releases_tags_by_repo_name(repo_name=repo_name)
+            if not result:
+                return result, message, latest_previous_version
+
+            for data in json_data:
+                if not 'v' in data.get("ref"):
+                    del json_data[json_data.index(data)]
+
+            find_string = json_data[len(json_data)-2].get('ref').split('/')
+            latest_previous_version = find_string[len(find_string)-1]
+
+            logging.info(f'Latest previous version of geckodriver: {latest_previous_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_previous_version
+        
+    def __download_driver(self, version : str = '', previous_version : bool = False):
         """Download specific version of phantomjs to folder
 
         Returns:
@@ -465,11 +515,8 @@ class GeckoDriver():
         result_run : bool = False
         message_run : str = ''
         file_name : str = ''
-        asset_name : str = ''
         url : str = ''
         latest_version : str = ''
-        repo_name : str = GeckoDriver._repo_name
-        asset_name : str = self.setting['GeckoDriver']['LinkLastReleasePlatform']
 
         try:
 
@@ -481,37 +528,41 @@ class GeckoDriver():
                     return result, message, file_name
 
             if version:
-
-                #repo_name = GeckoDriver._repo_name
-                #asset_name = self.setting['GeckoDriver']['LinkLastReleasePlatform']
-                #version = version
-                result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
-                asset_name=asset_name, version=version)
+                
+                latest_version_url = "v" + version 
+                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-                url = data[0].get('asset').get('browser_download_url')
-                asset_name = data[0].get('asset').get('name')
                 
                 logging.info(f'Started download geckodriver specific_version: {version}')
 
-            else:
-            
-                #repo_name = GeckoDriver._repo_name
-                #asset_name = self.setting['GeckoDriver']['LinkLastReleasePlatform']
-                result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
+            elif previous_version:
+
+                result, message, latest_previous_version = self.__get_latest_previous_version_geckodriver_via_requests()
                 if not result:
                     logging.error(message)
                     return result, message, file_name
 
-                latest_version = data[0].get('version')
-                url = data[0].get('asset').get('browser_download_url')
-                asset_name = data[0].get('asset').get('name')
+                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
+                
+                logging.info(f'Started download geckodriver latest_previous_version: {latest_previous_version}')
+
+            else:
+
+                result, message, latest_version = self.__get_latest_version_geckodriver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                latest_version_url = "v" + latest_version
+                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
                 
                 logging.info(f'Started download geckodriver latest_version: {latest_version}')
 
-            out_path = self.path + asset_name
+            archive_name = url.split("/")[len(url.split("/"))-1]
+            out_path = self.path + archive_name
 
             if os.path.exists(out_path):
                 os.remove(out_path)
@@ -528,7 +579,7 @@ class GeckoDriver():
 
             if not self.filename:
 
-                if asset_name.endswith('.tar.gz'):
+                if archive_name.endswith('.tar.gz'):
 
                     archive_path = file_name
                     out_path = self.path
@@ -537,7 +588,7 @@ class GeckoDriver():
                         logging.error(message)
                         return result, message, file_name
 
-                elif asset_name.endswith('.zip'):
+                elif archive_name.endswith('.zip'):
 
                     archive_path = file_name
                     out_path = self.path
@@ -547,7 +598,7 @@ class GeckoDriver():
                         return result, message, file_name
 
                 else:
-                    message = f'Unknown archive format was specified asset_name: {asset_name}'
+                    message = f'Unknown archive format was specified archive_name: {archive_name}'
                     logging.error(message)
                     return result_run, message, file_name
 

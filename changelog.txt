@@ -1,3 +1,16 @@
+[3.6.0] 31/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added downloading of latest previous version when latest version of driver cannot be downloaded
+
+# Improvements
+
+- Improved getting latest version of geckodriver and operadriver
+- Improved overall code optimization
+
 [3.5.2] 30/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

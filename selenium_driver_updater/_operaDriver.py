@@ -317,7 +317,13 @@ class OperaDriver():
                 if not is_driver_up_to_date:
                     message = f'Problem with updating operadriver current_version: {current_version} latest_version: {latest_version}'
                     logging.error(message)
-                    return result_run, message, driver_path
+                    message = 'Trying to download previous latest version of operadriver'
+                    logging.info(message)
+
+                    result, message, driver_path = self.__download_driver(previous_version=True)
+                    if not result:
+                        logging.error(message)
+                        return result, message, driver_path
 
             result_run = True
 
@@ -496,8 +502,48 @@ class OperaDriver():
             logging.error(message_run)
         
         return result_run, message_run, driver_version
+    
+    def __get_latest_previous_version_operadriver_via_requests(self) -> Tuple[bool, str, str]:
+        """Gets previous latest operadriver version
 
-    def __download_driver(self, version : str = ''):
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)               : True if function passed correctly, False otherwise.
+            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            latest_version_previous (str)   : Latest previous version of operadriver.
+            
+        Raises:
+            Except: If unexpected error raised. 
+
+        """
+
+        result_run : bool = False
+        message_run : str = ''
+        latest_previous_version : str = ''
+
+        try:
+
+            repo_name = OperaDriver._repo_name
+            result, message, json_data = self.github_viewer.get_all_releases_tags_by_repo_name(repo_name=repo_name)
+            if not result:
+                return result, message, latest_previous_version
+
+            find_string = json_data[len(json_data)-2].get('ref').split('/')
+            latest_previous_version = find_string[len(find_string)-1]
+
+            logging.info(f'Latest previous version of operadriver: {latest_previous_version}')
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run , latest_previous_version
+
+    def __download_driver(self, version : str = '', previous_version : bool = False):
         """Download specific version of phantomjs to folder
 
         Returns:
@@ -517,7 +563,6 @@ class OperaDriver():
         file_name : str = ''
         url : str = ''
         latest_version : str = ''
-        asset_name : str = ''
 
         try:
 
@@ -530,34 +575,40 @@ class OperaDriver():
 
             if version:
 
-                repo_name = OperaDriver._repo_name
-                asset_name = self.setting["OperaDriver"]["NamePlatformRelease"]
-                version = version
-                result, message, data = self.github_viewer.get_specific_asset_by_specific_version_by_repo_name(repo_name=repo_name, 
-                asset_name=asset_name, version=version)
+                latest_version_url = "v." + version 
+                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
-
-                url = data[0].get('asset').get('browser_download_url')
-                asset_name = data[0].get('asset').get('name')
                 
                 logging.info(f'Started download operadriver specific_version: {version}')
 
-            else:
+            elif previous_version:
 
-                repo_name = OperaDriver._repo_name
-                asset_name = self.setting["OperaDriver"]["NamePlatformRelease"]
-                result, message, data = self.github_viewer.get_specific_asset_by_repo_name(repo_name=repo_name, asset_name=asset_name)
+                result, message, latest_previous_version = self.__get_latest_previous_version_operadriver_via_requests()
                 if not result:
+                    logging.error(message)
                     return result, message, file_name
 
-                latest_version = data[0].get('version')
-                url = data[0].get('asset').get('browser_download_url')
-                asset_name = data[0].get('asset').get('name')
+                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
+                
+                logging.info(f'Started download operadriver latest_previous_version: {latest_previous_version}')
+
+            else:
+
+                result, message, latest_version = self.__get_latest_version_operadriver()
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                latest_version_url = "v." + latest_version
+                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
                 
                 logging.info(f'Started download operadriver latest_version: {latest_version}')
 
-            out_path = self.path + asset_name
+            archive_name = url.split("/")[len(url.split("/"))-1]
+            out_path = self.path + archive_name
 
             if os.path.exists(out_path):
                 os.remove(out_path)

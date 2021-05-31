@@ -25,19 +25,21 @@ chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Wind
 
 
 
-geckodriver_platform_release = f"win{os_bit}" if platform.system() == 'Windows' else\
-                    f"linux{os_bit}" if platform.system() == "Linux" else\
-                    "macos-aarch64" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                    "macos"
+latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/{}/'
+geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_geckodriver + "geckodriver-{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+                                latest_release_geckodriver + "geckodriver-{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
+                                latest_release_geckodriver + "geckodriver-{}-macos.tar.gz"
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
 
 
 
-operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                "operadriver_linux64.zip" if platform.system() == "Linux" else\
-                                "operadriver_mac64.zip"
+latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/{}/'
+operadriver_latest_release =    latest_release_operadriver + f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_operadriver + "operadriver_linux64.zip" if platform.system() == "Linux" else\
+                                latest_release_operadriver + "operadriver_mac64.zip"
 
 operadriver_platform_release = "operadriver.exe" if platform.system() == 'Windows' else\
                                     "operadriver"
@@ -155,11 +157,11 @@ class testSetting(unittest.TestCase):
     def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 2)
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
-        self.assertEqual(len(self.setting["GeckoDriver"]), 5)
-        self.assertEqual(len(self.setting["OperaDriver"]), 5)
+        self.assertEqual(len(self.setting["GeckoDriver"]), 4)
+        self.assertEqual(len(self.setting["OperaDriver"]), 4)
         self.assertEqual(len(self.setting["EdgeDriver"]), 3)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
-        self.assertEqual(len(self.setting["PhantomJS"]), 2)
+        self.assertEqual(len(self.setting["PhantomJS"]), 3)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
@@ -168,7 +170,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
-        self.assertEqual(len(self.setting["Github"]), 3)
+        self.assertEqual(len(self.setting["Github"]), 2)
         self.assertEqual(len(self.setting["PyPi"]), 1)
     
     #@unittest.skip('Temporary not needed')
@@ -185,13 +187,11 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], geckodriver_platform_last_release)
-        self.assertEqual(self.setting["GeckoDriver"]["LinkAllReleases"], 'https://api.github.com/repos/mozilla/geckodriver/releases')
         self.assertEqual(self.setting["GeckoDriver"]["geckodriverVersionPattern"], "[0-9]+.[0-9]+.[0-9]+")
 
         self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
         self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)
-        self.assertEqual(self.setting["OperaDriver"]["LinkAllReleases"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases')
         self.assertEqual(self.setting["OperaDriver"]["NamePlatformRelease"], operadriver_name_platform_release)
 
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/')
@@ -202,6 +202,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], phantomjs_platform_release)
+        self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], 'https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads')
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')
@@ -233,7 +234,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseTagSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_tag_schema.json')
 
         self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
-        self.assertEqual(self.setting["Github"]["linkAllReleasesBySpecificRepoName"], 'https://api.github.com/repos/{}/releases')
         self.assertEqual(self.setting["Github"]["linkAllReleasesTags"], 'https://api.github.com/repos/{}/git/refs/tags')
 
         self.assertEqual(self.setting["PyPi"]["urlProjectJson"], 'https://pypi.python.org/pypi/selenium-driver-updater/json')
