@@ -47,6 +47,7 @@ class EdgeDriver():
             filename (str)                      : Specific name for edgedriver. If given, it will replace name for edgedriver.
             version (str)                       : Specific version for edgedriver. If given, it will downloads given version.
             check_browser_is_up_to_date (bool)  : If true, it will check edge browser version before edgedriver update/upgrade.
+            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
         self.setting = setting
 
@@ -57,12 +58,35 @@ class EdgeDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-        
-        specific_filename = str(kwargs.get('filename'))
-        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                        specific_filename
 
-        self.edgedriver_path : str =  self.path + self.setting['EdgeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+        specific_system = str(kwargs.get('system_name'))
+        self.system_name = "edgedriver_win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
+                           "edgedriver_win32.zip" if specific_system == 'windows32' else\
+                           "edgedriver_linux64.zip" if specific_system == 'linux' or specific_system == 'linux64' else\
+                           "edgedriver_mac64.zip" if specific_system == 'macos' else\
+                           logging.error(f"You specified system_name: {specific_system} which unsupported by edgedriver - so used default instead.")\
+                           if specific_system else ''
+
+        self.specific_driver_name = ''
+                           
+        if not self.system_name:
+        
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                            specific_filename
+
+            self.edgedriver_path : str =  self.path + self.setting['EdgeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+
+        else:
+
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+                        
+            self.specific_driver_name = "msedgedriver.exe" if 'windows' in specific_system else\
+                                     "msedgedriver"
+
+            self.edgedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -310,7 +334,7 @@ class EdgeDriver():
         
         try:
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -325,7 +349,7 @@ class EdgeDriver():
                 logging.error(message)
                 return result, message, driver_path
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -494,7 +518,7 @@ class EdgeDriver():
         result_run : bool = False
         message_run : str = ''
         latest_previous_version : str = ''
-        specific_previous_release = None
+        releases_latest_previous_version = []
 
         try:
 
@@ -506,36 +530,19 @@ class EdgeDriver():
             latest_version_main = int(latest_version.split('.')[0])
             latest_previous_version_main = str(latest_version_main-1)
 
-            url = self.setting['EdgeDriver']['LinkLastRelease']
+            url = self.setting["EdgeDriver"]["LinkAllReleases"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
                 logging.error(message)
                 return result, message, latest_version
 
-            soup = BeautifulSoup(json_data, 'html.parser')
+            all_releases = re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data)
+            for release in all_releases:
+                if release.startswith(latest_previous_version_main):
+                    releases_latest_previous_version.append(release)
 
-            element_section_downloads = soup.findAll('section', attrs={'id' : 'downloads'})[0]
-
-            element_all_previous_releases = element_section_downloads.findAll('div', attrs={'class' : 'module'})
-
-            previous_version_text =f'Release {latest_previous_version_main}Version'
-            for release in element_all_previous_releases:
-                if previous_version_text in release.text:
-                    specific_previous_release = release.text
-                    break
-
-            if not specific_previous_release:
-                message = f'Cannot determine latest previous version of edgedriver, maybe the text "{previous_version_text}" is changed.'
-                logging.error(message)
-                return False, message, latest_previous_version
-
-            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], specific_previous_release)
-            latest_previous_version = find_string[0] if len(find_string) > 0 else ''
-
-            if not latest_previous_version:
-                message = f'Cannot determine latest previous version of edgedriver, maybe latest_previous_version_main: {latest_previous_version_main} is not exists.'
-                logging.error(message)
-                return False, message, latest_previous_version
+            releases_latest_previous_version.sort(key=lambda s: list(map(int, s.split('.'))), reverse=True)
+            latest_previous_version = releases_latest_previous_version[0]
 
             logging.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 
@@ -610,6 +617,16 @@ class EdgeDriver():
 
                 url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_version)
 
+            if self.system_name:
+                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+                url = url + self.system_name
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
 
@@ -640,7 +657,7 @@ class EdgeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = self.setting['EdgeDriver']['LastReleasePlatform']
+                filename = self.setting['EdgeDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
                 filename_replace = self.filename
 
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 

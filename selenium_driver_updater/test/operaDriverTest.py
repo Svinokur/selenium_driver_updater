@@ -102,7 +102,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_download_driver(self):
+    def test06_check_download_driver_specific_version(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
@@ -121,22 +121,42 @@ class testOperaDriver(unittest.TestCase):
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
         self.assertEqual(current_version, self.specific_version)
+
+    #@unittest.skip('Temporary not needed')
+    def test07_check_download_driver_latest_previous_version(self):
+        result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
+        self.assertTrue(result, message)
+        self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+
+        result, message, file_name = self.operadriver._OperaDriver__download_driver(previous_version=True)
+        self.assertTrue(result, message)
+        self.assertIsNotNone(file_name,file_name)
+        self.assertGreater(len(file_name), 0, len(file_name))
+        self.assertTrue(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+
+        result, message = self.operadriver._OperaDriver__chmod_driver()
+        self.assertTrue(result, message)
+
+        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver_selenium()
+        self.assertTrue(result, message)
+        self.assertIsNotNone(current_version, current_version)
+        self.assertGreaterEqual(len(current_version), 0, len(current_version))
     
     #@unittest.skip('Temporary not needed')
-    def test07_check_get_latest_version_operadriver(self):
+    def test08_check_get_latest_version_operadriver(self):
         result, message, latest_version = self.operadriver._OperaDriver__get_latest_version_operadriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
     
     #@unittest.skip('Temporary not needed')
-    def test08_check_delete_current_operadriver_for_current_os(self):
+    def test09_check_delete_current_operadriver_for_current_os(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
 
     #@unittest.skip('Temporary not needed')
-    def test09_check_download_driver(self):
+    def test10_check_download_driver(self):
         result, message, file_name = self.operadriver._OperaDriver__download_driver()
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
@@ -147,7 +167,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test10_check_compare_current_version_and_latest_version(self):
+    def test11_check_compare_current_version_and_latest_version(self):
         result, message, is_driver_is_up_to_date, current_version, latest_version = self.operadriver._OperaDriver__compare_current_version_and_latest_version()
         self.assertTrue(result, message)
         self.assertIsNotNone(is_driver_is_up_to_date, is_driver_is_up_to_date)
@@ -158,26 +178,26 @@ class testOperaDriver(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test11_check_get_current_version_operadriver_selenium(self):
+    def test12_check_get_current_version_operadriver_selenium(self):
         result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver_selenium()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test12_check_get_latest_version_opera_browser(self):
+    def test13_check_get_latest_version_opera_browser(self):
         result, message, latest_version = self.operadriver._OperaDriver__get_latest_version_opera_browser()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test13_check_get_latest_opera_browser_for_current_os(self):
+    def test14_check_get_latest_opera_browser_for_current_os(self):
         result, message = self.operadriver._OperaDriver__get_latest_opera_browser_for_current_os()
         self.assertTrue(result, message)
     
     #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test14_check_compare_current_version_and_latest_version_opera_browser(self):
+    def test15_check_compare_current_version_and_latest_version_opera_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.operadriver._OperaDriver__compare_current_version_and_latest_version_opera_browser()
         self.assertTrue(result, message)
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
@@ -190,7 +210,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test15_check_if_operadriver_is_up_to_date(self):
+    def test16_check_if_operadriver_is_up_to_date(self):
         result, message, filename = self.operadriver.main()
         self.assertTrue(result, message)
         self.assertGreater(len(filename), 0, len(filename))

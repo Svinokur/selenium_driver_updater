@@ -106,7 +106,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_download_driver(self):
+    def test06_check_download_driver_specific_version(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
@@ -125,6 +125,26 @@ class testPhantomJS(unittest.TestCase):
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
         self.assertEqual(current_version, self.specific_version)
+
+    #@unittest.skip('Temporary not needed')
+    def test06_check_download_driver_latest_previous_version(self):
+        result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
+        self.assertTrue(result, message)
+        self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+
+        result, message, file_name = self.phantomjs._PhantomJS__download_driver(previous_version=True)
+        self.assertTrue(result, message)
+        self.assertIsNotNone(file_name,file_name)
+        self.assertGreater(len(file_name), 0, len(file_name))
+        self.assertTrue(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+
+        result, message = self.phantomjs._PhantomJS__chmod_driver()
+        self.assertTrue(result, message)
+
+        result, message, current_version = self.phantomjs._PhantomJS__get_current_version_phantomjs()
+        self.assertTrue(result, message)
+        self.assertIsNotNone(current_version, current_version)
+        self.assertGreaterEqual(len(current_version), 0, len(current_version))
 
 
     #@unittest.skip('Temporary not needed')

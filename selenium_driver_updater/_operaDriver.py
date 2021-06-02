@@ -29,8 +29,6 @@ from util.github_viewer import GithubViewer
 from util.requests_getter import RequestsGetter
 from browsers._operaBrowser import OperaBrowser
 
-from bs4 import BeautifulSoup
-
 import pathlib
 
 import re
@@ -50,6 +48,7 @@ class OperaDriver():
             filename (str)                      : Specific name for operadriver. If given, it will replace name for operadriver. Defaults to empty string.
             version (str)                       : Specific version for operadriver. If given, it will downloads given version. Defaults to empty string.
             check_browser_is_up_to_date (bool)  : If true, it will check opera browser version before operadriver update/upgrade.
+            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
         self.setting = setting
 
@@ -60,12 +59,35 @@ class OperaDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-        
-        specific_filename = str(kwargs.get('filename'))
-        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                        specific_filename
 
-        self.operadriver_path : str =  self.path + self.setting['OperaDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+        specific_system = str(kwargs.get('system_name'))
+        self.system_name = "operadriver_win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
+                           "operadriver_win32.zip" if specific_system == 'windows32' else\
+                           "operadriver_linux64.zip" if specific_system == 'linux' or specific_system == 'linux64' else\
+                           "operadriver_mac64.zip" if specific_system == 'macos' else\
+                           logging.error(f"You specified system_name: {specific_system} which unsupported by operadriver - so used default instead.")\
+                           if specific_system else ''
+
+        self.specific_driver_name = ''
+
+        if not self.system_name:
+        
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                            specific_filename
+
+            self.operadriver_path : str =  self.path + self.setting['OperaDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+
+        else:
+
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+                        
+            self.specific_driver_name =    "operadriver.exe" if 'windows' in specific_system else\
+                                            "operadriver"
+                                    
+            self.operadriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -292,7 +314,7 @@ class OperaDriver():
         
         try:
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -307,7 +329,7 @@ class OperaDriver():
                 logging.error(message)
                 return result, message, driver_path
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -607,6 +629,16 @@ class OperaDriver():
                 
                 logging.info(f'Started download operadriver latest_version: {latest_version}')
 
+            if self.system_name:
+                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+                url = url + self.system_name
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
 
@@ -631,12 +663,15 @@ class OperaDriver():
                 logging.error(message)
                 return result, message, file_name
 
-            archive_folder_path = self.path + self.setting["OperaDriver"]["NamePlatformRelease"]
-            archive_operadriver_path = archive_folder_path + os.path.sep + self.setting['OperaDriver']['LastReleasePlatform']
+            platform : str = self.setting['OperaDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
+            archive_folder_name = self.setting["OperaDriver"]["NamePlatformRelease"] if not self.system_name else self.system_name.replace(".zip", '')
+
+            archive_folder_path = self.path + archive_folder_name
+            archive_operadriver_path = archive_folder_path + os.path.sep + platform
 
             if not self.filename:
-
-                copyfile(archive_operadriver_path, self.path + self.setting['OperaDriver']['LastReleasePlatform'])
+                
+                copyfile(archive_operadriver_path, self.path + platform)
 
             else:
 

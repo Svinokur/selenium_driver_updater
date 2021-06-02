@@ -255,9 +255,14 @@ class ChromeBrowser():
                 
                 if platform.system() == 'Windows':
 
-                    process = subprocess.Popen(chromebrowser_path, stdout=subprocess.PIPE)
-        
-                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+                    for command in chromebrowser_path:
+
+                        process = subprocess.Popen(command, stdout=subprocess.PIPE)
+            
+                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                        if not 'invalid' in browser_version_terminal.lower():
+                            break
 
                 elif platform.system() == 'Darwin':
                     process = subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE)

@@ -7,7 +7,7 @@ import os
 
 import platform
 
-from typing import Any, Tuple
+from typing import Tuple
 
 import sys
 import os.path
@@ -371,8 +371,12 @@ class FirefoxBrowser():
             
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], browser_version_terminal)
+                find_string = re.findall(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern"], browser_version_terminal)
                 browser_version = find_string[0] if len(find_string) > 0 else ''
+
+                if not browser_version:
+                    find_string = re.findall(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern2"], browser_version_terminal)
+                    browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

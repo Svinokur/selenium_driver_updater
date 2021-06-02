@@ -45,7 +45,8 @@ class ChromeDriver():
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver.
             version (str)                       : Specific version for chromedriver. If given, it will downloads given version.
-            check_browser_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
+            check_browser_is_up_to_date (bool)  : If true, it will check chrome browser version before chromedriver update/upgrade.
+            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
         self.setting = setting
 
@@ -57,11 +58,35 @@ class ChromeDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
         
-        specific_filename = str(kwargs.get('filename'))
-        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                        specific_filename
+        specific_system = str(kwargs.get('system_name'))
+        self.system_name = "chromedriver_win32.zip" if specific_system == 'windows' or specific_system == 'windows32' else\
+                           "chromedriver_linux64.zip" if specific_system == 'linux' or specific_system == 'linux64' else\
+                           "chromedriver_mac64.zip" if specific_system == 'macos' else\
+                           "chromedriver_mac64_m1.zip" if specific_system == 'macos_m1' else\
+                           logging.error(f"You specified system_name: {specific_system} which unsupported by chromedriver - so used default instead.")\
+                           if specific_system else ''
 
-        self.chromedriver_path : str =  self.path + self.setting['ChromeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+        self.specific_driver_name = ''
+                           
+        if not self.system_name:
+        
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                            specific_filename
+
+            self.chromedriver_path : str =  self.path + self.setting['ChromeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+
+        else:
+
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+                        
+            self.specific_driver_name =    "chromedriver.exe" if 'windows' in specific_system else\
+                                                "chromedriver"
+
+            self.chromedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
+
 
         self.version = str(kwargs.get('version'))
         
@@ -209,7 +234,7 @@ class ChromeDriver():
         
         try:
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -224,7 +249,7 @@ class ChromeDriver():
                 logging.error(message)
                 return result, message, driver_path
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -645,6 +670,16 @@ class ChromeDriver():
 
                 logging.info(f'Started download chromedriver latest_version: {latest_version}')
 
+            if self.system_name:
+                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+                url = url + self.system_name
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
 
@@ -675,7 +710,7 @@ class ChromeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = self.setting['ChromeDriver']['LastReleasePlatform']
+                filename = self.setting['ChromeDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)

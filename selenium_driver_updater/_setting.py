@@ -64,7 +64,8 @@ phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' e
 #                                 
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
-'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
+['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
+r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
@@ -90,7 +91,7 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 
 
 edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
-'reg query "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
+'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -117,7 +118,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 class info:
-    version = "3.6.0"
+    version = "3.7.0"
 
 setting = dict(
     {
@@ -152,6 +153,7 @@ setting = dict(
             "LinkLastRelease"           : 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/',
             "LinkLastReleaseFile"       : edgedriver_latest_release, 
             "LastReleasePlatform"       : edgedriver_platform_release,
+            "LinkAllReleases"           : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000',
         },
         "ChromiumChromeDriver":
         {
@@ -176,6 +178,8 @@ setting = dict(
             "LinkAllLatestReleases"         : 'https://www.mozilla.org/en-US/firefox/releases/',
             'FirefoxBrowserUpdater'         : firefox_browser_updater,
             'FirefoxBrowserUpdaterPath'     : firefox_browser_updater_path,
+            'FirefoxBrowserVersionPattern'  : '[0-9][0-9]+.[0-9]+',
+            'FirefoxBrowserVersionPattern2' : '[0-9][0-9]+.[0-9]+.[0-9]+',
         },
         "EdgeBrowser":
         {

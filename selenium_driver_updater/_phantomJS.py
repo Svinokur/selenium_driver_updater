@@ -49,6 +49,7 @@ class PhantomJS():
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             filename (str)                      : Specific name for phantomjs. If given, it will replace name for phantomjs.
             version (str)                       : Specific version for phantomjs. If given, it will downloads given version.
+            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
         self.setting = setting
 
@@ -59,12 +60,36 @@ class PhantomJS():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-        
-        specific_filename = str(kwargs.get('filename'))
-        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                        specific_filename
 
-        self.phantomjs_path : str =  self.path + self.setting["PhantomJS"]["LastReleasePlatform"] if not specific_filename else self.path + self.filename
+        specific_system = str(kwargs.get('system_name'))
+        self.system_name =  "phantomjs-{}-windows.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
+                            "phantomjs-{}-windows.zip" if specific_system == 'windows32' else\
+                            "phantomjs-{}-linux-x86_64.tar.bz2" if specific_system == 'linux' or specific_system == 'linux64' else\
+                            "phantomjs-{}-linux-i686.tar.bz2" if specific_system == 'linux32' else\
+                            "phantomjs-{}-macosx.zip" if specific_system == 'macos' else\
+                           logging.error(f"You specified system_name: {specific_system} which unsupported by phantomjs - so used default instead.")\
+                           if specific_system else ''
+
+        self.specific_driver_name = ''
+                           
+        if not self.system_name:
+        
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                            specific_filename
+
+            self.phantomjs_path : str =  self.path + self.setting["PhantomJS"]["LastReleasePlatform"] if not specific_filename else self.path + self.filename
+
+        else:
+
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+                        
+            self.specific_driver_name =    "phantomjs.exe" if 'windows' in specific_system else\
+                                        "phantomjs"
+
+            self.phantomjs_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -296,7 +321,7 @@ class PhantomJS():
         
         try:
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
                 if not result:
@@ -311,7 +336,7 @@ class PhantomJS():
                 logging.error(message)
                 return result, message, driver_path
             
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
                 if not result:
@@ -566,6 +591,8 @@ class PhantomJS():
         message_run : str = ''
         file_name : str = ''
         url : str = ''
+        latest_version : str = ''
+        latest_previous_version : str = ''
 
         try:
 
@@ -611,6 +638,18 @@ class PhantomJS():
                 logging.info(f'Started download phantomjs latest_version: {latest_version}')
 
                 url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_version)
+
+            if self.system_name:
+                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+                url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
+                url + self.system_name.format(version)
+
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
@@ -660,13 +699,15 @@ class PhantomJS():
                 logging.error(message)
                 return result_run, message, file_name
 
+            platform : str = self.setting["PhantomJS"]["LastReleasePlatform"] if not self.specific_driver_name else self.specific_driver_name 
+
             archive_path_folder = self.path + url.split('/')[6].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
             archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
-            driver_archive_path = archive_path_folder_bin + self.setting["PhantomJS"]["LastReleasePlatform"]
+            driver_archive_path = archive_path_folder_bin + platform
 
             if not self.filename:
 
-                copyfile(driver_archive_path, self.path + self.setting["PhantomJS"]["LastReleasePlatform"])
+                copyfile(driver_archive_path, self.path + platform)
 
             else:
 

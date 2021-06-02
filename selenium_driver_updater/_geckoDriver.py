@@ -47,6 +47,7 @@ class GeckoDriver():
             filename (str)                      : Specific name for geckodriver. If given, it will replace name for geckodriver.
             version (str)                       : Specific version for geckodriver. If given, it will downloads given version.
             check_browser_is_up_to_date (bool)  : If true, it will check firefox browser version before geckodriver update or upgrade.
+            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
         self.setting = setting
 
@@ -57,12 +58,37 @@ class GeckoDriver():
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
-        
-        specific_filename = str(kwargs.get('filename'))
-        self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                        specific_filename
 
-        self.geckodriver_path : str =  self.path + self.setting['GeckoDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+        specific_system = str(kwargs.get('system_name'))
+        self.system_name =  "geckodriver-{}-win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
+                            "geckodriver-{}-win32.zip" if specific_system == 'windows32' else\
+                            "geckodriver-{}-linux64.tar.gz" if specific_system == 'linux' or specific_system == 'linux64' else\
+                            "geckodriver-{}-linux32.tar.gz" if specific_system == 'linux32' else\
+                            "geckodriver-{}-macos-aarch64.tar.gz" if specific_system == 'macos_m1' else\
+                            "geckodriver-{}-macos.tar.gz" if specific_system == 'macos' else\
+                           logging.error(f"You specified system_name: {specific_system} which unsupported by geckodriver - so used default instead.")\
+                           if specific_system else ''
+
+        self.specific_driver_name = ''
+                           
+        if not self.system_name:
+        
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
+                            specific_filename
+
+            self.geckodriver_path : str =  self.path + self.setting['GeckoDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+
+        else:
+
+            specific_filename = str(kwargs.get('filename'))
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+                        
+            self.specific_driver_name =    "geckodriver.exe" if 'windows' in specific_system else\
+                                    "geckodriver"
+
+            self.geckodriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -286,7 +312,7 @@ class GeckoDriver():
         
         try:
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -301,7 +327,7 @@ class GeckoDriver():
                 logging.error(message)
                 return result, message, driver_path
 
-            if self.check_driver_is_up_to_date:
+            if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
@@ -517,6 +543,8 @@ class GeckoDriver():
         file_name : str = ''
         url : str = ''
         latest_version : str = ''
+        latest_version_url : str = ''
+        latest_previous_version : str = ''
 
         try:
 
@@ -560,6 +588,18 @@ class GeckoDriver():
                 url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
                 
                 logging.info(f'Started download geckodriver latest_version: {latest_version}')
+
+            if self.system_name:
+                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+                url = url + self.system_name.format(latest_version_url) if latest_version_url else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
+                url + self.system_name.format(version)    
+
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                if not result:
+                    logging.error(message)
+                    return result, message, file_name
+
+                logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
@@ -606,7 +646,7 @@ class GeckoDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = self.setting['GeckoDriver']['LastReleasePlatform']
+                filename = self.setting['GeckoDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
                 filename_replace = self.filename
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
                 out_path=out_path, filename=filename, filename_replace=filename_replace)

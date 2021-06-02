@@ -1,3 +1,25 @@
+[3.7.0] 01/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added parameter "system_name" for downloading drivers for specific OS
+- Added support for downloading multiply drivers with specific OS's
+Like:
+
+DriverUpdater.install(driver_name=DriverUpdater.chromedriver, system_name=DriverUpdater.windows)
+
+# Improvements
+
+- Improved getting current version of edge and chrome browsers via terminal on Windows
+- Improved unit-tests by all drivers
+
+# Fixes
+
+- Fixed an issue with incorrect detecting current version of fifefox browser via terminal
+- Fixed an issue with incorrect getting of latest previous version of edgedriver
+
 [3.6.0] 31/05/2021
 This version provides some innovations and improvements.
 This code was written and tested on Python 3.9.5

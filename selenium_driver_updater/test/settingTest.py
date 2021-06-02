@@ -15,7 +15,7 @@ os_bit = platform.architecture()[0][:-3]
 
 latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
 
-chromedriver_latest_release =   latest_release + f"chromedriver_win32.zip" if platform.system() == 'Windows' else\
+chromedriver_latest_release =   latest_release + "chromedriver_win32.zip" if platform.system() == 'Windows' else\
                                 latest_release + "chromedriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release + "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
                                 latest_release + "chromedriver_mac64.zip"
@@ -74,7 +74,8 @@ phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' e
 #                 
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
-'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version' if platform.system() == 'Windows' else \
+['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
+r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
@@ -100,7 +101,7 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 
 
 edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
-'reg query "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
+'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
 edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
@@ -159,12 +160,12 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["ChromeDriver"]), 4)
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
-        self.assertEqual(len(self.setting["EdgeDriver"]), 3)
+        self.assertEqual(len(self.setting["EdgeDriver"]), 4)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
-        self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
+        self.assertEqual(len(self.setting["FirefoxBrowser"]), 6)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
         self.assertEqual(len(self.setting["OperaBrowser"]), 5)
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
@@ -197,6 +198,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
+        self.assertEqual(self.setting["EdgeDriver"]["LinkAllReleases"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000")
 
         self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
 
@@ -213,6 +215,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["FirefoxBrowser"]["LinkAllLatestReleases"], 'https://www.mozilla.org/en-US/firefox/releases/')
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"], firefox_browser_updater)
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"], firefox_browser_updater_path)
+        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern"], '[0-9][0-9]+.[0-9]+')
+        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern2"], '[0-9][0-9]+.[0-9]+.[0-9]+')
 
         self.assertEqual(self.setting["EdgeBrowser"]["Path"], edge_browser_path)
         self.assertEqual(self.setting["EdgeBrowser"]["LinkAllLatestRelease"], 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel')
