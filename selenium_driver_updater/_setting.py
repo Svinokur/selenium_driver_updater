@@ -118,7 +118,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
 class info:
-    version = "3.7.0"
+    version = "3.8.0"
 
 setting = dict(
     {
@@ -133,6 +133,7 @@ setting = dict(
             "LinkLastReleaseFile"               : chromedriver_latest_release,
             "LastReleasePlatform"               : chromedriver_platform_release,
             "LinkLatestReleaseSpecificVersion"  : "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}",
+            "LinkCheckVersionIsValid"           : "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/",
         },
         "GeckoDriver":
         {
@@ -154,6 +155,7 @@ setting = dict(
             "LinkLastReleaseFile"       : edgedriver_latest_release, 
             "LastReleasePlatform"       : edgedriver_platform_release,
             "LinkAllReleases"           : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000',
+            "LinkCheckVersionIsValid"   : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000",
         },
         "ChromiumChromeDriver":
         {
@@ -211,6 +213,7 @@ setting = dict(
         {
             "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
             "linkAllReleasesTags"                   : 'https://api.github.com/repos/{}/git/refs/tags',
+            "linkAllReleases"                       : 'https://api.github.com/repos/{}/releases',
         },
         "PyPi":
         {

@@ -609,8 +609,35 @@ class ChromeDriver():
         
         return result_run, message_run, driver_version
 
+    def __check_if_version_is_valid(self, url : str, version_url : str) -> Tuple[bool, str]:
+        result_run : bool = False
+        message_run : str = ''
+        archive_name : str = url.split("/")[len(url.split("/"))-1]
+        url_test_valid = self.setting["ChromeDriver"]["LinkCheckVersionIsValid"].format(version_url)
+        version_valid : str = f"{version_url}/{archive_name}"
+
+        try:
+
+            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url_test_valid)
+            if not result:
+                logging.error(message)
+                return result, message
+
+            if not version_valid in json_data:
+                message = f'Wrong version or system_name was specified. version_valid: {version_valid} version_url: {version_url} url: {url}'
+                logging.error(message)
+                return False, message
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run
+
     def __download_driver(self, version : str = '', previous_version : bool = False):
-        """Download specific version of phantomjs to folder
+        """Download specific version of chromedriver to folder
 
         Returns:
             Tuple of bool, str and str
@@ -628,6 +655,8 @@ class ChromeDriver():
         message_run : str = ''
         file_name : str = ''
         url : str = ''
+        latest_previous_version : str = ''
+        latest_version : str = ''
 
         try:
 
@@ -641,11 +670,6 @@ class ChromeDriver():
             if version:
 
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(version)
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
                 logging.info(f'Started download chromedriver specific_version: {version}')
 
             elif previous_version:
@@ -656,7 +680,6 @@ class ChromeDriver():
                     return result, message, file_name
                 
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_previous_version)
-
                 logging.info(f'Started download chromedriver latest_previous_version: {latest_previous_version}')
 
             else:
@@ -667,18 +690,20 @@ class ChromeDriver():
                     return result, message, file_name
 
                 url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
-
                 logging.info(f'Started download chromedriver latest_version: {latest_version}')
 
             if self.system_name:
                 url = url.replace(url.split("/")[len(url.split("/"))-1], '')
                 url = url + self.system_name
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+
+                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+
+            if version or self.system_name:
+                version_url = version if version else latest_previous_version if latest_previous_version else latest_version
+                result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name

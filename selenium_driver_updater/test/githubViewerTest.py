@@ -64,6 +64,13 @@ class testGithubViewer(unittest.TestCase):
         self.assertGreaterEqual(len(tags),0, (len(tags)))
 
     #@unittest.skip('Temporary not needed')
+    def test04_check_get_all_releases_data_by_repo_name_failure(self):
+        result, message, releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = 'mazilla/geckadruver')
+        self.assertFalse(result, releases)
+        self.assertGreater(len(message), 0, len(message))
+        self.assertGreaterEqual(len(releases),0, (len(releases)))
+
+    #@unittest.skip('Temporary not needed')
     def test04_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):
         result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = self.repo_name)
         self.assertTrue(result, message)
@@ -109,6 +116,19 @@ class testGithubViewer(unittest.TestCase):
         
         for tag in tags:
             self.assertIsNone(jsonschema.validate(instance=tag, schema=schema))
+
+    #@unittest.skip('Temporary not needed')
+    def test07_check_get_all_releases_data_by_repo_name_and_validate_json_schema(self):
+        result, message, releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = self.repo_name)
+        self.assertTrue(result, message)
+        self.assertIsNotNone(releases,releases)
+        self.assertGreater(len(releases), 0, len(releases))
+
+        with open(self.setting["JsonSchema"]["githubReleaseSchema"], 'r', encoding='utf-8') as schema_file:
+            schema = json.loads(schema_file.read())
+        
+        for release in releases:
+            self.assertIsNone(jsonschema.validate(instance=release, schema=schema))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

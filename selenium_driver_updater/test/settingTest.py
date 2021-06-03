@@ -157,10 +157,10 @@ class testSetting(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 2)
-        self.assertEqual(len(self.setting["ChromeDriver"]), 4)
+        self.assertEqual(len(self.setting["ChromeDriver"]), 5)
         self.assertEqual(len(self.setting["GeckoDriver"]), 4)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
-        self.assertEqual(len(self.setting["EdgeDriver"]), 4)
+        self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
 
@@ -171,7 +171,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
-        self.assertEqual(len(self.setting["Github"]), 2)
+        self.assertEqual(len(self.setting["Github"]), 3)
         self.assertEqual(len(self.setting["PyPi"]), 1)
     
     #@unittest.skip('Temporary not needed')
@@ -184,6 +184,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
         self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], chromedriver_platform_release)
         self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
+        self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/")
 
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
@@ -199,6 +200,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
         self.assertEqual(self.setting["EdgeDriver"]["LinkAllReleases"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000")
+        self.assertEqual(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000")
 
         self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
 
@@ -239,6 +241,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
         self.assertEqual(self.setting["Github"]["linkAllReleasesTags"], 'https://api.github.com/repos/{}/git/refs/tags')
+        self.assertEqual(self.setting["Github"]["linkAllReleases"], 'https://api.github.com/repos/{}/releases')
 
         self.assertEqual(self.setting["PyPi"]["urlProjectJson"], 'https://pypi.python.org/pypi/selenium-driver-updater/json')
 

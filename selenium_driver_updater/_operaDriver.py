@@ -565,6 +565,39 @@ class OperaDriver():
 
         return result_run, message_run , latest_previous_version
 
+    def __check_if_version_is_valid(self, url : str, version_url : str) -> Tuple[bool, str]:
+        result_run : bool = False
+        message_run : str = ''
+        archive_name : str = url.split("/")[len(url.split("/"))-1]
+        is_found : bool = False
+
+        try:
+
+            result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(OperaDriver._repo_name)
+            if not result:
+                logging.error(message)
+                return result, message
+
+            for data in json_data:
+                if data.get('name') == version_url:
+                    for asset in data.get('assets'):
+                        if asset.get('name') == archive_name:
+                            is_found = True
+                            break
+
+            if not is_found:
+                message = f'Wrong version or system_name was specified. version_url: {version_url} url: {url}'
+                logging.error(message)
+                return False, message
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run
+
     def __download_driver(self, version : str = '', previous_version : bool = False):
         """Download specific version of phantomjs to folder
 
@@ -599,11 +632,7 @@ class OperaDriver():
 
                 latest_version_url = "v." + version 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-                
+
                 logging.info(f'Started download operadriver specific_version: {version}')
 
             elif previous_version:
@@ -614,7 +643,7 @@ class OperaDriver():
                     return result, message, file_name
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
-                
+
                 logging.info(f'Started download operadriver latest_previous_version: {latest_previous_version}')
 
             else:
@@ -626,18 +655,21 @@ class OperaDriver():
 
                 latest_version_url = "v." + latest_version
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
-                
+
                 logging.info(f'Started download operadriver latest_version: {latest_version}')
 
             if self.system_name:
                 url = url.replace(url.split("/")[len(url.split("/"))-1], '')
                 url = url + self.system_name
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+
+                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+
+            if version or self.system_name:
+                version_url = version if version else latest_previous_version if latest_previous_version else latest_version
+                result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
