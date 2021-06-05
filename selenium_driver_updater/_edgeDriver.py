@@ -555,6 +555,18 @@ class EdgeDriver():
         return result_run, message_run, latest_previous_version
 
     def __check_if_version_is_valid(self, url : str, version_url : str) -> Tuple[bool, str]:
+        """Checks the specified version for existence.
+
+        Args:
+            url (str)           : Full download url of edgedriver.
+            version_url (str)   : Version that will be downloaded.
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+        """
         result_run : bool = False
         message_run : str = ''
         archive_name : str = url.split("/")[len(url.split("/"))-1]
@@ -581,15 +593,19 @@ class EdgeDriver():
         
         return result_run, message_run
 
-    def __download_driver(self, version : str = '', previous_version : bool = False):
-        """Download specific version of edgedriver to folder
+    def __download_driver(self, version : str = '', previous_version : bool = False) -> Tuple[bool, str, str]:
+        """Function to download, delete or upgrade current chromedriver
+
+        Args:
+            version (str)               : Specific chromedriver version to download. Defaults to empty string.
+            previous_version (boll)     : If true, chromedriver latest previous version will be downloaded. Defaults to False.
 
         Returns:
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : File name of unzipped file
+            file_name (str)         : Path to unzipped driver.
             
         Raises:
             Except: If unexpected error raised. 

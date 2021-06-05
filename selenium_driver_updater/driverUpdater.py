@@ -31,12 +31,12 @@ class DriverUpdater():
 
     #OS'S
     windows = 'windows'
-    windows64 = 'windows64'
     windows32 = 'windows32'
+    windows64 = 'windows64'
 
     linux = 'linux'
-    linux64 = 'linux64'
     linux32 = 'linux32'
+    linux64 = 'linux64'
 
     macos = 'macos'
     macos_m1 = 'macos_m1'

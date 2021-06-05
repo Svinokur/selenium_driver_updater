@@ -49,7 +49,7 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
-url_release_phantomjs = "https://bitbucket.org/ariya/phantomjs/downloads/"
+url_release_phantomjs = "https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads/"
 os_bit_linux = 'x86_64' if os_bit == '64' else "i686"
 phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
                                 url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
@@ -165,7 +165,7 @@ setting = dict(
         {   
             "LinkLastReleaseFile"   : phantomjs_latest_release,
             "LastReleasePlatform"   : phantomjs_platform_release,
-            "LinkAllReleases"       : 'https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads',
+            "LinkAllReleases"       : url_release_phantomjs,
         },
         "ChromeBrowser":
         {

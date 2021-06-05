@@ -1,3 +1,13 @@
+[3.9.0] 05/05/2021
+This version provides some improvements and minor fixes.
+This code was written and tested on Python 3.9.5
+
+# Improvements
+
+- Speeded up phantomjs binary download
+- Speeded up validation of specific version for phantomjs
+- Improved unit-tests
+
 [3.8.0] 03/05/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5

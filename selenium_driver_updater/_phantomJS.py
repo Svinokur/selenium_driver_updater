@@ -572,15 +572,68 @@ class PhantomJS():
 
         return result_run, message_run, latest_previous_version
 
-    def __download_driver(self, version : str = '', previous_version : bool = False):
-        """Download specific version of phantomjs to folder
+    def __check_if_version_is_valid(self, url : str) -> Tuple[bool, str]:
+        """Checks the specified version for existence.
+
+        Args:
+            url (str)           : Full download url of chromedriver.
+
+        Returns:
+            Tuple of bool and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+        """
+        result_run : bool = False
+        message_run : str = ''
+        archive_name : str = url.split("/")[len(url.split("/"))-1]
+        url_releases : str = self.setting["PhantomJS"]["LinkAllReleases"]
+        is_found : bool = False
+
+        try:
+
+            while is_found == False:
+
+                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url_releases, is_json=True)
+                if not result:
+                    logging.error(message)
+                    return result, message
+
+                for data in json_data.get('values'):
+                    if data.get('name') == archive_name:
+                        is_found = True
+                        break
+
+                url_releases = json_data.get('next')
+                if not url_releases:
+                    break
+
+            if not is_found:
+                message = f'Wrong version or system_name was specified. archive_name: {archive_name} url: {url}'
+                logging.error(message)
+                return False, message
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+        
+        return result_run, message_run
+
+    def __download_driver(self, version : str = '', previous_version : bool = False) -> Tuple[bool, str, str]:
+        """Function to download, delete or upgrade current phantomjs
+
+        Args:
+            version (str)               : Specific phantomjs version to download. Defaults to empty string.
+            previous_version (boll)     : If true, phantomjs latest previous version will be downloaded. Defaults to False.
 
         Returns:
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : File name of unzipped file
+            file_name (str)         : Path to unzipped driver.
             
         Raises:
             Except: If unexpected error raised. 
@@ -605,18 +658,9 @@ class PhantomJS():
             
             if version:
 
-                logging.info(f'Started download phantomjs: {version}')
+                logging.info(f'Started download phantomjs specific_version: {version}')
 
                 url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(version)
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text = False, no_error_status_code=True)
-                if not result:
-                    logging.error(message)
-                    return result, message, file_name
-
-                if status_code != 200:
-                    message = f'Specific binary was not found, wrong version was specified. version: {version}'
-                    logging.error(message)
-                    return result_run, message, file_name
 
             elif previous_version:
 
@@ -644,12 +688,14 @@ class PhantomJS():
                 url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
                 url + self.system_name.format(version)
 
-                result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, return_text=False)
+                logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
+
+            if version or self.system_name:
+
+                result, message = self.__check_if_version_is_valid(url=url)
                 if not result:
                     logging.error(message)
                     return result, message, file_name
-
-                logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
@@ -701,7 +747,7 @@ class PhantomJS():
 
             platform : str = self.setting["PhantomJS"]["LastReleasePlatform"] if not self.specific_driver_name else self.specific_driver_name 
 
-            archive_path_folder = self.path + url.split('/')[6].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
+            archive_path_folder = self.path + url.split('/')[len(url.split('/'))-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
             archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
             driver_archive_path = archive_path_folder_bin + platform
 

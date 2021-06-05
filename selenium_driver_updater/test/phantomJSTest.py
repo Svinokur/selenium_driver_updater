@@ -92,8 +92,15 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreater(len(message), 0, len(message))
         self.assertEqual(len(filename), 0, len(filename))
 
+    ##@unittest.skip('Temporary not needed')
+    def test05_check_if_version_is_valid_failure(self):
+        url = self.setting["PhantomJS"]["LinkAllReleases"].format(self.specific_version_failure)
+        result, message = self.phantomjs_failure._PhantomJS__check_if_version_is_valid(url=url)
+        self.assertFalse(result, result)
+        self.assertGreater(len(message), 0, len(message))
+
     #@unittest.skip('Temporary not needed')
-    def test05_check_get_latest_version_phantomjs(self):
+    def test06_check_get_latest_version_phantomjs(self):
         result, message, latest_version = self.phantomjs._PhantomJS__get_latest_version_phantomjs()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
@@ -106,7 +113,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_download_driver_specific_version(self):
+    def test07_check_download_driver_specific_version(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
@@ -127,7 +134,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertEqual(current_version, self.specific_version)
 
     @unittest.skip('Temporary not needed')
-    def test06_check_download_driver_latest_previous_version(self):
+    def test08_check_download_driver_latest_previous_version(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
         self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
@@ -148,7 +155,7 @@ class testPhantomJS(unittest.TestCase):
 
 
     #@unittest.skip('Temporary not needed')
-    def test07_check_download_driver(self):
+    def test09_check_download_driver(self):
         result, message, latest_version = self.phantomjs._PhantomJS__get_latest_version_phantomjs()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
@@ -164,11 +171,18 @@ class testPhantomJS(unittest.TestCase):
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test08_check_phantomjs_is_up_to_date_failure(self):
+    def test10_check_phantomjs_is_up_to_date_failure(self):
         result, message, filename = self.phantomjs.main()
         self.assertTrue(result, result)
         self.assertEqual(len(message), 0, len(message))
         self.assertGreater(len(filename), 0, len(filename))
+
+    #@unittest.skip('Temporary not needed')
+    def test11_check_if_version_is_valid(self):
+        url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(self.specific_version)
+        result, message = self.phantomjs._PhantomJS__check_if_version_is_valid(url=url)
+        self.assertTrue(result, result)
+        self.assertEqual(len(message), 0, len(message))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

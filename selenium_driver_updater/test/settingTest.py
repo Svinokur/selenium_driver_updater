@@ -59,7 +59,7 @@ edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_
 edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
                              "msedgedriver"
 
-url_release_phantomjs = "https://bitbucket.org/ariya/phantomjs/downloads/"
+url_release_phantomjs = "https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads/"
 os_bit_linux = 'x86_64' if os_bit == '64' else "i686"
 phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
                                 url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
@@ -206,7 +206,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], phantomjs_platform_release)
-        self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], 'https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads')
+        self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], url_release_phantomjs)
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')

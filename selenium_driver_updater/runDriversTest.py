@@ -19,6 +19,7 @@ from test import geckoDriverTest
 from test import firefoxBrowserTest
 
 from test import operaDriverTest
+from test import operaBrowserTest
 
 from test import edgeDriverTest
 from test import edgeBrowserTest
@@ -28,6 +29,7 @@ from test import extractorTest
 from test import requestsGetterTest
 
 from test import chromiumChromeDriverTest
+from test import chromiumChromeBrowserTest
 
 from test import phantomJSTest
 
@@ -67,6 +69,7 @@ try:
     testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
     #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it in Github Workflow
+    #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) Temporary could not test it in Github Workflow
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
@@ -74,6 +77,7 @@ try:
 
 
     #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver)) Temporary could not test it in Github Workflow
+    #testSuite.addTest(unittest.makeSuite(chromiumChromeBrowserTest.testChromiumChromeBrowser)) Temporary could not test it in Github Workflow
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 
