@@ -1,3 +1,11 @@
+[3.9.1] 05/05/2021
+This version provides some minor fixes.
+This code was written and tested on Python 3.9.5
+
+# Fixes
+
+- Minor fixes
+
 [3.9.0] 05/05/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5
