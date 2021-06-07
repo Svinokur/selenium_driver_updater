@@ -65,7 +65,7 @@ class testOperaDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_operadriver_selenium_failure(self):
-        result, message, current_version = self.operadriver_failure._OperaDriver__get_current_version_operadriver_selenium()
+        result, message, current_version = self.operadriver_failure._OperaDriver__get_current_version_operadriver()
         self.assertTrue(result, message)
         self.assertGreaterEqual(len(message), 0, len(message))
         self.assertEqual(len(current_version), 0, len(current_version))
@@ -124,7 +124,7 @@ class testOperaDriver(unittest.TestCase):
         result, message = self.operadriver._OperaDriver__chmod_driver()
         self.assertTrue(result, message)
 
-        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver_selenium()
+        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
@@ -145,7 +145,7 @@ class testOperaDriver(unittest.TestCase):
         result, message = self.operadriver._OperaDriver__chmod_driver()
         self.assertTrue(result, message)
 
-        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver_selenium()
+        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
@@ -187,7 +187,7 @@ class testOperaDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test13_check_get_current_version_operadriver_selenium(self):
-        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver_selenium()
+        result, message, current_version = self.operadriver._OperaDriver__get_current_version_operadriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))

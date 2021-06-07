@@ -100,7 +100,7 @@ class PhantomJS():
         self.requests_getter = RequestsGetter
 
     def __get_current_version_phantomjs(self) -> Tuple[bool, str, str]:
-        """Gets current phantomjs version
+        """Gets current phantomjs version via command in terminal
 
 
         Returns:
@@ -108,14 +108,14 @@ class PhantomJS():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current driver version.
+            driver_version (str)    : Current phantomjs version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current phantomjs could not start.
+            SessionNotCreatedException: Occurs when current edgedriver could not start.
 
-            WebDriverException: Occurs when current phantomjs could not start or critical error occured
+            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
-            OSError: Occurs when phantomjs made for another CPU type
+            OSError: Occurs when chromedriver made for another CPU type
 
             Except: If unexpected error raised. 
 
@@ -124,24 +124,19 @@ class PhantomJS():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
-
-        try:
-
-            if os.path.exists(self.phantomjs_path):
-
-                result, message, driver_version = self.__get_current_version_phantomjs_via_terminal()
-                if not result:
-                    logging.error(message)
-                    message = 'Trying to get current version of phantomjs via webdriver'
-                    logging.info(message)
-                
-                if not True or not driver_version:
-
-                    driver = webdriver.PhantomJS(executable_path = self.phantomjs_path)
-                    driver_version = str(driver.capabilities['version'])
-                    driver.close()
-                    driver.quit()
+        driver_version_terminal : str = ''
         
+        try:
+            
+            if os.path.exists(self.phantomjs_path):
+        
+                process = subprocess.Popen([self.phantomjs_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
+
                 logging.info(f'Current version of phantomjs: {driver_version}')
 
             result_run = True
@@ -160,47 +155,6 @@ class PhantomJS():
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
             logging.error(message_run)
             return True, message_run, driver_version
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-        
-        return result_run, message_run, driver_version
-
-    def __get_current_version_phantomjs_via_terminal(self) -> Tuple[bool, str, str]:
-        """Gets current phantomjs version via command in terminal
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current phantomjs version.
-
-        Raises:
-
-            Except: If unexpected error raised. 
-
-        """
-
-        result_run : bool = False
-        message_run : str = ''
-        driver_version : str = ''
-        driver_version_terminal : str = ''
-        
-        try:
-            
-            logging.info('Trying to get current version of phantomjs via terminal')
-        
-            process = subprocess.Popen([self.phantomjs_path, '--version'], stdout=subprocess.PIPE)
-    
-            driver_version_terminal = process.communicate()[0].decode('UTF-8')
-
-            find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], driver_version_terminal)
-            driver_version = find_string[0] if len(find_string) > 0 else ''
-
-            result_run = True
 
         except:
             message_run = f'Unexcepted error: {traceback.format_exc()}'

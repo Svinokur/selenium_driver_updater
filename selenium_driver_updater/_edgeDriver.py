@@ -145,8 +145,8 @@ class EdgeDriver():
 
         return result_run, message_run, driver_path
 
-    def __get_current_version_edgedriver_selenium(self) -> Tuple[bool, str, str]:
-        """Gets current edgedriver version
+    def __get_current_version_edgedriver(self) -> Tuple[bool, str, str]:
+        """Gets current edgedriver version via command in terminal
 
 
         Returns:
@@ -154,7 +154,7 @@ class EdgeDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current driver version.
+            driver_version (str)    : Current edgedriver version.
 
         Raises:
             SessionNotCreatedException: Occurs when current edgedriver could not start.
@@ -170,32 +170,19 @@ class EdgeDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
-
+        driver_version_terminal : str = ''
+        
         try:
 
             if os.path.exists(self.edgedriver_path):
-
-                result, message, driver_version = self.__get_current_version_edgedriver_via_terminal()
-                if not result:
-                    logging.error(message)
-                    message = 'Trying to get current version of edgedriver via webdriver'
-                    logging.info(message)
-                
-                if not result or not driver_version:
-
-                    #driver = Edge(executable_path=self.edgedriver_path, desired_capabilities=desired_cap)
-                    desired_cap = {}
-
-                    driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
-                    
-                    driver_version_selenium = str(driver.capabilities['msedge']['msedgedriverVersion'])
-
-                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_selenium)
-                    driver_version = find_string[0] if len(find_string) > 0 else driver_version_selenium.split(' ')[0]
-
-                    driver.close()
-                    driver.quit()
         
+                process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
+
                 logging.info(f'Current version of edgedriver: {driver_version}')
 
             result_run = True
@@ -397,7 +384,7 @@ class EdgeDriver():
         
         try:
 
-            result, message, current_version = self.__get_current_version_edgedriver_selenium()
+            result, message, current_version = self.__get_current_version_edgedriver()
             if not result:
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
@@ -457,47 +444,6 @@ class EdgeDriver():
             logging.error(message_run)
 
         return result_run, message_run
-
-    def __get_current_version_edgedriver_via_terminal(self) -> Tuple[bool, str, str]:
-        """Gets current edgedriver version via command in terminal
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current edgedriver version.
-
-        Raises:
-
-            Except: If unexpected error raised. 
-
-        """
-
-        result_run : bool = False
-        message_run : str = ''
-        driver_version : str = ''
-        driver_version_terminal : str = ''
-        
-        try:
-
-            logging.info('Trying to get current version of edgedriver via terminal')
-        
-            process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
-    
-            driver_version_terminal = process.communicate()[0].decode('UTF-8')
-
-            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
-            driver_version = find_string[0] if len(find_string) > 0 else ''
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-        
-        return result_run, message_run, driver_version
 
     def __get_latest_previous_version_edgedriver_via_requests(self) -> Tuple[bool, str, str]:
         """Gets previous latest edgedriver version

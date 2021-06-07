@@ -1,3 +1,20 @@
+[3.10.0] 07/05/2021
+This version provides some innovations and improvements.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added support for downloading multiply specific versions for multiply drivers
+
+# Improvements
+
+- Improved overall code optimization (removed alternative method for getting current version of driver via its capabilities)
+- Improved unit-tests
+
+# Fixes
+
+- Fixed an issue with incorrect version validation for operadriver
+
 [3.9.1] 05/05/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

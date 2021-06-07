@@ -66,7 +66,7 @@ class testEdgeDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_edge_selenium_failure(self):
-        result, message, current_version = self.edgedriver_failure._EdgeDriver__get_current_version_edgedriver_selenium()
+        result, message, current_version = self.edgedriver_failure._EdgeDriver__get_current_version_edgedriver()
         self.assertTrue(result, message)
         self.assertGreaterEqual(len(message), 0, len(message))
         self.assertEqual(len(current_version), 0, len(current_version))
@@ -112,7 +112,7 @@ class testEdgeDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test07_check_get_current_version_edge_selenium(self):
-        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver_selenium()
+        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
@@ -132,7 +132,7 @@ class testEdgeDriver(unittest.TestCase):
         result, message = self.edgedriver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)
 
-        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver_selenium()
+        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
@@ -153,7 +153,7 @@ class testEdgeDriver(unittest.TestCase):
         result, message = self.edgedriver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)
 
-        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver_selenium()
+        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
@@ -200,7 +200,7 @@ class testEdgeDriver(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test14_check_get_current_version_edge_selenium(self):
-        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver_selenium()
+        result, message, current_version = self.edgedriver._EdgeDriver__get_current_version_edgedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))

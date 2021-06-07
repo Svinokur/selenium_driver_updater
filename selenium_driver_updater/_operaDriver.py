@@ -148,8 +148,8 @@ class OperaDriver():
 
         return result_run, message_run, driver_path
 
-    def __get_current_version_operadriver_selenium(self) -> Tuple[bool, str, str]:
-        """Gets current operadriver version
+    def __get_current_version_operadriver(self) -> Tuple[bool, str, str]:
+        """Gets current operadriver version via command in terminal
 
 
         Returns:
@@ -157,14 +157,14 @@ class OperaDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current driver version
+            driver_version (str)    : Current operadriver version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current operadriver could not start.
+            SessionNotCreatedException: Occurs when current edgedriver could not start.
 
-            WebDriverException: Occurs when current operadriver could not start or critical error occured
+            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
-            OSError: Occurs when operadriver made for another CPU type
+            OSError: Occurs when chromedriver made for another CPU type
 
             Except: If unexpected error raised. 
 
@@ -173,28 +173,18 @@ class OperaDriver():
         result_run : bool = False
         message_run : str = ''
         driver_version : str = ''
-
+        driver_version_terminal : str = ''
+        
         try:
-
+            
             if os.path.exists(self.operadriver_path):
-
-                result, message, driver_version = self.__get_current_version_operadriver_via_terminal()
-                if not result:
-                    logging.error(message)
-                    message = 'Trying to get current version of operadriver via webdriver'
-                    logging.info(message)
+            
+                process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
+        
+                driver_version_terminal = process.communicate()[0].decode('UTF-8')
                 
-                if not result or not driver_version:
-
-                    driver = webdriver.Opera(executable_path = self.operadriver_path)
-
-                    driver_version_selenium = str(driver.capabilities['opera']['operadriverVersion'])
-
-                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_selenium)
-                    driver_version = find_string[0] if len(find_string) > 0 else driver_version_selenium.split(' ')[0]
-
-                    driver.close()
-                    driver.quit()
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+                driver_version = find_string[0] if len(find_string) > 0 else ''
 
                 logging.info(f'Current version of operadriver: {driver_version}')
 
@@ -377,7 +367,7 @@ class OperaDriver():
         
         try:
 
-            result, message, current_version = self.__get_current_version_operadriver_selenium()
+            result, message, current_version = self.__get_current_version_operadriver()
             if not result:
                 logging.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
@@ -481,49 +471,6 @@ class OperaDriver():
             logging.error(message_run)
 
         return result_run, message_run
-
-    def __get_current_version_operadriver_via_terminal(self) -> Tuple[bool, str, str]:
-        """Gets current operadriver version via command in terminal
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_version (str)    : Current operadriver version.
-
-        Raises:
-
-            Except: If unexpected error raised. 
-
-        """
-
-        result_run : bool = False
-        message_run : str = ''
-        driver_version : str = ''
-        driver_version_terminal : str = ''
-        
-        try:
-            
-            if os.path.exists(self.operadriver_path):
-
-                logging.info('Trying to get current version of operadriver via terminal')
-            
-                process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
-        
-                driver_version_terminal = process.communicate()[0].decode('UTF-8')
-                
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
-                driver_version = find_string[0] if len(find_string) > 0 else ''
-
-            result_run = True
-
-        except:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-        
-        return result_run, message_run, driver_version
     
     def __get_latest_previous_version_operadriver_via_requests(self) -> Tuple[bool, str, str]:
         """Gets previous latest operadriver version
@@ -634,6 +581,7 @@ class OperaDriver():
         file_name : str = ''
         url : str = ''
         latest_version : str = ''
+        latest_previous_version : str = ''
 
         try:
 

@@ -92,8 +92,12 @@ class DriverUpdater():
         upgrade = bool(kwargs.get('upgrade', False))
         chmod = bool(kwargs.get('chmod', True))
         check_driver_is_up_to_date = bool(kwargs.get('check_driver_is_up_to_date', False))
-        version = str(kwargs.get('version', ''))
+
+        version = str(kwargs.get('version', '')) if type(kwargs.get('version', '')) == str else\
+                        kwargs.get('version', '') if type(kwargs.get('version', '')) == list else ''
+
         check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date', False))
+        
         system_name = str(kwargs.get('system_name', '')) if type(kwargs.get('system_name', '')) == str else\
                         kwargs.get('system_name', '') if type(kwargs.get('system_name', '')) == list else ''
 
@@ -128,9 +132,12 @@ class DriverUpdater():
                     system_name_driver = str(system_name[driver_name.index(driver)]) if len(system_name) > driver_name.index(driver) and system_name else ''
                     system_name_driver.replace('.', '')
 
+                    version_driver = str(version[driver_name.index(driver)]) if len(version) > driver_name.index(driver) and version else ''
+                    version_driver.replace('.', '')
+
                     result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, path=path, upgrade=upgrade, chmod=chmod, 
                                                 check_driver_is_up_to_date=check_driver_is_up_to_date, 
-                                                filename=filename_driver, version=version,
+                                                filename=filename_driver, version=version_driver,
                                                 check_browser_is_up_to_date=check_browser_is_up_to_date, info_messages=info_messages, system_name=system_name_driver)
                     if not result:
                         logging.error(message)
