@@ -10,7 +10,7 @@ import os
 
 import platform
 
-from typing import Tuple
+from typing import Any, Tuple
 
 import sys
 import os.path
@@ -51,7 +51,7 @@ class PhantomJS():
             version (str)                       : Specific version for phantomjs. If given, it will downloads given version.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     

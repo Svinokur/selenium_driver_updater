@@ -10,6 +10,7 @@ from _setting import setting
 import time
 import os
 from util.requests_getter import RequestsGetter
+from driverUpdater import info
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,12 +30,17 @@ class testDriverUpdater(unittest.TestCase):
 
         cls.driver_updater = DriverUpdater
         cls.requests_getter = RequestsGetter
+        cls.info = info
 
     def setUp(self):
         self.startTime : float = time.time()
 
         self.path = base_dir
         self.driver_name = 'chromedriver'
+        self.system_name = 'linux64'
+
+        self.driver_name_failure = 'chromedriverabobus'
+        self.system_name_failure = 'linux6412312'
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -42,42 +48,66 @@ class testDriverUpdater(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_all_input_parameteres_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path + 'hahaha', driver_name=self.driver_name, filename='hi', system_name='')
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres()
         self.assertFalse(result, message)
         self.assertGreater(len(message), 0, len(message))
 
     #@unittest.skip('Temporary not needed')
     def test02_check_enviroment_and_variables_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path + 'hahaha', driver_name=self.driver_name, enable_library_update_check=True, filename='hi', system_name='')
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables()
         self.assertFalse(result, message)
         self.assertGreater(len(message), 0, len(message))
+
+    #@unittest.skip('Temporary not needed')
+    def test03_check_driver_name_is_valid_failure(self):
+        result, message = self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name_failure)
+        self.assertFalse(result, message)
+
+    #@unittest.skip('Temporary not needed')
+    def test04_check_system_name_is_valid_failure(self):
+        result, message = self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name_failure)
+        self.assertFalse(result, message)
     
     #@unittest.skip('Temporary not needed')
-    def test03_check_get_result_by_request(self):
-        url = self.setting["PyPi"]["urlProjectJson"]
+    def test05_check_get_result_by_request(self):
+        url = str(self.setting["PyPi"]["urlProjectJson"])
         result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertTrue(result, message)
         self.assertEqual(status_code, 200, status_code)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
     
     #@unittest.skip('Temporary not needed')
-    def test04_check_library_is_up_to_date(self):
+    def test06_check_library_is_up_to_date(self):
+        info._path = base_dir
+        info._driver_name = 'chromedriver'
+        info._system_name = 'macos'
+
         result, message = self.driver_updater._DriverUpdater__check_library_is_up_to_date()
         self.assertTrue(result, message)
     
     #@unittest.skip('Temporary not needed')
-    def test05_check_is_python_version_compatible_for_library(self):
+    def test07_check_is_python_version_compatible_for_library(self):
         result, message = self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_all_input_parameteres(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres(path=self.path, driver_name=self.driver_name, filename=self.driver_name, system_name='')
+    def test08_check_all_input_parameteres(self):
+        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres()
         self.assertTrue(result, message)
 
     #@unittest.skip('Temporary not needed')
-    def test07_check_enviroment_and_variables(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables(path=self.path, driver_name=self.driver_name, enable_library_update_check=True, filename=self.driver_name, system_name='')
+    def test09_check_enviroment_and_variables(self):
+        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables()
+        self.assertTrue(result, message)
+        
+    #@unittest.skip('Temporary not needed')
+    def test10_check_driver_name_is_valid(self):
+        result, message = self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name)
+        self.assertTrue(result, message)
+
+    #@unittest.skip('Temporary not needed')
+    def test11_check_system_name_is_valid(self):
+        result, message = self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name)
         self.assertTrue(result, message)
     
     

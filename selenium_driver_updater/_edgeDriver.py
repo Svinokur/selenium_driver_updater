@@ -10,7 +10,7 @@ import os
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
-from typing import Tuple
+from typing import Any, Tuple
 
 import sys
 import os.path
@@ -49,7 +49,7 @@ class EdgeDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check edge browser version before edgedriver update/upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     
@@ -75,7 +75,7 @@ class EdgeDriver():
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
-            self.edgedriver_path : str =  self.path + self.setting['EdgeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+            self.edgedriver_path : str =  self.path + str(self.setting['EdgeDriver']['LastReleasePlatform']) if not specific_filename else self.path + self.filename
 
         else:
 
@@ -180,7 +180,7 @@ class EdgeDriver():
         
                 driver_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
+                find_string = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), str(driver_version_terminal))
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
                 logging.info(f'Current version of edgedriver: {driver_version}')
@@ -229,10 +229,10 @@ class EdgeDriver():
         latest_version : str = ''
         stable_channel_element = None
         latest_version_element = None
+        url = str(self.setting['EdgeDriver']['LinkLastRelease'])
 
         try:
             
-            url = self.setting['EdgeDriver']['LinkLastRelease']
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
                 logging.error(message)
@@ -241,6 +241,9 @@ class EdgeDriver():
             soup = BeautifulSoup(json_data, 'html.parser')
 
             elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
+            if len(elements) == 0:
+                elements = soup.findAll('div', attrs={'class' : 'bare driver-downloads'})
+                
             stable_channel_text = 'stable ChannelCurrent'
 
             for element in elements:
@@ -255,7 +258,7 @@ class EdgeDriver():
             
             latest_version_element = stable_channel_element.findAll('p', attrs={'class' : 'driver-download__meta'})[0].text
             
-            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
+            latest_version = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), str(latest_version_element))[0]
 
             logging.info(f'Latest version of edgedriver: {latest_version}')
 
@@ -465,6 +468,7 @@ class EdgeDriver():
         message_run : str = ''
         latest_previous_version : str = ''
         releases_latest_previous_version = []
+        url = str(self.setting["EdgeDriver"]["LinkAllReleases"])
 
         try:
 
@@ -476,7 +480,6 @@ class EdgeDriver():
             latest_version_main = int(latest_version.split('.')[0])
             latest_previous_version_main = str(latest_version_main-1)
 
-            url = self.setting["EdgeDriver"]["LinkAllReleases"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
                 logging.error(message)
@@ -516,7 +519,7 @@ class EdgeDriver():
         result_run : bool = False
         message_run : str = ''
         archive_name : str = url.split("/")[len(url.split("/"))-1]
-        url_test_valid = self.setting["EdgeDriver"]["LinkCheckVersionIsValid"].format(version_url)
+        url_test_valid = str(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"]).format(version_url)
         version_valid : str = f"{version_url}/{archive_name}"
 
         try:
@@ -578,7 +581,7 @@ class EdgeDriver():
 
             if version:
 
-                url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(version)
+                url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(version)
                 logging.info(f'Started download edgedriver specific_version: {version}')
 
             elif previous_version:
@@ -589,7 +592,7 @@ class EdgeDriver():
                     return result, message, file_name
 
                 logging.info(f'Started download edgedriver latest_previous_version: {latest_previous_version}')
-                url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_previous_version)
+                url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_previous_version)
 
             else:
 
@@ -599,7 +602,7 @@ class EdgeDriver():
                     return result, message, file_name
                 
                 logging.info(f'Started download edgedriver latest_version: {latest_version}')
-                url = self.setting["EdgeDriver"]["LinkLastReleaseFile"].format(latest_version)
+                url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_version)
 
             if self.system_name:
                 url = url.replace(url.split("/")[len(url.split("/"))-1], '')
@@ -644,7 +647,7 @@ class EdgeDriver():
 
                 archive_path = file_name
                 out_path = self.path
-                filename = self.setting['EdgeDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
+                filename = str(self.setting['EdgeDriver']['LastReleasePlatform']) if not self.specific_driver_name else self.specific_driver_name
                 filename_replace = self.filename
 
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 

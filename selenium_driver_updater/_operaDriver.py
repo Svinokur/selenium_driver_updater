@@ -10,7 +10,7 @@ import os
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
-from typing import Tuple
+from typing import Any, Tuple
 
 import sys
 import os.path
@@ -50,7 +50,7 @@ class OperaDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check opera browser version before operadriver update/upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     
