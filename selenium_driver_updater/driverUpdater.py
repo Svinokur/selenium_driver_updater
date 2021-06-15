@@ -412,7 +412,7 @@ class DriverUpdater():
         return result_run, message_run
     
     @staticmethod
-    def __run_specific_driver(driver_name = info._driver_name, filename = info._filename, version = info._version, system_name = info._system_name) -> Tuple[bool, str, str]:
+    def __run_specific_driver(driver_name = '', filename = '', version = '', system_name = '') -> Tuple[bool, str, str]:
         """Private function for run download or update for specific driver
 
         Args:
@@ -438,6 +438,18 @@ class DriverUpdater():
         driver_path : str = ''
 
         try:
+
+            if not driver_name:
+                driver_name = info._driver_name
+
+            if not filename:
+                filename = info._filename
+
+            if not version:
+                version = info._version
+
+            if not system_name:
+                system_name = info._system_name
 
             if DriverUpdater.chromedriver == driver_name:
 
