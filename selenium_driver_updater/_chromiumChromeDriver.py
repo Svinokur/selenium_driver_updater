@@ -24,6 +24,8 @@ from browsers._chromiumChromeBrowser import ChromiumChromeBrowser
 
 import re
 
+from typing import Any
+
 class ChromiumChromeDriver():
     
     def __init__(self, **kwargs):
@@ -33,7 +35,7 @@ class ChromiumChromeDriver():
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
             check_browser_is_up_to_date (bool)   : If true, it will check chrome browser version before chromedriver update/upgrade.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
         

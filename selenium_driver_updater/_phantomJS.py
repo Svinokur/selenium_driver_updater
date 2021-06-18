@@ -28,6 +28,8 @@ import re
 
 from shutil import copyfile
 
+from typing import Any
+
 class PhantomJS():
 
 
@@ -46,7 +48,7 @@ class PhantomJS():
             version (str)                       : Specific version for phantomjs. If given, it will downloads given version.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     

@@ -23,10 +23,12 @@ from bs4 import BeautifulSoup
 
 import re
 
+from typing import Any
+
 class ChromiumChromeBrowser():
 
     def __init__(self, check_browser_is_up_to_date : bool):
-        self.setting = setting
+        self.setting : Any = setting
         self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
         self.requests_getter = RequestsGetter

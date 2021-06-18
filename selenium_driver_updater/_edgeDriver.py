@@ -29,6 +29,8 @@ import pathlib
 
 import re
 
+from typing import Any
+
 class EdgeDriver():
 
     _tmp_folder_path = 'tmp'
@@ -46,7 +48,7 @@ class EdgeDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check edge browser version before edgedriver update/upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     

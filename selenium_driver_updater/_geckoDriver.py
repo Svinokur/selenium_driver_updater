@@ -27,6 +27,8 @@ import re
 
 import pathlib
 
+from typing import Any
+
 class GeckoDriver():
 
     _repo_name = 'mozilla/geckodriver'
@@ -44,7 +46,7 @@ class GeckoDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check firefox browser version before geckodriver update or upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting = setting
+        self.setting : Any = setting
 
         self.path : str = path
                     

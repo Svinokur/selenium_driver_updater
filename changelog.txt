@@ -1,3 +1,11 @@
+[3.12.3] 18/06/2021
+This version provides some minor fixes.
+This code was written and tested on Python 3.9.5
+
+# Fixes
+
+- Fixed some issues with typing
+
 [3.12.2] 18/06/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.5

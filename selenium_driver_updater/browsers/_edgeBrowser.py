@@ -27,10 +27,12 @@ from bs4 import BeautifulSoup
 
 import re
 
+from typing import Any
+
 class EdgeBrowser():
 
     def __init__(self, path : str, check_browser_is_up_to_date : bool):
-        self.setting = setting
+        self.setting : Any = setting
         self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
         self.edgedriver_path = path
