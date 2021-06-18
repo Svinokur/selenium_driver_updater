@@ -1,6 +1,5 @@
 import shutil
 import subprocess
-from selenium import webdriver
 import wget
 import os
 import traceback
@@ -495,12 +494,11 @@ class OperaDriver():
         try:
 
             repo_name = OperaDriver._repo_name
-            result, message, json_data = self.github_viewer.get_all_releases_tags_by_repo_name(repo_name=repo_name)
+            result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
             if not result:
                 return result, message, latest_previous_version
 
-            find_string = json_data[len(json_data)-2].get('ref').split('/')
-            latest_previous_version = find_string[len(find_string)-1]
+            latest_previous_version = json_data[1].get('name')
 
             logging.info(f'Latest previous version of operadriver: {latest_previous_version}')
 
@@ -538,7 +536,7 @@ class OperaDriver():
                 return result, message
 
             for data in json_data:
-                if data.get('name') == version_url:
+                if data.get('tag_name') == version_url or data.get('name') == version_url:
                     for asset in data.get('assets'):
                         if asset.get('name') == archive_name:
                             is_found = True
@@ -594,8 +592,7 @@ class OperaDriver():
 
             if version:
 
-                latest_version_url = "v." + version 
-                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(version, version)
 
                 logging.info(f'Started download operadriver specific_version: {version}')
 
@@ -617,8 +614,7 @@ class OperaDriver():
                     logging.error(message)
                     return result, message, file_name
 
-                latest_version_url = "v." + latest_version
-                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
 
                 logging.info(f'Started download operadriver latest_version: {latest_version}')
 
@@ -628,7 +624,7 @@ class OperaDriver():
 
                 logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
-            if version or self.system_name:
+            if any([version, self.system_name ,latest_previous_version]):
                 version_url = version if version else latest_previous_version if latest_previous_version else latest_version
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:

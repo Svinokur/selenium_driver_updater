@@ -22,8 +22,6 @@ from selenium.common.exceptions import WebDriverException
 from util.requests_getter import RequestsGetter
 from browsers._chromiumChromeBrowser import ChromiumChromeBrowser
 
-from bs4 import BeautifulSoup
-
 import re
 
 class ChromiumChromeDriver():
@@ -74,7 +72,7 @@ class ChromiumChromeDriver():
         try:
 
             if platform.system() != 'Linux':
-                message = 'chromium_chromedriver webdriver is only supports for Linux only. Please wait for the new releases.'
+                message = 'chromium_chromedriver webdriver downloading/updating is only supported for Linux only. Please wait for the new releases.'
                 logging.error(message)
                 return False, message, driver_path
 

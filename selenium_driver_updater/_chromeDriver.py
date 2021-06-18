@@ -17,11 +17,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 from _setting import setting
 
-from selenium import webdriver
-
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.common.exceptions import WebDriverException
-
 from util.extractor import Extractor
 from util.requests_getter import RequestsGetter
 from browsers._chromeBrowser import ChromeBrowser
@@ -127,7 +122,7 @@ class ChromeDriver():
 
             if not self.version:
 
-                #additional checking for equal versions
+                #additional checking for main versions to equal - sometimes chromedriver is 90 and chrome browser is still 89
                 result, message, is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
                 if not result:
                     logging.error(message)
@@ -363,9 +358,6 @@ class ChromeDriver():
             driver_version (str)    : Current chromedriver version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current edgedriver could not start.
-
-            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
             OSError: Occurs when chromedriver made for another CPU type
 
@@ -392,16 +384,6 @@ class ChromeDriver():
                 logging.info(f'Current version of chromedriver: {driver_version}')
 
             result_run = True
-
-        except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
-
-        except WebDriverException:
-            message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
@@ -526,13 +508,8 @@ class ChromeDriver():
                 return result, message, latest_version_previous
 
             latest_version = str(json_data)
-
-            logging.info(f'Latest version of chromedriver: {latest_version}')
-
             latest_version_main = latest_version.split(".")[0]
-
-            logging.info(f'Latest main version of chromedriver: {latest_version_main}')
-
+            
             latest_version_main_previous = int(latest_version_main) - 1
 
             url = self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_version_main_previous)
@@ -658,7 +635,7 @@ class ChromeDriver():
 
                 logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
-            if version or self.system_name:
+            if any([version, self.system_name ,latest_previous_version]):
                 version_url = version if version else latest_previous_version if latest_previous_version else latest_version
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:

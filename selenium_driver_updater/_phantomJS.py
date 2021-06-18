@@ -18,11 +18,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 from _setting import setting
 
-from selenium import webdriver
-
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.common.exceptions import WebDriverException
-
 from util.extractor import Extractor
 from util.github_viewer import GithubViewer
 from util.requests_getter import RequestsGetter
@@ -111,9 +106,6 @@ class PhantomJS():
             driver_version (str)    : Current phantomjs version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current edgedriver could not start.
-
-            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
             OSError: Occurs when chromedriver made for another CPU type
 
@@ -134,22 +126,12 @@ class PhantomJS():
         
                 driver_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], driver_version_terminal)
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
                 logging.info(f'Current version of phantomjs: {driver_version}')
 
             result_run = True
-
-        except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
-
-        except WebDriverException:
-            message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
@@ -189,7 +171,7 @@ class PhantomJS():
             if not result:
                 return result, message, latest_version
 
-            find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], json_data.get('ref'))
+            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data.get('ref'))
             latest_version = find_string[0] if len(find_string) > 0 else ''
 
             if not latest_version:
@@ -506,7 +488,7 @@ class PhantomJS():
                 value_name = value.get('name')
                 if not 'beta' in value_name:
 
-                    find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], value_name)
+                    find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], value_name)
                     version = find_string[0] if len(find_string) > 0 else ''
 
                     all_versions.append(version)
@@ -644,7 +626,7 @@ class PhantomJS():
 
                 logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
-            if version or self.system_name:
+            if any([version, self.system_name ,latest_previous_version]):
 
                 result, message = self.__check_if_version_is_valid(url=url)
                 if not result:

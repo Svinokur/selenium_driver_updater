@@ -89,42 +89,6 @@ class GithubViewer():
             logging.error(message_run)
 
         return result_run, message_run, json_data
-    
-    @staticmethod
-    def get_all_releases_tags_by_repo_name(repo_name : str) -> Tuple[bool, str, Any]:
-        """Gets all releases tags by github repository name
-
-        Args:
-            repo_name (str): Repository name on github. Something like operasoftware/operachromiumdriver
-
-        Returns:
-            Tuple of bool, str and Any
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            json_data               : Latest release tag.
-        """
-
-        result_run : bool = False
-        message_run : str = '' 
-        url : str = setting["Github"]["linkAllReleasesTags"].format(repo_name)
-        json_data : Any = ''
-
-        try:
-
-            result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
-            if not result:
-                logging.error(message)
-                return result, message, json_data
-
-            result_run = True
-
-        except:
-
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
-
-        return result_run, message_run, json_data
 
     @staticmethod
     def get_all_releases_data_by_repo_name(repo_name : str) -> Tuple[bool, str, Any]:

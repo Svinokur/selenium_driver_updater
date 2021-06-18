@@ -1,3 +1,27 @@
+[3.12.0] 18/06/2021
+This version provides some improvements and minor fixes.
+This code was written and tested on Python 3.9.5
+
+# New
+
+- Added version validation for latest previous version of driver
+
+# Improvements
+
+- Improved overall code optimization
+- Improved getting current and latest versions of drivers (fixed incorrect regex)
+
+# Fixes
+
+- Fixed an issue with incorrect getting of current version of firefox browser
+- Fixed an issue with incorrect validation of specific version for operadriver
+- Fixed an issue with system_name if multiply specific OS's were given
+
+# Operations
+
+- Removed unused imports
+- Removed unnecessary function in github_viewer
+
 [3.11.1] 15/06/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5

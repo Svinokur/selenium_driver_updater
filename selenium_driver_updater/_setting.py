@@ -16,17 +16,17 @@ chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Wind
                                 "chromedriver"
 
 
-latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/{}/'
-geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_geckodriver + "geckodriver-{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
-                                latest_release_geckodriver + "geckodriver-{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                                latest_release_geckodriver + "geckodriver-{}-macos.tar.gz"
+latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
+geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_geckodriver + "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+                                latest_release_geckodriver + "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
+                                latest_release_geckodriver + "geckodriver-v{}-macos.tar.gz"
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
 
 
-latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/{}/'
+latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/v.{}/'
 operadriver_latest_release =    latest_release_operadriver + f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 latest_release_operadriver + "operadriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release_operadriver + "operadriver_mac64.zip"
@@ -117,15 +117,18 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
+from dataclasses import dataclass
+
+@dataclass
 class info:
-    version = "3.11.1"
+    version = "3.12.0"
 
 setting = dict(
     {
         "Program":
         {
             'version'                   : info.version,
-            'wedriverVersionPattern'    : '[0-9]+.[0-9]+.[0-9]+.[0-9]+',
+            'wedriverVersionPattern'    : r'([0-9.]*\.[0-9]+)',
         },
         "ChromeDriver":
         {   
@@ -140,7 +143,6 @@ setting = dict(
             "LinkLastRelease"           : 'https://api.github.com/repos/mozilla/geckodriver/releases/latest',
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : geckodriver_platform_last_release,
-            'geckodriverVersionPattern' : "[0-9]+.[0-9]+.[0-9]+",
         },
         "OperaDriver":
         {
@@ -180,8 +182,6 @@ setting = dict(
             "LinkAllLatestReleases"         : 'https://www.mozilla.org/en-US/firefox/releases/',
             'FirefoxBrowserUpdater'         : firefox_browser_updater,
             'FirefoxBrowserUpdaterPath'     : firefox_browser_updater_path,
-            'FirefoxBrowserVersionPattern'  : '[0-9][0-9]+.[0-9]+',
-            'FirefoxBrowserVersionPattern2' : '[0-9][0-9]+.[0-9]+.[0-9]+',
         },
         "EdgeBrowser":
         {

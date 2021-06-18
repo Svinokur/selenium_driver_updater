@@ -200,7 +200,7 @@ class testOperaDriver(unittest.TestCase):
 
     ##@unittest.skip('Temporary not needed')
     def test15_check_if_version_is_valid(self):
-        version = "v" + self.specific_version
+        version = self.specific_version
         url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(version)
         version_url = self.specific_version
         result, message = self.operadriver_failure._OperaDriver__check_if_version_is_valid(url=url,version_url=version_url)

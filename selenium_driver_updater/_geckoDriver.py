@@ -1,15 +1,10 @@
 import subprocess
-from selenium import webdriver
 import wget
 import os
 import traceback
 import logging
 import time
 import os
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.common.exceptions import WebDriverException
-
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from typing import Any, Tuple
 
@@ -60,12 +55,12 @@ class GeckoDriver():
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
         specific_system = str(kwargs.get('system_name'))
-        self.system_name =  "geckodriver-{}-win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
-                            "geckodriver-{}-win32.zip" if specific_system == 'windows32' else\
-                            "geckodriver-{}-linux64.tar.gz" if specific_system == 'linux' or specific_system == 'linux64' else\
-                            "geckodriver-{}-linux32.tar.gz" if specific_system == 'linux32' else\
-                            "geckodriver-{}-macos-aarch64.tar.gz" if specific_system == 'macos_m1' else\
-                            "geckodriver-{}-macos.tar.gz" if specific_system == 'macos' else\
+        self.system_name =  "geckodriver-v{}-win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
+                            "geckodriver-v{}-win32.zip" if specific_system == 'windows32' else\
+                            "geckodriver-v{}-linux64.tar.gz" if specific_system == 'linux' or specific_system == 'linux64' else\
+                            "geckodriver-v{}-linux32.tar.gz" if specific_system == 'linux32' else\
+                            "geckodriver-v{}-macos-aarch64.tar.gz" if specific_system == 'macos_m1' else\
+                            "geckodriver-v{}-macos.tar.gz" if specific_system == 'macos' else\
                            logging.error(f"You specified system_name: {specific_system} which unsupported by geckodriver - so used default instead.")\
                            if specific_system else ''
 
@@ -161,11 +156,8 @@ class GeckoDriver():
             driver_version (str)    : Current geckodriver version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current edgedriver could not start.
 
-            WebDriverException: Occurs when current edgedriver could not start or critical error occured
-
-            OSError: Occurs when chromedriver made for another CPU type
+            OSError: Occurs when geckodriver maded for another CPU type
 
             Except: If unexpected error raised. 
 
@@ -184,22 +176,12 @@ class GeckoDriver():
         
                 driver_version_terminal = process.communicate()[0].decode('UTF-8')
                 
-                find_string = re.findall(self.setting["GeckoDriver"]["geckodriverVersionPattern"], driver_version_terminal)
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
                 logging.info(f'Current version of geckodriver: {driver_version}')
 
             result_run = True
-
-        except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
-        
-        except WebDriverException:
-            message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
@@ -452,16 +434,11 @@ class GeckoDriver():
         try:
 
             repo_name = GeckoDriver._repo_name
-            result, message, json_data = self.github_viewer.get_all_releases_tags_by_repo_name(repo_name=repo_name)
+            result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
             if not result:
                 return result, message, latest_previous_version
 
-            for data in json_data:
-                if not 'v' in data.get("ref"):
-                    del json_data[json_data.index(data)]
-
-            find_string = json_data[len(json_data)-2].get('ref').split('/')
-            latest_previous_version = find_string[len(find_string)-1]
+            latest_previous_version = latest_previous_version = json_data[1].get('name')
 
             logging.info(f'Latest previous version of geckodriver: {latest_previous_version}')
 
@@ -504,6 +481,7 @@ class GeckoDriver():
                         if asset.get('name') == archive_name:
                             is_found = True
                             break
+                    break
 
             if not is_found:
                 message = f'Wrong version or system_name was specified. version_url: {version_url} url: {url}'
@@ -542,7 +520,6 @@ class GeckoDriver():
         file_name : str = ''
         url : str = ''
         latest_version : str = ''
-        latest_version_url : str = ''
         latest_previous_version : str = ''
 
         try:
@@ -556,8 +533,7 @@ class GeckoDriver():
 
             if version:
                 
-                latest_version_url = "v" + version 
-                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(version, version)
                 logging.info(f'Started download geckodriver specific_version: {version}')
 
             elif previous_version:
@@ -577,18 +553,17 @@ class GeckoDriver():
                     logging.error(message)
                     return result, message, file_name
 
-                latest_version_url = "v" + latest_version
-                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version_url, latest_version_url)
+                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
                 logging.info(f'Started download geckodriver latest_version: {latest_version}')
 
             if self.system_name:
                 url = url.replace(url.split("/")[len(url.split("/"))-1], '')
-                url = url + self.system_name.format(latest_version_url) if latest_version_url else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
+                url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
                 url + self.system_name.format(version)    
 
                 logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
-            if version or self.system_name:
+            if any([version, self.system_name ,latest_previous_version]):
                 version_url = version if version else latest_previous_version if latest_previous_version else latest_version
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:

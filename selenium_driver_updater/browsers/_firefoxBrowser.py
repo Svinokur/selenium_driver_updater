@@ -28,10 +28,12 @@ from bs4 import BeautifulSoup
 
 import re
 
+from typing import Any
+
 class FirefoxBrowser():
 
     def __init__(self, path : str, check_browser_is_up_to_date : bool):
-        self.setting = setting
+        self.setting : Any = setting
         self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
         self.geckodriver_path = path
@@ -371,12 +373,9 @@ class FirefoxBrowser():
             
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                find_string = re.findall(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern"], browser_version_terminal)
-                browser_version = find_string[0] if len(find_string) > 0 else ''
 
-                if not browser_version:
-                    find_string = re.findall(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern2"], browser_version_terminal)
-                    browser_version = find_string[0] if len(find_string) > 0 else ''
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
+                browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 

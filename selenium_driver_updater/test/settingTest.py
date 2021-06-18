@@ -24,19 +24,17 @@ chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Wind
                                 "chromedriver"
 
 
-
-latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/{}/'
-geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_geckodriver + "geckodriver-{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
-                                latest_release_geckodriver + "geckodriver-{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                                latest_release_geckodriver + "geckodriver-{}-macos.tar.gz"
+latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
+geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                latest_release_geckodriver + "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+                                latest_release_geckodriver + "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
+                                latest_release_geckodriver + "geckodriver-v{}-macos.tar.gz"
 
 geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
                                 "geckodriver"
 
 
-
-latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/{}/'
+latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/v.{}/'
 operadriver_latest_release =    latest_release_operadriver + f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 latest_release_operadriver + "operadriver_linux64.zip" if platform.system() == "Linux" else\
                                 latest_release_operadriver + "operadriver_mac64.zip"
@@ -70,8 +68,8 @@ phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' e
 
 
 #
-# UPDATERS
-#                 
+# BROWSERS AND THEIR UPDATERS
+#                                 
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
@@ -158,14 +156,14 @@ class testSetting(unittest.TestCase):
     def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 2)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
-        self.assertEqual(len(self.setting["GeckoDriver"]), 4)
+        self.assertEqual(len(self.setting["GeckoDriver"]), 3)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
-        self.assertEqual(len(self.setting["FirefoxBrowser"]), 6)
+        self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
         self.assertEqual(len(self.setting["OperaBrowser"]), 5)
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
@@ -178,7 +176,7 @@ class testSetting(unittest.TestCase):
     def test03_check_values_params(self):
 
         self.assertEqual(self.setting["Program"]["version"], info.version)
-        self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], '[0-9]+.[0-9]+.[0-9]+.[0-9]+')
+        self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], r'([0-9.]*\.[0-9]+)')
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -189,7 +187,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], geckodriver_platform_last_release)
-        self.assertEqual(self.setting["GeckoDriver"]["geckodriverVersionPattern"], "[0-9]+.[0-9]+.[0-9]+")
 
         self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
@@ -217,8 +214,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["FirefoxBrowser"]["LinkAllLatestReleases"], 'https://www.mozilla.org/en-US/firefox/releases/')
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"], firefox_browser_updater)
         self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"], firefox_browser_updater_path)
-        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern"], '[0-9][0-9]+.[0-9]+')
-        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserVersionPattern2"], '[0-9][0-9]+.[0-9]+.[0-9]+')
 
         self.assertEqual(self.setting["EdgeBrowser"]["Path"], edge_browser_path)
         self.assertEqual(self.setting["EdgeBrowser"]["LinkAllLatestRelease"], 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel')

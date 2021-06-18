@@ -1,14 +1,11 @@
 import shutil
 import subprocess
-from selenium import webdriver
 import wget
 import os
 import traceback
 import logging
 import time
 import os
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.common.exceptions import WebDriverException
 
 from typing import Any, Tuple
 
@@ -157,9 +154,6 @@ class EdgeDriver():
             driver_version (str)    : Current edgedriver version.
 
         Raises:
-            SessionNotCreatedException: Occurs when current edgedriver could not start.
-
-            WebDriverException: Occurs when current edgedriver could not start or critical error occured
 
             OSError: Occurs when chromedriver made for another CPU type
 
@@ -186,16 +180,6 @@ class EdgeDriver():
                 logging.info(f'Current version of edgedriver: {driver_version}')
 
             result_run = True
-
-        except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
-
-        except WebDriverException:
-            message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
@@ -243,6 +227,11 @@ class EdgeDriver():
             elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
             if len(elements) == 0:
                 elements = soup.findAll('div', attrs={'class' : 'bare driver-downloads'})
+
+            if len(elements) == 0:
+                message = f'len(elements): {len(elements)} is equal to zero, unable to determine latest version of edgedriver, maybe the class "bare driver-downloads" is changed'
+                logging.error(message)
+                return False, message, latest_version
                 
             stable_channel_text = 'stable ChannelCurrent'
 
@@ -610,7 +599,7 @@ class EdgeDriver():
 
                 logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
-            if version or self.system_name:
+            if any([version, self.system_name ,latest_previous_version]):
                 version_url = version if version else latest_previous_version if latest_previous_version else latest_version
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:

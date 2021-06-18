@@ -68,8 +68,8 @@ try:
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
-    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) Temporary could not test it in Github Workflow
-    #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) Temporary could not test it in Github Workflow
+    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) #Temporary could not test it in Github Workflow
+    #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) #Temporary could not test it in Github Workflow
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))

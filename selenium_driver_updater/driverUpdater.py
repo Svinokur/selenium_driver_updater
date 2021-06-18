@@ -440,16 +440,16 @@ class DriverUpdater():
         try:
 
             if not driver_name:
-                driver_name = info._driver_name
+                driver_name = info._driver_name if type(info._system_name) == str else ''
 
             if not filename:
-                filename = info._filename
+                filename = info._filename if type(info._system_name) == str else ''
 
             if not version:
-                version = info._version
+                version = info._version if type(info._system_name) == str else ''
 
             if not system_name:
-                system_name = info._system_name
+                system_name = info._system_name if type(info._system_name) == str else ''
 
             if DriverUpdater.chromedriver == driver_name:
 
