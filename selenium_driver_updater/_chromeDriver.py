@@ -9,7 +9,7 @@ import os
 
 import platform
 
-from typing import Any, Tuple
+from typing import Tuple
 
 import sys
 import os.path
@@ -42,7 +42,7 @@ class ChromeDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check chrome browser version before chromedriver update/upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting : Any = setting
+        self.setting = setting
 
         self.path : str = path
                     

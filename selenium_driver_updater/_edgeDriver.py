@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-from typing import Any, Tuple
+from typing import Tuple
 
 import sys
 import os.path
@@ -46,7 +46,7 @@ class EdgeDriver():
             check_browser_is_up_to_date (bool)  : If true, it will check edge browser version before edgedriver update/upgrade.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
         """
-        self.setting : Any = setting
+        self.setting = setting
 
         self.path : str = path
                     
