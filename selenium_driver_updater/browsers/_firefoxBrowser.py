@@ -28,12 +28,10 @@ from bs4 import BeautifulSoup
 
 import re
 
-from typing import Any
-
 class FirefoxBrowser():
 
     def __init__(self, path : str, check_browser_is_up_to_date : bool):
-        self.setting : Any = setting
+        self.setting = setting
         self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
         self.geckodriver_path = path

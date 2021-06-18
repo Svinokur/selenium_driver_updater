@@ -121,7 +121,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "3.12.1"
+    version = "3.12.2"
 
 setting = dict(
     {

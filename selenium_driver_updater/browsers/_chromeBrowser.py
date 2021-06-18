@@ -7,7 +7,7 @@ import os
 
 import platform
 
-from typing import Any, Tuple
+from typing import Tuple
 
 import sys
 import os.path
@@ -27,12 +27,10 @@ from bs4 import BeautifulSoup
 
 import re
 
-from typing import Any
-
 class ChromeBrowser():
 
     def __init__(self, path : str, check_browser_is_up_to_date : bool):
-        self.setting : Any = setting
+        self.setting = setting
         self.check_browser_is_up_to_date = check_browser_is_up_to_date
 
         self.chromedriver_path = path
