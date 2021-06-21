@@ -213,8 +213,6 @@ class EdgeDriver():
         result_run : bool = False
         message_run : str = ''
         latest_version : str = ''
-        stable_channel_element = None
-        latest_version_element = None
         url = str(self.setting['EdgeDriver']['LinkLastRelease'])
 
         try:
@@ -223,33 +221,8 @@ class EdgeDriver():
             if not result:
                 logging.error(message)
                 return result, message, latest_version
-
-            soup = BeautifulSoup(json_data, 'html.parser')
-
-            elements = soup.findAll('ul', attrs={'class' : 'bare driver-downloads'})
-            if len(elements) == 0:
-                elements = soup.findAll('div', attrs={'class' : 'bare driver-downloads'})
-
-            if len(elements) == 0:
-                message = f'len(elements): {len(elements)} is equal to zero, unable to determine latest version of edgedriver, maybe the class "bare driver-downloads" is changed'
-                logging.error(message)
-                return False, message, latest_version
-                
-            stable_channel_text = 'stable ChannelCurrent'
-
-            for element in elements:
-                if stable_channel_text in element.text:
-                    stable_channel_element = element
-                    break
-
-            if not stable_channel_element:
-                message = f'Could not determine latest version of Edge Driver. Maybe the text "{stable_channel_text}" is changed'
-                logging.error(message)
-                return result_run, message, latest_version
             
-            latest_version_element = stable_channel_element.findAll('p', attrs={'class' : 'driver-download__meta'})[0].text
-            
-            latest_version = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), str(latest_version_element))[0]
+            latest_version = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), json_data)[0]
 
             logging.info(f'Latest version of edgedriver: {latest_version}')
 

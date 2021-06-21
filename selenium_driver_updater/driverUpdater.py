@@ -440,24 +440,26 @@ class DriverUpdater():
         try:
 
             if not driver_name:
-                driver_name = info._driver_name if type(info._system_name) == str else ''
+                driver_name = info._driver_name if type(info._driver_name) == str else ''
 
             if not filename:
-                filename = info._filename if type(info._system_name) == str else ''
+                filename = info._filename if type(info._filename) == str else ''
 
             if not version:
-                version = info._version if type(info._system_name) == str else ''
+                version = info._version if type(info._version) == str else ''
 
             if not system_name:
                 system_name = info._system_name if type(info._system_name) == str else ''
 
+            parametres = dict(  upgrade=info._upgrade, chmod=info._chmod, 
+                                check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
+                                filename=filename, version=version,
+                                check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
+                                system_name=system_name )
+
             if DriverUpdater.chromedriver == driver_name:
 
-                chrome_driver = ChromeDriver(path=info._path, upgrade=info._upgrade, chmod=info._chmod, 
-                                            check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                            filename=filename, version=version,
-                                            check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
-                                            system_name=system_name)
+                chrome_driver = ChromeDriver(path=info._path, **parametres)
                 result, message, driver_path = chrome_driver.main()
                 if not result:
                     logging.error(message)
@@ -465,11 +467,7 @@ class DriverUpdater():
 
             elif DriverUpdater.geckodriver == driver_name:
 
-                gecko_driver = GeckoDriver(path=info._path, upgrade=info._upgrade, chmod=info._chmod, 
-                                        check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                        filename=filename, version=version,
-                                        check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
-                                        system_name=system_name)
+                gecko_driver = GeckoDriver(path=info._path, **parametres)
                 result, message, driver_path = gecko_driver.main()
                 if not result:
                     logging.error(message)
@@ -477,11 +475,7 @@ class DriverUpdater():
 
             elif DriverUpdater.operadriver == driver_name:
 
-                opera_driver = OperaDriver(path=info._path, upgrade=info._upgrade, chmod=info._chmod, 
-                                        check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                        filename=filename, version=version,
-                                        check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
-                                        system_name=system_name)
+                opera_driver = OperaDriver(path=info._path, **parametres)
                 result, message, driver_path = opera_driver.main()
                 if not result:
                     logging.error(message)
@@ -489,11 +483,7 @@ class DriverUpdater():
 
             elif DriverUpdater.edgedriver == driver_name:
 
-                edge_driver = EdgeDriver(path=info._path, upgrade=info._upgrade, chmod=info._chmod, 
-                                    check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                    filename=filename, version=version,
-                                    check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
-                                    system_name=system_name)
+                edge_driver = EdgeDriver(path=info._path, **parametres)
                 result, message, driver_path = edge_driver.main()
                 if not result:
                     logging.error(message)
@@ -501,8 +491,7 @@ class DriverUpdater():
 
             elif DriverUpdater.chromium_chromedriver == driver_name:
 
-                chromium_chromedriver = ChromiumChromeDriver(check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                                            check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages)
+                chromium_chromedriver = ChromiumChromeDriver(**parametres)
                 result, message, driver_path = chromium_chromedriver.main()
                 if not result:
                     logging.error(message)
@@ -510,10 +499,7 @@ class DriverUpdater():
 
             elif DriverUpdater.phantomjs == driver_name:
 
-                phantomjs = PhantomJS(path=info._path, upgrade=info._upgrade, chmod=info._chmod, 
-                                    check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
-                                    filename=filename, version=version, info_messages=info._info_messages,
-                                    system_name=system_name)
+                phantomjs = PhantomJS(path=info._path, **parametres)
                 result, message, driver_path = phantomjs.main()
                 if not result:
                     logging.error(message)

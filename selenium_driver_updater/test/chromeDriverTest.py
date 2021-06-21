@@ -229,8 +229,8 @@ class testChromeDriver(unittest.TestCase):
     ##@unittest.skip('Temporary not needed')
     def test17_check_if_version_is_valid(self):
         url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(self.specific_version)
-        version_url = self.specific_version
-        result, message = self.chrome_driver._ChromeDriver__check_if_version_is_valid(url=url,version_url=version_url)
+
+        result, message = self.chrome_driver._ChromeDriver__check_if_version_is_valid(url=url,version_url=self.specific_version)
         self.assertTrue(result, result)
         self.assertEqual(len(message), 0, len(message))
      

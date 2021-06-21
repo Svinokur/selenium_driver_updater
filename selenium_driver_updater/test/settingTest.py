@@ -76,7 +76,7 @@ chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chr
 r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
-chrome_browser_updater = fr'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
+chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
 "sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
@@ -101,14 +101,14 @@ firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" i
 edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
 'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
-edge_browser_updater = fr'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
+edge_browser_updater = r'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
 'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
 
-edge_browser_updater_path = fr"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else \
+edge_browser_updater_path = r"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else \
 '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
 
 
-opera_browser_path = r'REG QUERY "HKEY_USERS\S-1-5-21-3790059719-4236911619-2548269985-1000\Software\Microsoft\Windows\CurrentVersion\Uninstall"' if platform.system() == 'Windows' else \
+opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera' if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
 "opera" if platform.system() == 'Linux' else ''
 
@@ -193,7 +193,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)
         self.assertEqual(self.setting["OperaDriver"]["NamePlatformRelease"], operadriver_name_platform_release)
 
-        self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/')
+        self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
         self.assertEqual(self.setting["EdgeDriver"]["LinkAllReleases"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000")
