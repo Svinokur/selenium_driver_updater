@@ -92,7 +92,6 @@ try:
     if result.wasSuccessful():
 
         logging.debug('OK')
-        exit(0)
    
     else:
 
