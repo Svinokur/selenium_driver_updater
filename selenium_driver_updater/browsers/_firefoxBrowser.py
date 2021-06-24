@@ -1,5 +1,4 @@
 import subprocess
-import os
 import traceback
 import logging
 import time
@@ -29,6 +28,8 @@ from bs4 import BeautifulSoup
 import re
 
 from typing import Any
+
+from pathlib import Path
 
 class FirefoxBrowser():
 
@@ -85,7 +86,7 @@ class FirefoxBrowser():
                 logging.info(message)
                 return True, message
 
-            if not os.path.exists(firefoxbrowser_updater_path):
+            if not Path(firefoxbrowser_updater_path).exists():
                 message = f'firefoxbrowser_updater_path: {firefoxbrowser_updater_path} is not exists. Please report your OS information and path to {firefoxbrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
@@ -151,7 +152,7 @@ class FirefoxBrowser():
                 message = 'Trying to get current version of firefox browser via geckodriver'
                 logging.info(message)
             
-            if os.path.exists(self.geckodriver_path) and not result or not browser_version:
+            if Path(self.geckodriver_path).exists() and not result or not browser_version:
 
                 options = FirefoxOptions()
                 options.add_argument("--headless")

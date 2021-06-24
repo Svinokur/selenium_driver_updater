@@ -1,5 +1,4 @@
 import subprocess
-import os
 import traceback
 import logging
 import time
@@ -28,6 +27,8 @@ from bs4 import BeautifulSoup
 import re
 
 from typing import Any
+
+from pathlib import Path
 
 class EdgeBrowser():
 
@@ -84,7 +85,7 @@ class EdgeBrowser():
                 logging.info(message)
                 return True, message
 
-            if not os.path.exists(edgebrowser_updater_path):
+            if not Path(edgebrowser_updater_path).exists():
                 message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
@@ -150,7 +151,7 @@ class EdgeBrowser():
                 message = 'Trying to get current version of edge browser via edgedriver'
                 logging.info(message)
             
-            if os.path.exists(self.edgedriver_path) and not result or not browser_version:
+            if Path(self.edgedriver_path).exists() and not result or not browser_version:
 
                 desired_cap = {}
 

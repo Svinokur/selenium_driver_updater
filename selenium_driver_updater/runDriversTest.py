@@ -92,6 +92,7 @@ try:
     if result.wasSuccessful():
 
         logging.debug('OK')
+        exit(0)
    
     else:
 
@@ -108,6 +109,10 @@ try:
 
         logging.error(errors)
 
+        exit(1)
+
 except:
     message_run = f'Unexcepted error: {traceback.format_exc()}'
     logging.error(message_run)
+
+    exit(1)

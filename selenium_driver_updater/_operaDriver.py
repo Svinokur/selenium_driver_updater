@@ -28,7 +28,7 @@ from util.github_viewer import GithubViewer
 from util.requests_getter import RequestsGetter
 from browsers._operaBrowser import OperaBrowser
 
-import pathlib
+from pathlib import Path
 
 import re
 
@@ -178,7 +178,7 @@ class OperaDriver():
         
         try:
             
-            if os.path.exists(self.operadriver_path):
+            if Path(self.operadriver_path).exists():
             
                 process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
         
@@ -271,10 +271,9 @@ class OperaDriver():
 
         try:
 
-            if os.path.exists(self.operadriver_path):
+            if Path(self.operadriver_path).exists():
                 logging.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
-                file_to_rem = pathlib.Path(self.operadriver_path)
-                file_to_rem.unlink()
+                Path(self.operadriver_path).unlink()
             
 
             result_run = True
@@ -419,14 +418,14 @@ class OperaDriver():
 
             new_path = archive_folder_path + os.path.sep + self.filename
 
-            if os.path.exists(new_path):
-                os.remove(new_path)
+            if Path(new_path).exists():
+                Path(new_path).unlink()
 
             os.rename(archive_operadriver_path, new_path)
             
             renamed_driver_path = self.path + self.filename
-            if os.path.exists(renamed_driver_path):
-                os.remove(renamed_driver_path)
+            if Path(renamed_driver_path).exists():
+                Path(renamed_driver_path).unlink()
 
             copyfile(new_path, renamed_driver_path)
 
@@ -456,7 +455,7 @@ class OperaDriver():
         
         try:
 
-            if os.path.exists(self.operadriver_path):
+            if Path(self.operadriver_path).exists():
 
                 logging.info('Trying to give operadriver needed permissions')
 
@@ -569,7 +568,7 @@ class OperaDriver():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            file_name (str)         : Path to unzipped driver.
+            driver_path (str)       : Path to unzipped driver.
             
         Raises:
             Except: If unexpected error raised. 
@@ -578,10 +577,11 @@ class OperaDriver():
 
         result_run : bool = False
         message_run : str = ''
-        file_name : str = ''
         url : str = ''
         latest_version : str = ''
         latest_previous_version : str = ''
+
+        driver_path : str = ''
 
         try:
 
@@ -590,7 +590,7 @@ class OperaDriver():
                 result, message = self.__delete_current_operadriver_for_current_os()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             if version:
 
@@ -603,7 +603,7 @@ class OperaDriver():
                 result, message, latest_previous_version = self.__get_latest_previous_version_operadriver_via_requests()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
 
@@ -614,7 +614,7 @@ class OperaDriver():
                 result, message, latest_version = self.__get_latest_version_operadriver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
 
@@ -631,31 +631,30 @@ class OperaDriver():
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
 
-            if os.path.exists(out_path):
-                os.remove(out_path)
+            if Path(out_path).exists():
+                Path(out_path).unlink()
 
             logging.info(f'Started download operadriver by url: {url}')
 
             if self.info_messages:
-                file_name = wget.download(url=url, out=out_path)
+                archive_path = wget.download(url=url, out=out_path)
             else:
-                file_name = wget.download(url=url, out=out_path, bar=None)
+                archive_path = wget.download(url=url, out=out_path, bar=None)
 
-            logging.info(f'Operadriver was downloaded to path: {file_name}')
+            logging.info(f'Operadriver was downloaded to path: {archive_path}')
 
             time.sleep(2)
 
-            archive_path = file_name
             out_path = self.path
-            result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+            result, message = self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
             if not result:
                 logging.error(message)
-                return result, message, file_name
+                return result, message, driver_path
 
             platform : str = self.setting['OperaDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
             archive_folder_name = self.setting["OperaDriver"]["NamePlatformRelease"] if not self.system_name else self.system_name.replace(".zip", '')
@@ -672,23 +671,23 @@ class OperaDriver():
                 result, message = self.__rename_driver(archive_folder_path=archive_folder_path,
                                                         archive_operadriver_path=archive_operadriver_path)
                 if not result:
-                    return result, message, file_name
+                    return result, message, driver_path
 
-            if os.path.exists(file_name):
-                os.remove(file_name)
+            if Path(archive_path).exists():
+                Path(archive_path).unlink()
 
-            if os.path.exists(archive_folder_path):
+            if Path(archive_folder_path).exists():
                 shutil.rmtree(archive_folder_path)
             
-            file_name = self.operadriver_path
+            driver_path = self.operadriver_path
 
-            logging.info(f'Operadriver was successfully unpacked by path: {file_name}')
+            logging.info(f'Operadriver was successfully unpacked by path: {driver_path}')
 
             if self.chmod:
 
                 result, message = self.__chmod_driver()
                 if not result:
-                    return result, message, file_name
+                    return result, message, driver_path
 
             result_run = True
 
@@ -696,4 +695,4 @@ class OperaDriver():
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
-        return result_run, message_run, file_name
+        return result_run, message_run, driver_path

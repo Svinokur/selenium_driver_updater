@@ -1,5 +1,4 @@
 import subprocess
-import os
 import traceback
 import logging
 import os

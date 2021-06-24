@@ -15,6 +15,10 @@ from _setting import setting
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
+from typing import Any
+
 class testGithubViewer(unittest.TestCase): 
     """Class for unit-testing GithubViewer class
 
@@ -28,7 +32,7 @@ class testGithubViewer(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.setting = setting
+        cls.setting : Any = setting
         cls.github_viewer = GithubViewer
 
     def setUp(self):
@@ -70,8 +74,7 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNotNone(json_data,json_data)
         self.assertGreater(len(json_data), 0, len(json_data))
 
-        with open(self.setting["JsonSchema"]["githubAssetSchema"], 'r', encoding='utf-8') as schema_file:
-            schema_asset = json.loads(schema_file.read())
+        schema_asset = json.loads(Path(self.setting["JsonSchema"]["githubAssetSchema"]).read_text(encoding='utf-8'))
 
         for asset in json_data.get('assets'):
             self.assertIsNone(jsonschema.validate(instance=asset, schema=schema_asset))
@@ -80,8 +83,7 @@ class testGithubViewer(unittest.TestCase):
 
         self.assertIsNone(json_data.get('assets'), json_data)
 
-        with open(self.setting["JsonSchema"]["githubReleaseSchema"], 'r', encoding='utf-8') as schema_file:
-            schema_release = json.loads(schema_file.read())
+        schema_release = json.loads(Path(self.setting["JsonSchema"]["githubReleaseSchema"]).read_text(encoding='utf-8'))
         
         self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema_release))
 
@@ -92,8 +94,7 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNotNone(json_data,json_data)
         self.assertGreater(len(json_data), 0, len(json_data))
 
-        with open(self.setting["JsonSchema"]["githubReleaseTagSchema"], 'r', encoding='utf-8') as schema_file:
-            schema = json.loads(schema_file.read())
+        schema = json.loads(Path(self.setting["JsonSchema"]["githubReleaseTagSchema"]).read_text(encoding='utf-8'))
         
         self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema))
 
@@ -104,8 +105,7 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNotNone(releases,releases)
         self.assertGreater(len(releases), 0, len(releases))
 
-        with open(self.setting["JsonSchema"]["githubReleaseSchema"], 'r', encoding='utf-8') as schema_file:
-            schema = json.loads(schema_file.read())
+        schema = json.loads(Path(self.setting["JsonSchema"]["githubReleaseSchema"]).read_text(encoding='utf-8'))
         
         for release in releases:
             self.assertIsNone(jsonschema.validate(instance=release, schema=schema))

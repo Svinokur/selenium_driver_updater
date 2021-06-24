@@ -16,6 +16,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testPhantomJS(unittest.TestCase): 
     """Class for unit-testing PhantomJS class
 
@@ -57,6 +59,8 @@ class testPhantomJS(unittest.TestCase):
 
         self.phantomjs_name : str = "phantomjs_test.exe" if platform.system() == 'Windows' else\
                                         "phantomjs_test"
+
+        self.phantomjs_path = self.path + self.phantomjs_name
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -116,13 +120,13 @@ class testPhantomJS(unittest.TestCase):
     def test07_check_download_driver_specific_version(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+        self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
         result, message, file_name = self.phantomjs._PhantomJS__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+        self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
         result, message = self.phantomjs._PhantomJS__chmod_driver()
         self.assertTrue(result, message)
@@ -137,13 +141,13 @@ class testPhantomJS(unittest.TestCase):
     def test08_check_download_driver_latest_previous_version(self):
         result, message = self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+        self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
         result, message, file_name = self.phantomjs._PhantomJS__download_driver(previous_version=True)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+        self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
         result, message = self.phantomjs._PhantomJS__chmod_driver()
         self.assertTrue(result, message)
@@ -165,7 +169,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.phantomjs_name), self.path + self.phantomjs_name)
+        self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
         result, message = self.phantomjs._PhantomJS__chmod_driver()
         self.assertTrue(result, message)

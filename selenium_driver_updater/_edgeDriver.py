@@ -17,19 +17,17 @@ from _setting import setting
 
 import platform
 
-from bs4 import BeautifulSoup
-
 import stat
 
 from util.extractor import Extractor
 from util.requests_getter import RequestsGetter
 from browsers._edgeBrowser import EdgeBrowser
 
-import pathlib
-
 import re
 
 from typing import Any
+
+from pathlib import Path
 
 class EdgeDriver():
 
@@ -170,7 +168,7 @@ class EdgeDriver():
         
         try:
 
-            if os.path.exists(self.edgedriver_path):
+            if Path(self.edgedriver_path).exists():
         
                 process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
         
@@ -254,10 +252,10 @@ class EdgeDriver():
 
         try:
 
-            if os.path.exists(self.edgedriver_path):
+            if Path(self.edgedriver_path).exists():
+
                 logging.info(f'Deleted existing edgedriver edgedriver_path: {self.edgedriver_path}')
-                file_to_rem = pathlib.Path(self.edgedriver_path)
-                file_to_rem.unlink()
+                Path(self.edgedriver_path).unlink()
             
 
             result_run = True
@@ -395,7 +393,7 @@ class EdgeDriver():
         
         try:
 
-            if os.path.exists(self.edgedriver_path):
+            if Path(self.edgedriver_path).exists():
 
                 logging.info('Trying to give edgedriver needed permissions')
 
@@ -527,12 +525,12 @@ class EdgeDriver():
 
         result_run : bool = False
         message_run : str = ''
-        file_name : str = ''
         url : str = ''
-        file_name : str = ''
         driver_notes_path : str = self.path + 'Driver_Notes'
         latest_previous_version : str = ''
         latest_version : str = ''
+
+        driver_path : str = ''
 
         try:
 
@@ -541,7 +539,7 @@ class EdgeDriver():
                 result, message = self.__delete_current_edgedriver_for_current_os()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             if version:
 
@@ -553,7 +551,7 @@ class EdgeDriver():
                 result, message, latest_previous_version = self.__get_latest_previous_version_edgedriver_via_requests()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
                 logging.info(f'Started download edgedriver latest_previous_version: {latest_previous_version}')
                 url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_previous_version)
@@ -563,7 +561,7 @@ class EdgeDriver():
                 result, message, latest_version = self.__get_latest_version_edgedriver()
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
                 
                 logging.info(f'Started download edgedriver latest_version: {latest_version}')
                 url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_version)
@@ -579,38 +577,36 @@ class EdgeDriver():
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             archive_name = url.split("/")[len(url.split("/"))-1]
             out_path = self.path + archive_name
 
             logging.info(f'Started download edgedriver by url: {url}')
 
-            if os.path.exists(out_path):
-                os.remove(out_path)
+            if Path(out_path).exists():
+                Path(out_path).unlink()
 
             if self.info_messages:
-                file_name = wget.download(url=url, out=out_path)
+                archive_path = wget.download(url=url, out=out_path)
             else:
-                file_name = wget.download(url=url, out=out_path, bar=None)
+                archive_path = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
-            logging.info(f'Edgedriver was downloaded to path: {file_name}')
+            logging.info(f'Edgedriver was downloaded to path: {archive_path}')
+
+            out_path = self.path
 
             if not self.filename:
-                
-                archive_path = file_name
-                out_path = self.path
 
-                result, message = self.extractor.extract_all_zip_archive(archive_path=archive_path, out_path=out_path)
+                result, message = self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
             else:
 
-                archive_path = file_name
-                out_path = self.path
+
                 filename = str(self.setting['EdgeDriver']['LastReleasePlatform']) if not self.specific_driver_name else self.specific_driver_name
                 filename_replace = self.filename
 
@@ -618,23 +614,23 @@ class EdgeDriver():
                 out_path=out_path, filename=filename, filename_replace=filename_replace)
                 if not result:
                     logging.error(message)
-                    return result, message, file_name
+                    return result, message, driver_path
 
-            if os.path.exists(file_name):
-                os.remove(file_name)
+            if Path(archive_path).exists():
+                Path(archive_path).unlink()
 
-            if os.path.exists(driver_notes_path):
+            if Path(driver_notes_path).exists():
                 shutil.rmtree(driver_notes_path)
 
-            file_name = self.edgedriver_path
+            driver_path = self.edgedriver_path
 
-            logging.info(f'Edgedriver was successfully unpacked by path: {file_name}')
+            logging.info(f'Edgedriver was successfully unpacked by path: {driver_path}')
 
             if self.chmod:
 
                 result, message = self.__chmod_driver()
                 if not result:
-                    return result, message, file_name
+                    return result, message, driver_path
 
             result_run = True
 
@@ -642,4 +638,4 @@ class EdgeDriver():
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
-        return result_run, message_run, file_name
+        return result_run, message_run, driver_path

@@ -16,6 +16,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testOperaDriver(unittest.TestCase): 
     """Class for unit-testing OperaDriver class
 
@@ -58,6 +60,8 @@ class testOperaDriver(unittest.TestCase):
 
         self.operadriver_name : str = "operadriver_test.exe" if platform.system() == 'Windows' else\
                                         "operadriver_test"
+
+        self.operadriver_path = self.operadriver_path
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -113,13 +117,13 @@ class testOperaDriver(unittest.TestCase):
     def test07_check_download_driver_specific_version(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
         result, message, file_name = self.operadriver._OperaDriver__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertTrue(Path(self.operadriver_path).exists(), self.operadriver_path)
 
         result, message = self.operadriver._OperaDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -134,13 +138,13 @@ class testOperaDriver(unittest.TestCase):
     def test08_check_download_driver_latest_previous_version(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
         result, message, file_name = self.operadriver._OperaDriver__download_driver(previous_version=True)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertTrue(Path(self.operadriver_path).exists(), self.operadriver_path)
 
         result, message = self.operadriver._OperaDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -161,7 +165,7 @@ class testOperaDriver(unittest.TestCase):
     def test10_check_delete_current_operadriver_for_current_os(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
     #@unittest.skip('Temporary not needed')
     def test11_check_download_driver(self):
@@ -169,7 +173,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.operadriver_name), self.path + self.operadriver_name)
+        self.assertTrue(Path(self.operadriver_path).exists(), self.operadriver_path)
 
         result, message = self.operadriver._OperaDriver__chmod_driver()
         self.assertTrue(result, message)

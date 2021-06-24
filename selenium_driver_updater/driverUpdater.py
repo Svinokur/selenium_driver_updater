@@ -21,6 +21,8 @@ from util.requests_getter import RequestsGetter
 
 from dataclasses import dataclass
 
+from pathlib import Path
+
 @dataclass
 class info():
     
@@ -194,12 +196,12 @@ class DriverUpdater():
                 logging.error(message)
                 return result_run, message
 
-            if not os.path.exists(info._path):
+            if not Path(info._path).exists():
                 message = f"The specified path does not exist current path is: {info._path}"
                 logging.error(message)
                 return result_run, message
 
-            if not os.path.isdir(info._path):
+            if not Path(info._path).is_dir():
                 message = f"The specified path is not a folder current path is: {info._path}"
                 logging.error(message)
                 return result_run, message

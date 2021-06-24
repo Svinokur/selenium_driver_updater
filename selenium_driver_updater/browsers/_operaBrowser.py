@@ -1,5 +1,4 @@
 import subprocess
-import os
 import traceback
 import logging
 import time
@@ -28,6 +27,8 @@ from bs4 import BeautifulSoup
 import re
 
 from typing import Any
+
+from pathlib import Path
 
 class OperaBrowser():
 
@@ -84,7 +85,7 @@ class OperaBrowser():
                 logging.info(message)
                 return True, message
 
-            if not os.path.exists(operabrowser_updater_path):
+            if not Path(operabrowser_updater_path).exists():
                 message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
@@ -150,10 +151,14 @@ class OperaBrowser():
                 message = 'Trying to get current version of opera browser via operadriver'
                 logging.info(message)
             
-            if os.path.exists(self.operadriver_path) and not result or not browser_version:
+            if Path(self.operadriver_path).exists() and not result or not browser_version:
 
                 driver = webdriver.Opera(executable_path = self.operadriver_path)
-                browser_version = driver.execute_script("return navigator.userAgent").split('/')[5]
+                browser_version = driver.execute_script("return navigator.userAgent")
+
+                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version)
+                browser_version = find_string[0] if len(find_string) > 0 else ''
+
                 driver.close()
                 driver.quit()
 

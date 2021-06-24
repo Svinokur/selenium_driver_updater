@@ -16,6 +16,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testChromeDriver(unittest.TestCase): 
     """Class for unit-testing ChromeDriver class
 
@@ -59,6 +61,8 @@ class testChromeDriver(unittest.TestCase):
 
         self.chromedriver_name : str = "chromedriver_test.exe" if platform.system() == 'Windows' else\
                                         "chromedriver_test"
+
+        self.chromedriver_path = self.path + self.chromedriver_name
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -136,13 +140,13 @@ class testChromeDriver(unittest.TestCase):
     def test09_check_download_driver_specific_version(self):
         result, message = self.chrome_driver._ChromeDriver__delete_current_chromedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertFalse(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
         result, message, file_name = self.chrome_driver._ChromeDriver__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertTrue(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
         result, message = self.chrome_driver._ChromeDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -157,13 +161,13 @@ class testChromeDriver(unittest.TestCase):
     def test10_check_download_driver_latest_previous_version(self):
         result, message = self.chrome_driver._ChromeDriver__delete_current_chromedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertFalse(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
         result, message, file_name = self.chrome_driver._ChromeDriver__download_driver(previous_version=True)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertTrue(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
         result, message = self.chrome_driver._ChromeDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -184,7 +188,7 @@ class testChromeDriver(unittest.TestCase):
     def test12_check_delete_current_chromedriver_for_current_os(self):
         result, message = self.chrome_driver._ChromeDriver__delete_current_chromedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertFalse(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
     #@unittest.skip('Temporary not needed')
     def test13_check_download_driver(self):
@@ -197,7 +201,7 @@ class testChromeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.chromedriver_name), self.path + self.chromedriver_name)
+        self.assertTrue(Path(self.chromedriver_path).exists(), self.chromedriver_path)
 
         result, message = self.chrome_driver._ChromeDriver__chmod_driver()
         self.assertTrue(result, message)

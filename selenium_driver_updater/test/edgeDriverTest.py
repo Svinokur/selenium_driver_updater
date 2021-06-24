@@ -16,6 +16,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testEdgeDriver(unittest.TestCase): 
     """Class for unit-testing EdgeDriver class
 
@@ -59,6 +61,8 @@ class testEdgeDriver(unittest.TestCase):
 
         self.edgedriver_name : str = "edgedriver_test.exe" if platform.system() == 'Windows' else\
                                         "edgedriver_test"
+
+        self.edgedriver_path = self.path + self.edgedriver_name
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -121,13 +125,13 @@ class testEdgeDriver(unittest.TestCase):
     def test08_check_download_driver_specific_version(self):
         result, message = self.edgedriver._EdgeDriver__delete_current_edgedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertFalse(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
         result, message, file_name = self.edgedriver._EdgeDriver__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertTrue(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
         result, message = self.edgedriver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -142,13 +146,13 @@ class testEdgeDriver(unittest.TestCase):
     def test09_check_download_driver_latest_previous_version(self):
         result, message = self.edgedriver._EdgeDriver__delete_current_edgedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertFalse(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
         result, message, file_name = self.edgedriver._EdgeDriver__download_driver(previous_version=True)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertTrue(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
         result, message = self.edgedriver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -169,7 +173,7 @@ class testEdgeDriver(unittest.TestCase):
     def test11_check_delete_current_edgedriver_for_current_os(self):
         result, message = self.edgedriver._EdgeDriver__delete_current_edgedriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertFalse(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
     #@unittest.skip('Temporary not needed')
     def test12_check_download_driver(self):
@@ -182,7 +186,7 @@ class testEdgeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.edgedriver_name), self.path + self.edgedriver_name)
+        self.assertTrue(Path(self.edgedriver_path).exists(), self.edgedriver_path)
 
         result, message = self.edgedriver._EdgeDriver__chmod_driver()
         self.assertTrue(result, message)

@@ -16,6 +16,8 @@ import time
 import platform
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testGeckoDriver(unittest.TestCase): 
     """Class for unit-testing GeckoDriver class
 
@@ -59,6 +61,8 @@ class testGeckoDriver(unittest.TestCase):
 
         self.geckodriver_name : str = "geckodriver_test.exe" if platform.system() == 'Windows' else\
                                         "geckodriver_test"
+
+        self.geckodriver_path = self.path + self.geckodriver_name
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -114,13 +118,13 @@ class testGeckoDriver(unittest.TestCase):
     def test07_check_download_driver_specific_version(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
         result, message, file_name = self.gecko_driver._GeckoDriver__download_driver(version=self.specific_version)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertTrue(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
         result, message = self.gecko_driver._GeckoDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -135,13 +139,13 @@ class testGeckoDriver(unittest.TestCase):
     def test08_check_download_driver_latest_previous_version(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
         result, message, file_name = self.gecko_driver._GeckoDriver__download_driver(previous_version=True)
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertTrue(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
         result, message = self.gecko_driver._GeckoDriver__chmod_driver()
         self.assertTrue(result, message)
@@ -162,7 +166,7 @@ class testGeckoDriver(unittest.TestCase):
     def test10_check_delete_current_geckodriver_for_current_os(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertTrue(result, message)
-        self.assertFalse(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
     #@unittest.skip('Temporary not needed')
     def test11_check_download_driver(self):
@@ -170,7 +174,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
-        self.assertTrue(os.path.exists(self.path + self.geckodriver_name), self.path + self.geckodriver_name)
+        self.assertTrue(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
         result, message = self.gecko_driver._GeckoDriver__chmod_driver()
         self.assertTrue(result, message)

@@ -1,5 +1,4 @@
 import subprocess
-import os
 import traceback
 import logging
 import time
@@ -28,6 +27,8 @@ from bs4 import BeautifulSoup
 import re
 
 from typing import Any
+
+from pathlib import Path
 
 class ChromeBrowser():
 
@@ -84,7 +85,7 @@ class ChromeBrowser():
                 logging.info(message)
                 return True, message
 
-            if not os.path.exists(chromebrowser_updater_path) and platform.system() != 'Linux':
+            if not Path(chromebrowser_updater_path).exists() and platform.system() != 'Linux':
                 message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
                 logging.info(message)
                 return True, message
@@ -195,7 +196,7 @@ class ChromeBrowser():
                 message = 'Trying to get current version of chrome browser via chromedriver'
                 logging.info(message)
             
-            if os.path.exists(self.chromedriver_path) and not result or not browser_version:
+            if Path(self.chromedriver_path).exists() and not result or not browser_version:
 
                 chrome_options = webdriver.ChromeOptions()
         

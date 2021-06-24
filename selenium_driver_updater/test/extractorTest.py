@@ -16,6 +16,8 @@ import shutil
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from pathlib import Path
+
 class testExtractor(unittest.TestCase): 
     """Class for unit-testing Extractor class
 
@@ -74,9 +76,9 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(result, message)
 
         geckodriver_path = self.out_path + 'geckodriver.exe'
-        self.assertTrue(os.path.exists(geckodriver_path))
-        os.remove(geckodriver_path)
-        self.assertFalse(os.path.exists(geckodriver_path))
+        self.assertTrue(Path(geckodriver_path).exists())
+        Path(geckodriver_path).unlink()
+        self.assertFalse(Path(geckodriver_path).exists())
     
     #@unittest.skip('Temporary not needed')
     def test06_check_extract_all_tar_gz_archive(self):
@@ -84,9 +86,9 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(result, message)
 
         geckodriver_path = self.out_path + 'geckodriver'
-        self.assertTrue(os.path.exists(geckodriver_path))
-        os.remove(geckodriver_path)
-        self.assertFalse(os.path.exists(geckodriver_path))
+        self.assertTrue(Path(geckodriver_path).exists())
+        Path(geckodriver_path).unlink()
+        self.assertFalse(Path(geckodriver_path).exists())
     
     #@unittest.skip('Temporary not needed')
     def test07_check_extract_all_zip_archive_with_specific_name(self):
@@ -95,9 +97,9 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(result, message)
 
         geckodriver_path = self.out_path + 'geckodriverzip'
-        self.assertTrue(os.path.exists(geckodriver_path))
-        os.remove(geckodriver_path)
-        self.assertFalse(os.path.exists(geckodriver_path))
+        self.assertTrue(Path(geckodriver_path).exists())
+        Path(geckodriver_path).unlink()
+        self.assertFalse(Path(geckodriver_path).exists())
     
     #@unittest.skip('Temporary not needed')
     def test08_check_extract_all_tar_archive_with_specific_name(self):
@@ -106,9 +108,9 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(result, message)
 
         geckodriver_path = self.out_path + 'geckodrivertar'
-        self.assertTrue(os.path.exists(geckodriver_path))
-        os.remove(geckodriver_path)
-        self.assertFalse(os.path.exists(geckodriver_path))
+        self.assertTrue(Path(geckodriver_path).exists())
+        Path(geckodriver_path).unlink()
+        self.assertFalse(Path(geckodriver_path).exists())
 
     #@unittest.skip('Temporary not needed')
     def test09_check_extract_all_tar_bz2_archive(self):
@@ -116,9 +118,9 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(result, message)
 
         phantom_path = self.out_path + 'phantomjs-2.1.1-linux-x86_64'
-        self.assertTrue(os.path.exists(phantom_path))
+        self.assertTrue(Path(phantom_path).exists())
         shutil.rmtree(phantom_path)
-        self.assertFalse(os.path.exists(phantom_path))
+        self.assertFalse(Path(phantom_path).exists())
     
     
 if __name__ == '__main__':
