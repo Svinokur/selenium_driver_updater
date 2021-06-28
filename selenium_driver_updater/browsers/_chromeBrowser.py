@@ -325,13 +325,24 @@ class ChromeBrowser():
 
             for news in elements_news:
                 if stable_channel_header_text in news.text:
-                    latest_stable_version_element = news.text.replace('\n', '').replace('\xa0', '')
+                    
+                    current_os = platform.system().replace('Darwin', 'Mac')
+                    if not current_os.lower() in news.text.lower():
+                        continue
+
+                    latest_stable_version_element = news.text
                     break
 
             if not latest_stable_version_element:
                 message = f'Could not determine latest stable channel post of Chrome Browser. Maybe the text "{stable_channel_header_text}" is changed'
                 logging.error(message)
-                return result_run, message, latest_version
+
+                message = 'Trying to determine latest stable channel post of Chrome Browser without OS detection'
+                logging.info(message)
+
+                latest_stable_version_element = [news.text for news in elements_news if stable_channel_header_text in news.text][0]
+                if not latest_stable_version_element:
+                    return result_run, message, latest_version
 
             latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_stable_version_element)[0]
 
