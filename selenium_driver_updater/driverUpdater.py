@@ -191,11 +191,6 @@ class DriverUpdater():
 
         try:
 
-            if not info._path:
-                message = f"Please specify path to folder current path is: {info._path}"
-                logging.error(message)
-                return result_run, message
-
             if not Path(info._path).exists():
                 message = f"The specified path does not exist current path is: {info._path}"
                 logging.error(message)
@@ -206,67 +201,60 @@ class DriverUpdater():
                 logging.error(message)
                 return result_run, message
 
-            if type(info._driver_name) == str:
-
-                result, message = DriverUpdater.__check_driver_name_is_valid(driver_name=info._driver_name)
-                if not result:
-                    logging.error(message)
-                    return result, message
+            if type(info._driver_name) in [list, str]:
 
                 if info._filename:
 
-                    if type(info._filename) != str:
-                        message = f'Unknown type of filename was specificed type(filename): {type(info._filename)}, but must be str, if one driver is given'
-                        logging.error(message)
-                        return result_run, message
-
-                if info._system_name:
-
-                    if type(info._system_name) != str:
-                        message = f'Unknown type of system_name was specificed type(system_name): {type(info._system_name)}, but must be str, if one driver is given'
-                        logging.error(message)
-                        return result_run, message
-
-                    result, message = DriverUpdater.__check_system_name_is_valid(system_name=info._system_name)
+                    result, message = DriverUpdater.__check_parameter_type_is_valid(info._filename, type(info._driver_name), 'filename')
                     if not result:
                         logging.error(message)
                         return result, message
 
-            elif type(info._driver_name) == list:
+                if info._system_name:
 
-                for driver in info._driver_name:
-
-                    result, message = DriverUpdater.__check_driver_name_is_valid(driver_name=driver)
+                    result, message = DriverUpdater.__check_parameter_type_is_valid(info._system_name, type(info._driver_name), 'system_name')
                     if not result:
-                        message = message + f' at index: {info._driver_name.index(driver)}'
                         logging.error(message)
                         return result, message
 
-                if info._filename:
 
-                    if type(info._filename) != list:
-                        message = f'Unknown type of filename was specificed type(filename): {type(info._filename)}, but must be list[str], if multiply drivers were given'
+                if type(info._driver_name) == str:
+
+                    result, message = DriverUpdater.__check_driver_name_is_valid(driver_name=info._driver_name)
+                    if not result:
                         logging.error(message)
-                        return result_run, message
+                        return result, message
 
-                if info._system_name:
+                    if info._system_name:
 
-                    if type(info._system_name) != list:
-                        message = f'Unknown type of system_name was specificed type(system_name): {type(info._system_name)}, but must be list[str], if multiply drivers were given'
-                        logging.error(message)
-                        return result_run, message
-
-                    for os_system in info._system_name:
-
-                        result, message = DriverUpdater.__check_system_name_is_valid(system_name=os_system)
+                        result, message = DriverUpdater.__check_system_name_is_valid(system_name=info._system_name)
                         if not result:
-                            message = message + f' at index: {info._system_name.index(os_system)}'
                             logging.error(message)
                             return result, message
 
+                elif type(info._driver_name) == list:
+
+                    for driver in info._driver_name:
+
+                        result, message = DriverUpdater.__check_driver_name_is_valid(driver_name=driver)
+                        if not result:
+                            message = message + f' at index: {info._driver_name.index(driver)}'
+                            logging.error(message)
+                            return result, message
+
+                    if info._system_name:
+
+                        for os_system in info._system_name:
+
+                            result, message = DriverUpdater.__check_system_name_is_valid(system_name=os_system)
+                            if not result:
+                                message = message + f' at index: {info._system_name.index(os_system)}'
+                                logging.error(message)
+                                return result, message
+
             else:
 
-                message = f'Unknown type of driver name was specified, this library only supports str or list[str], current type is: {type(info._driver_name)}'
+                message = f'The type of "driver_name" must be a list or str current type is: {type(info._driver_name)}'
                 logging.error(message)
                 return result_run, message
 
@@ -534,12 +522,7 @@ class DriverUpdater():
 
         try:
 
-            driver_name_check =     DriverUpdater.chromedriver if DriverUpdater.chromedriver == driver_name else \
-                                    DriverUpdater.geckodriver  if DriverUpdater.geckodriver == driver_name else \
-                                    DriverUpdater.operadriver if DriverUpdater.operadriver == driver_name else \
-                                    DriverUpdater.edgedriver if DriverUpdater.edgedriver == driver_name else \
-                                    DriverUpdater.chromium_chromedriver if DriverUpdater.chromium_chromedriver == driver_name else \
-                                    DriverUpdater.phantomjs if DriverUpdater.phantomjs == driver_name else ''
+            driver_name_check = driver_name in list(vars(DriverUpdater))
 
             if not driver_name_check:
                 message = f'Unknown driver name was specified current driver_name is: {driver_name}'
@@ -573,17 +556,30 @@ class DriverUpdater():
 
         try:
 
-            system_name_check =  DriverUpdater.windows if DriverUpdater.windows == system_name else\
-                                DriverUpdater.windows64 if DriverUpdater.windows64 == system_name else\
-                                DriverUpdater.windows32 if DriverUpdater.windows32 == system_name else\
-                                DriverUpdater.linux if DriverUpdater.linux == system_name else\
-                                DriverUpdater.linux64 if DriverUpdater.linux64 == system_name else\
-                                DriverUpdater.linux32 if DriverUpdater.linux32 == system_name else\
-                                DriverUpdater.macos if DriverUpdater.macos == system_name else\
-                                DriverUpdater.macos_m1 if DriverUpdater.macos_m1 == system_name else ''
+            system_name_check =  system_name in list(vars(DriverUpdater))
 
             if not system_name_check:
                 message = f'Unknown system name was specified current system_name is: {system_name}'
+                logging.error(message)
+                return result_run, message
+
+            result_run = True
+
+        except:
+            message_run = f'Unexcepted error: {traceback.format_exc()}'
+            logging.error(message_run)
+
+        return result_run, message_run
+
+    @staticmethod
+    def __check_parameter_type_is_valid(parameter, needed_type, parameter_name):
+        result_run : bool = False
+        message_run : str = ''
+
+        try:
+
+            if type(parameter) != needed_type:
+                message = f'The type of {parameter_name} must be a {needed_type} current type is: {type(parameter)}'
                 logging.error(message)
                 return result_run, message
 

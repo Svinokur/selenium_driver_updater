@@ -1,3 +1,12 @@
+[3.16.0] 29/06/2021
+This version provides some improvements and minor fixes.
+This code was written and tested on Python 3.9.5
+
+# Improvements
+
+- Improved getting latest version of firefox browser
+- Improved error messages
+
 [3.15.0] 28/06/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5

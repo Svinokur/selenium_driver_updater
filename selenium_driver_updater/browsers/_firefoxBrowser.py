@@ -211,15 +211,7 @@ class FirefoxBrowser():
                 return result, message, latest_version
 
             soup = BeautifulSoup(json_data, 'html.parser')
-            element_releases_list = soup.findAll('ol', attrs={'class' : 'c-release-list'})[0]
-
-            all_releases_elements = element_releases_list.findAll('a', attrs={'href' : re.compile('/releasenotes/')})
-            all_releases = []
-
-            [all_releases.append(release.text) for release in all_releases_elements]
-            all_releases.sort(key=lambda s: list(map(int, s.split('.'))), reverse=True)
-
-            latest_version = all_releases[0]
+            latest_version = soup.findAll('html')[0].attrs.get('data-latest-firefox')
             
             logging.info(f'Latest version of firefox browser: {latest_version}')
 
