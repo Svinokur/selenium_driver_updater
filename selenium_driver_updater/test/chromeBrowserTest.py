@@ -1,22 +1,22 @@
+#Standart library imports
 import unittest
+import os.path
+import time
+import logging
+import platform
 
 import sys
-import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from browsers._chromeBrowser import ChromeBrowser
 from util.requests_getter import RequestsGetter
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-import time
-import logging
-import platform
 logging.basicConfig(level=logging.INFO)
 
-class testChromeBrowser(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testChromeBrowser(unittest.TestCase):
     """Class for unit-testing ChromeBrowser class
 
     Attributes:
@@ -34,22 +34,22 @@ class testChromeBrowser(unittest.TestCase):
         driver_name : str = "chromedriver_test.exe" if platform.system() == 'Windows' else\
                                         "chromedriver_test"
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
+        path : str = str(setting["Program"]["driversPath"]) + driver_name
 
         cls.chromebrowser = ChromeBrowser(path=path, check_browser_is_up_to_date = True)
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.chromebrowser
 
     def setUp(self):
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
@@ -72,12 +72,12 @@ class testChromeBrowser(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test04_check_get_latest_chrome_browser_for_current_os(self):
         result, message = self.chromebrowser._ChromeBrowser__get_latest_chrome_browser_for_current_os()
         self.assertTrue(result, message)
-    
+
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test05_check_compare_current_version_and_latest_version_chrome_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.chromebrowser._ChromeBrowser__compare_current_version_and_latest_version_chrome_browser()
@@ -87,7 +87,7 @@ class testChromeBrowser(unittest.TestCase):
         self.assertIsNotNone(latest_version, latest_version)
 
         self.assertIn(is_browser_is_up_to_date, [True, False], is_browser_is_up_to_date)
-        
+
         self.assertGreater(len(current_version), 0, len(current_version))
         self.assertGreater(len(latest_version), 0, len(latest_version))
 

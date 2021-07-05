@@ -1,19 +1,20 @@
+#Standart library imports
 import unittest
+import time
+import logging
 
 import sys
 import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from util.requests_getter import RequestsGetter
 from _setting import setting
 
-import time
-
-import logging
 logging.basicConfig(level=logging.INFO)
 
-class testRequestsGetter(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testRequestsGetter(unittest.TestCase):
     """Class for unit-testing RequestsGetter class
 
     Attributes:
@@ -29,11 +30,11 @@ class testRequestsGetter(unittest.TestCase):
 
     def setUp(self):
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request_failure(self):
@@ -42,7 +43,7 @@ class testRequestsGetter(unittest.TestCase):
         self.assertFalse(result, json_data)
         self.assertGreater(len(message), 0, len(message))
         self.assertNotEqual(status_code, 200, status_code)
-    
+
     #@unittest.skip('Temporary not needed')
     def test02_check_get_result_by_request(self):
         url = self.setting["ChromeDriver"]["LinkLastRelease"]
@@ -53,3 +54,4 @@ class testRequestsGetter(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

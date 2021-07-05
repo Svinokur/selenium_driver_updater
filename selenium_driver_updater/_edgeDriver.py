@@ -1,89 +1,68 @@
+#Standart library imports
 import shutil
 import subprocess
-import wget
 import os
 import traceback
 import logging
 import time
-import os
-
-from typing import Tuple
-
-import sys
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-
-from _setting import setting
-
+from typing import Tuple, Any
+import re
+from pathlib import Path
 import platform
-
 import stat
+
+# Third party imports
+import wget
+
+# Local imports
+from _setting import setting
 
 from util.extractor import Extractor
 from util.requests_getter import RequestsGetter
+
 from browsers._edgeBrowser import EdgeBrowser
-
-import re
-
-from typing import Any
-
-from pathlib import Path
 
 class EdgeDriver():
 
-    _tmp_folder_path = 'tmp'
-    
-    def __init__(self, path : str, **kwargs):
-        """Class for working with Selenium edgedriver binary
+    """Class for working with Selenium edgedriver binary"""
 
-        Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium edgedriver binary. Must be folder path.
-            upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make edgedriver binary executable. Defaults to True.
-            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
-            filename (str)                      : Specific name for edgedriver. If given, it will replace name for edgedriver.
-            version (str)                       : Specific version for edgedriver. If given, it will downloads given version.
-            check_browser_is_up_to_date (bool)  : If true, it will check edge browser version before edgedriver update/upgrade.
-            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
-        """
+    _tmp_folder_path = 'tmp'
+
+    def __init__(self, **kwargs):
+
         self.setting : Any = setting
 
-        self.path : str = path
-                    
+        self.path : str = str(kwargs.get('path'))
+
         self.upgrade : bool = bool(kwargs.get('upgrade'))
 
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        specific_system = str(kwargs.get('system_name'))
-        self.system_name = "edgedriver_win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
-                           "edgedriver_win32.zip" if specific_system == 'windows32' else\
-                           "edgedriver_linux64.zip" if specific_system == 'linux' or specific_system == 'linux64' else\
-                           "edgedriver_mac64.zip" if specific_system == 'macos' else\
-                           logging.error(f"You specified system_name: {specific_system} which unsupported by edgedriver - so used default instead.")\
-                           if specific_system else ''
-
         self.specific_driver_name = ''
-                           
-        if not self.system_name:
-        
-            specific_filename = str(kwargs.get('filename'))
+        self.system_name = ''
+        specific_filename = str(kwargs.get('filename'))
+
+        specific_system = str(kwargs.get('system_name', ''))
+
+        if specific_system:
+            self.system_name = f"edgedriver_{specific_system}.zip"
+
+            self.filename = f"{specific_filename}.exe" if 'win' in specific_system or 'arm' in specific_system and specific_filename else\
+                            specific_filename
+
+            self.specific_driver_name = "msedgedriver.exe" if 'win' in specific_system or 'arm' in specific_system else\
+                                     "msedgedriver"
+
+            self.edgedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
+
+        else:
+
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
             self.edgedriver_path : str =  self.path + str(self.setting['EdgeDriver']['LastReleasePlatform']) if not specific_filename else self.path + self.filename
-
-        else:
-
-            specific_filename = str(kwargs.get('filename'))
-            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
-                            specific_filename
-                        
-            self.specific_driver_name = "msedgedriver.exe" if 'windows' in specific_system else\
-                                     "msedgedriver"
-
-            self.edgedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -93,7 +72,7 @@ class EdgeDriver():
 
         self.extractor = Extractor
         self.requests_getter = RequestsGetter
-        self.edgebrowser = EdgeBrowser(path=self.path, check_browser_is_up_to_date=self.check_browser_is_up_to_date)
+        self.edgebrowser = EdgeBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:
         """Main function, checks for the latest version, downloads or updates edgedriver binary
@@ -104,15 +83,15 @@ class EdgeDriver():
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             driver_path (str)       : Path where edgedriver was downloaded or updated.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
-        
+
         try:
 
             result, message = self.edgebrowser.main()
@@ -136,7 +115,7 @@ class EdgeDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -150,14 +129,14 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_version (str)    : Current edgedriver version.
 
         Raises:
 
             OSError: Occurs when chromedriver made for another CPU type
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -165,14 +144,13 @@ class EdgeDriver():
         message_run : str = ''
         driver_version : str = ''
         driver_version_terminal : str = ''
-        
+
         try:
 
             if Path(self.edgedriver_path).exists():
-        
-                process = subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE)
-        
-                driver_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                with subprocess.Popen([self.edgedriver_path, '--version'], stdout=subprocess.PIPE) as process:
+                    driver_version_terminal = process.communicate()[0].decode('UTF-8')
 
                 find_string = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), str(driver_version_terminal))
                 driver_version = find_string[0] if len(find_string) > 0 else ''
@@ -186,10 +164,10 @@ class EdgeDriver():
             logging.error(message_run)
             return True, message_run, driver_version
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, driver_version
 
     def __get_latest_version_edgedriver(self) -> Tuple[bool, str, str]:
@@ -200,11 +178,11 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             latest_version (str)    : Latest version of edgedriver
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -214,19 +192,19 @@ class EdgeDriver():
         url = str(self.setting['EdgeDriver']['LinkLastRelease'])
 
         try:
-            
+
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
                 logging.error(message)
                 return result, message, latest_version
-            
+
             latest_version = re.findall(str(self.setting["Program"]["wedriverVersionPattern"]), json_data)[0]
 
             logging.info(f'Latest version of edgedriver: {latest_version}')
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -240,10 +218,10 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+            message_run (str)       : Returns an error message if an error occurs in the function.
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -256,16 +234,16 @@ class EdgeDriver():
 
                 logging.info(f'Deleted existing edgedriver edgedriver_path: {self.edgedriver_path}')
                 Path(self.edgedriver_path).unlink()
-            
+
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
-    
+
     def __check_if_edgedriver_is_up_to_date(self) -> Tuple[bool, str, str]:
         """Checks for the latest version, downloads or updates edgedriver binary
 
@@ -273,17 +251,17 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_path (str)       : Path where edgedriver was downloaded or updated.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
-        
+
         try:
 
             if self.check_driver_is_up_to_date and not self.system_name:
@@ -309,8 +287,10 @@ class EdgeDriver():
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
-                    message = f'Problem with updating edgedriver current_version: {current_version} latest_version: {latest_version}'
+                    message = ('Problem with updating edgedriver'
+                                f'current_version: {current_version} latest_version: {latest_version}')
                     logging.error(message)
+
                     message = 'Trying to download previous latest version of edgedriver'
                     logging.info(message)
 
@@ -321,7 +301,7 @@ class EdgeDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -334,11 +314,11 @@ class EdgeDriver():
             Tuple of bool, str and bool
 
             result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of edgedriver is up to date. Defaults to False.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -346,7 +326,7 @@ class EdgeDriver():
         is_driver_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
-        
+
         try:
 
             result, message, current_version = self.__get_current_version_edgedriver()
@@ -369,7 +349,7 @@ class EdgeDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -381,16 +361,16 @@ class EdgeDriver():
         Returns:
             Tuple of bool and str
 
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            
+            result_run (bool)   : True if function passed correctly, False otherwise.
+            message_run (str)   : Returns an error message if an error occurs in the function.
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             if Path(self.edgedriver_path).exists():
@@ -404,7 +384,7 @@ class EdgeDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -418,19 +398,17 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)               : Returns an error message if an error occurs in the function.
             latest_version_previous (str)   : Latest previous version of edgedriver.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
         result_run : bool = False
         message_run : str = ''
         latest_previous_version : str = ''
-        releases_latest_previous_version = []
-        url = str(self.setting["EdgeDriver"]["LinkAllReleases"])
 
         try:
 
@@ -442,24 +420,20 @@ class EdgeDriver():
             latest_version_main = int(latest_version.split('.')[0])
             latest_previous_version_main = str(latest_version_main-1)
 
+            url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_previous_version_main)
+
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
                 logging.error(message)
                 return result, message, latest_version
 
-            all_releases = re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data)
-            for release in all_releases:
-                if release.startswith(latest_previous_version_main):
-                    releases_latest_previous_version.append(release)
-
-            releases_latest_previous_version.sort(key=lambda s: list(map(int, s.split('.'))), reverse=True)
-            latest_previous_version = releases_latest_previous_version[0]
+            latest_previous_version = str(json_data.strip())
 
             logging.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -476,7 +450,7 @@ class EdgeDriver():
             Tuple of bool and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
         """
         result_run : bool = False
         message_run : str = ''
@@ -492,16 +466,17 @@ class EdgeDriver():
                 return result, message
 
             if not version_valid in json_data:
-                message = f'Wrong version or system_name was specified. version_valid: {version_valid} version_url: {version_url} url: {url}'
+                message = ('Wrong version or system_name was specified.'
+                f'version_valid: {version_valid} version_url: {version_url} url: {url}')
                 logging.error(message)
                 return False, message
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run
 
     def __download_driver(self, version : str = '', previous_version : bool = False) -> Tuple[bool, str, str]:
@@ -515,11 +490,11 @@ class EdgeDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             file_name (str)         : Path to unzipped driver.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -562,7 +537,7 @@ class EdgeDriver():
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
-                
+
                 logging.info(f'Started download edgedriver latest_version: {latest_version}')
                 url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_version)
 
@@ -597,9 +572,11 @@ class EdgeDriver():
 
             out_path = self.path
 
+            parameters = dict(archive_path=archive_path, out_path=out_path)
+
             if not self.filename:
 
-                result, message = self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
+                result, message = self.extractor.extract_and_detect_archive_format(**parameters)
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -608,10 +585,9 @@ class EdgeDriver():
 
 
                 filename = str(self.setting['EdgeDriver']['LastReleasePlatform']) if not self.specific_driver_name else self.specific_driver_name
-                filename_replace = self.filename
+                parameters.update(dict(filename=filename, filename_replace=self.filename))
 
-                result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=archive_path, 
-                out_path=out_path, filename=filename, filename_replace=filename_replace)
+                result, message = self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
@@ -634,8 +610,9 @@ class EdgeDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, driver_path
+        

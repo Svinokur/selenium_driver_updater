@@ -1,41 +1,36 @@
+#Standart library imports
 import subprocess
 import traceback
 import logging
 import os
+import re
+from typing import Tuple, Any
 
-from typing import Tuple
+# Third party imports
+from bs4 import BeautifulSoup
 
-import sys
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-
-from _setting import setting
-
+# Selenium imports
 from selenium import webdriver
-
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
+# Local imports
+from _setting import setting
 from util.requests_getter import RequestsGetter
 
-from bs4 import BeautifulSoup
-
-import re
-
-from typing import Any
-
 class ChromiumChromeBrowser():
+    """Class for working with Chromium browser"""
 
-    def __init__(self, check_browser_is_up_to_date : bool):
+    def __init__(self, **kwargs):
         self.setting : Any = setting
-        self.check_browser_is_up_to_date = check_browser_is_up_to_date
+        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
         self.requests_getter = RequestsGetter
 
     def main(self):
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             if self.check_browser_is_up_to_date:
@@ -43,11 +38,11 @@ class ChromiumChromeBrowser():
                 if not result:
                     logging.error(message)
                     return result, message
-        
+
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -61,14 +56,14 @@ class ChromiumChromeBrowser():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chromiumbrowser()
@@ -94,7 +89,7 @@ class ChromiumChromeBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -109,9 +104,9 @@ class ChromiumChromeBrowser():
             result_run (bool)               : True if function passed correctly, False otherwise.
             message_run (str)               : Empty string if function passed correctly, non-empty string if error.
             is_browser_up_to_date (bool)    : If true current version of chromiumbrowser is up to date. Defaults to False.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -119,7 +114,7 @@ class ChromiumChromeBrowser():
         is_browser_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
-        
+
         try:
 
             result, message, current_version = self.__get_current_version_chromiumbrowser_selenium()
@@ -139,7 +134,7 @@ class ChromiumChromeBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -168,7 +163,7 @@ class ChromiumChromeBrowser():
         result_run : bool = False
         message_run : str = ''
         browser_version : str = ''
-        
+
         try:
 
             result, message, browser_version = self.__get_current_version_chromiumbrowser_via_terminal()
@@ -176,11 +171,11 @@ class ChromiumChromeBrowser():
                 logging.error(message)
                 message = 'Trying to get current version of chromiumbrowser via chromium_chromedriver'
                 logging.info(message)
-            
+
             if not result or not browser_version:
 
                 chrome_options = webdriver.ChromeOptions()
-        
+
                 chrome_options.add_argument('--headless')
 
                 driver = webdriver.Chrome(options = chrome_options)
@@ -202,10 +197,10 @@ class ChromiumChromeBrowser():
             logging.error(message_run)
             return True, message_run, browser_version
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, browser_version
 
     def __get_current_version_chromiumbrowser_via_terminal(self) -> Tuple[bool, str, str]:
@@ -221,7 +216,7 @@ class ChromiumChromeBrowser():
 
         Raises:
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -229,27 +224,24 @@ class ChromiumChromeBrowser():
         message_run : str = ''
         browser_version : str = ''
         browser_version_terminal : str = ''
-        
+
         try:
-            
-            
+
 
             logging.info('Trying to get current version of chromium browser via terminal')
-    
-            process = subprocess.Popen(self.setting["ChromiumBrowser"]["Path"] + ' --version', stdout=subprocess.PIPE, shell=True)
-    
-            browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
+            with subprocess.Popen(self.setting["ChromiumBrowser"]["Path"] + ' --version', stdout=subprocess.PIPE, shell=True) as process:
+                browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
             find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
             browser_version = find_string[0] if len(find_string) > 0 else ''
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, browser_version
 
     def __get_latest_version_chromiumbrowser(self) -> Tuple[bool, str, str]:
@@ -262,9 +254,9 @@ class ChromiumChromeBrowser():
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             latest_version (str)    : Latest version of chromiumbrowser.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -274,7 +266,7 @@ class ChromiumChromeBrowser():
         latest_stable_version_element : Any = ''
 
         try:
-            
+
             url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
@@ -301,7 +293,7 @@ class ChromiumChromeBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -315,28 +307,29 @@ class ChromiumChromeBrowser():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
-            message = f'Trying to update chromium_browser to the latest version.'
+            message = 'Trying to update chromium_browser to the latest version.'
             logging.info(message)
-                
+
             os.system(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"])
-            
-            message = f'Chrome browser was successfully updated to the latest version.'
+
+            message = 'Chrome browser was successfully updated to the latest version.'
             logging.info(message)
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
+        

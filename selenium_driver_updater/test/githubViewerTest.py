@@ -1,24 +1,24 @@
+#Standart library imports
 import unittest
-
-import sys
-import os.path
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-
-from util.github_viewer import GithubViewer
 import time
 import jsonschema
 import json
+from pathlib import Path
+from typing import Any
+import logging
+
+import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+# Local imports
+from util.github_viewer import GithubViewer
 
 from _setting import setting
 
-import logging
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
-from typing import Any
-
+# pylint: disable=missing-function-docstring
 class testGithubViewer(unittest.TestCase): 
     """Class for unit-testing GithubViewer class
 
@@ -40,11 +40,11 @@ class testGithubViewer(unittest.TestCase):
         self.specific_version : str = '0.29.0'
         self.specific_asset_name : str = 'win64'
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_latest_release_data_by_repo_name_failure(self):
@@ -84,7 +84,7 @@ class testGithubViewer(unittest.TestCase):
         self.assertIsNone(json_data.get('assets'), json_data)
 
         schema_release = json.loads(Path(self.setting["JsonSchema"]["githubReleaseSchema"]).read_text(encoding='utf-8'))
-        
+
         self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema_release))
 
     #@unittest.skip('Temporary not needed')
@@ -95,7 +95,7 @@ class testGithubViewer(unittest.TestCase):
         self.assertGreater(len(json_data), 0, len(json_data))
 
         schema = json.loads(Path(self.setting["JsonSchema"]["githubReleaseTagSchema"]).read_text(encoding='utf-8'))
-        
+
         self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema))
 
     #@unittest.skip('Temporary not needed')
@@ -106,9 +106,10 @@ class testGithubViewer(unittest.TestCase):
         self.assertGreater(len(releases), 0, len(releases))
 
         schema = json.loads(Path(self.setting["JsonSchema"]["githubReleaseSchema"]).read_text(encoding='utf-8'))
-        
+
         for release in releases:
             self.assertIsNone(jsonschema.validate(instance=release, schema=schema))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

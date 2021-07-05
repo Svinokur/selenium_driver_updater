@@ -1,22 +1,23 @@
+#Standart library imports
 import unittest
+import os.path
+import logging
+import platform
+import time
 
 import sys
-import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from browsers._operaBrowser import OperaBrowser
 from util.requests_getter import RequestsGetter
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
 
-import logging
-import platform
-import time
 logging.basicConfig(level=logging.INFO)
 
-class testOperaBrowser(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testOperaBrowser(unittest.TestCase):
     """Class for unit-testing OperaBrowser class
 
     Attributes:
@@ -34,22 +35,22 @@ class testOperaBrowser(unittest.TestCase):
         driver_name : str = "operadriver_test.exe" if platform.system() == 'Windows' else\
                                         "operadriver_test"
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep + driver_name
+        path : str = str(setting["Program"]["driversPath"]) + driver_name
 
         cls.operabrowser = OperaBrowser(path=path, check_browser_is_up_to_date = True)
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.operabrowser
 
     def setUp(self):
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
@@ -70,7 +71,7 @@ class testOperaBrowser(unittest.TestCase):
     def test03_check_get_latest_opera_browser_for_current_os(self):
         result, message = self.operabrowser._OperaBrowser__get_latest_opera_browser_for_current_os()
         self.assertTrue(result, message)
-    
+
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test04_check_compare_current_version_and_latest_version_opera_browser(self):
         result, message, is_browser_is_up_to_date, current_version, latest_version = self.operabrowser._OperaBrowser__compare_current_version_and_latest_version_opera_browser()
@@ -80,7 +81,7 @@ class testOperaBrowser(unittest.TestCase):
         self.assertIsNotNone(latest_version, latest_version)
 
         self.assertIn(is_browser_is_up_to_date, [True, False], is_browser_is_up_to_date)
-        
+
         self.assertGreater(len(current_version), 0, len(current_version))
         self.assertGreater(len(latest_version), 0, len(latest_version))
 

@@ -1,7 +1,17 @@
+#Standart library imports
+from dataclasses import dataclass
+from pathlib import Path
+import logging
+import os
+import traceback
+from typing import Tuple
+import time
+
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
+# Local imports
 from _chromeDriver import ChromeDriver
 from _geckoDriver import GeckoDriver
 from _operaDriver import OperaDriver
@@ -10,22 +20,11 @@ from _chromiumChromeDriver import ChromiumChromeDriver
 from _phantomJS import PhantomJS
 from _setting import setting
 
-import logging
-import os
-import traceback
-from typing import Tuple
-
-import time
-
 from util.requests_getter import RequestsGetter
-
-from dataclasses import dataclass
-
-from pathlib import Path
 
 @dataclass
 class info():
-    
+
     _driver_name = ''
 
     _path = ''
@@ -41,28 +40,31 @@ class info():
     _check_browser_is_up_to_date = False
     _enable_library_update_check = True
 
+#pylint: disable=protected-access
 class DriverUpdater():
-    
+
     #DRIVERS
     chromedriver = 'chromedriver'
     geckodriver = 'geckodriver'
     operadriver = 'operadriver'
     edgedriver = 'edgedriver'
-    chromium_chromedriver = 'chromium-chromedriver'
+    chromium_chromedriver = 'chromium_chromedriver'
     phantomjs = 'phantomjs'
 
     #OS'S
-    windows = 'windows'
-    windows32 = 'windows32'
-    windows64 = 'windows64'
+    windows = 'win64'
+    windows32 = 'win32'
+    windows64 = 'win64'
 
     linux = 'linux'
     linux32 = 'linux32'
     linux64 = 'linux64'
 
-    macos = 'macos'
-    macos_m1 = 'macos_m1'
-        
+    macos = 'mac64'
+    macos_m1 = 'mac64_m1'
+
+    arm = 'arm64'
+
     @staticmethod
     def install(driver_name, **kwargs):
         """Function for install or update Selenium driver binary
@@ -88,7 +90,7 @@ class DriverUpdater():
             driver_path (str)       : Path where Selenium driver binary was downloaded or updated.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -106,8 +108,11 @@ class DriverUpdater():
         else:
             logging.basicConfig(level=logging.ERROR)
 
-        path = kwargs.get('path', sys.path[0])
-        logging.info('You have not specified the path - so used default folder path instead') if not kwargs.get('path') else ''
+        path = kwargs.get('path')
+        if not path:
+            path = sys.path[0]
+            logging.info('You have not specified the path - so used default folder path instead')
+
         info._path = str(os.path.abspath(path) + os.path.sep)
 
         info._filename = str(kwargs.get('filename', '')).replace('.', '') if type(kwargs.get('filename', '')) == str else\
@@ -122,7 +127,7 @@ class DriverUpdater():
                         kwargs.get('version', '') if type(kwargs.get('version', '')) == list else ''
 
         info._check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date', False))
-        
+
         info._system_name = str(kwargs.get('system_name', '')) if type(kwargs.get('system_name', '')) == str else\
                         kwargs.get('system_name', '') if type(kwargs.get('system_name', '')) == list else ''
 
@@ -133,17 +138,17 @@ class DriverUpdater():
                 logging.error(message)
                 return result, message, driver_path
 
-            if type(info._driver_name) == str:
+            if isinstance(info._driver_name, str):
 
                 result, message, driver_path = DriverUpdater.__run_specific_driver()
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
 
-            elif type(info._driver_name) == list:
+            elif isinstance(info._driver_name, list):
 
                 list_of_paths : list[str] = []
-                
+
                 for driver in info._driver_name:
 
                     time.sleep(1) #small sleep
@@ -166,7 +171,7 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -183,7 +188,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
         """
 
         result_run : bool = False
@@ -201,7 +206,7 @@ class DriverUpdater():
                 logging.error(message)
                 return result_run, message
 
-            if type(info._driver_name) in [list, str]:
+            if isinstance(info._driver_name,(list, str)):
 
                 if info._filename:
 
@@ -218,7 +223,7 @@ class DriverUpdater():
                         return result, message
 
 
-                if type(info._driver_name) == str:
+                if isinstance(info._driver_name, str):
 
                     result, message = DriverUpdater.__check_driver_name_is_valid(driver_name=info._driver_name)
                     if not result:
@@ -232,7 +237,7 @@ class DriverUpdater():
                             logging.error(message)
                             return result, message
 
-                elif type(info._driver_name) == list:
+                elif isinstance(info._driver_name, list):
 
                     for driver in info._driver_name:
 
@@ -260,12 +265,12 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
-    
+
     @staticmethod
     def __check_library_is_up_to_date() -> Tuple[bool, str]:
         """Private function for comparing latest version and current version of program
@@ -277,7 +282,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -286,7 +291,7 @@ class DriverUpdater():
         url : str = str(setting["PyPi"]["urlProjectJson"])
 
         try:
-            
+
             result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
             if not result:
                 logging.error(message)
@@ -306,14 +311,14 @@ class DriverUpdater():
             elif latest_version_tuple == current_version_tuple:
                 message = 'Your selenium-driver-updater library is up to date.'
                 logging.info(message)
-            
+
             else:
                 message = 'Unable to compare the latest version and current version of the library, maybe you are using a beta version.'
                 logging.error(message)
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -330,7 +335,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -351,7 +356,7 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -368,7 +373,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -395,14 +400,14 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
-    
+
     @staticmethod
-    def __run_specific_driver(driver_name = '', filename = '', version = '', system_name = '') -> Tuple[bool, str, str]:
+    def __run_specific_driver(**kwargs) -> Tuple[bool, str, str]:
         """Private function for run download or update for specific driver
 
         Args:
@@ -418,10 +423,10 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
-        
+
 
         result_run : bool = False
         message_run : str = ''
@@ -429,27 +434,21 @@ class DriverUpdater():
 
         try:
 
-            if not driver_name:
-                driver_name = info._driver_name if type(info._driver_name) == str else ''
+            driver_name = kwargs.get('driver_name', info._driver_name)
+            filename = kwargs.get('filename', info._filename)
+            version = kwargs.get('version', info._version)
+            system_name = kwargs.get('system_name', info._system_name)
 
-            if not filename:
-                filename = info._filename if type(info._filename) == str else ''
-
-            if not version:
-                version = info._version if type(info._version) == str else ''
-
-            if not system_name:
-                system_name = info._system_name if type(info._system_name) == str else ''
-
-            parametres = dict(  upgrade=info._upgrade, chmod=info._chmod, 
-                                check_driver_is_up_to_date=info._check_driver_is_up_to_date, 
+            parametres = dict(  path=info._path, upgrade=info._upgrade, chmod=info._chmod,
+                                check_driver_is_up_to_date=info._check_driver_is_up_to_date,
                                 filename=filename, version=version,
-                                check_browser_is_up_to_date=info._check_browser_is_up_to_date, info_messages=info._info_messages,
+                                check_browser_is_up_to_date=info._check_browser_is_up_to_date,
+                                info_messages=info._info_messages,
                                 system_name=system_name )
 
             if DriverUpdater.chromedriver == driver_name:
 
-                chrome_driver = ChromeDriver(path=info._path, **parametres)
+                chrome_driver = ChromeDriver(**parametres)
                 result, message, driver_path = chrome_driver.main()
                 if not result:
                     logging.error(message)
@@ -457,7 +456,7 @@ class DriverUpdater():
 
             elif DriverUpdater.geckodriver == driver_name:
 
-                gecko_driver = GeckoDriver(path=info._path, **parametres)
+                gecko_driver = GeckoDriver(**parametres)
                 result, message, driver_path = gecko_driver.main()
                 if not result:
                     logging.error(message)
@@ -465,7 +464,7 @@ class DriverUpdater():
 
             elif DriverUpdater.operadriver == driver_name:
 
-                opera_driver = OperaDriver(path=info._path, **parametres)
+                opera_driver = OperaDriver(**parametres)
                 result, message, driver_path = opera_driver.main()
                 if not result:
                     logging.error(message)
@@ -473,7 +472,7 @@ class DriverUpdater():
 
             elif DriverUpdater.edgedriver == driver_name:
 
-                edge_driver = EdgeDriver(path=info._path, **parametres)
+                edge_driver = EdgeDriver(**parametres)
                 result, message, driver_path = edge_driver.main()
                 if not result:
                     logging.error(message)
@@ -489,7 +488,7 @@ class DriverUpdater():
 
             elif DriverUpdater.phantomjs == driver_name:
 
-                phantomjs = PhantomJS(path=info._path, **parametres)
+                phantomjs = PhantomJS(**parametres)
                 result, message, driver_path = phantomjs.main()
                 if not result:
                     logging.error(message)
@@ -497,7 +496,7 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -514,7 +513,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -531,7 +530,7 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -548,7 +547,7 @@ class DriverUpdater():
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -556,7 +555,7 @@ class DriverUpdater():
 
         try:
 
-            system_name_check =  system_name in list(vars(DriverUpdater))
+            system_name_check = system_name in [DriverUpdater.__dict__[item] for item in DriverUpdater.__dict__]
 
             if not system_name_check:
                 message = f'Unknown system name was specified current system_name is: {system_name}'
@@ -565,7 +564,7 @@ class DriverUpdater():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -578,14 +577,14 @@ class DriverUpdater():
 
         try:
 
-            if type(parameter) != needed_type:
+            if not isinstance(parameter, needed_type):
                 message = f'The type of {parameter_name} must be a {needed_type} current type is: {type(parameter)}'
                 logging.error(message)
                 return result_run, message
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 

@@ -1,24 +1,23 @@
+#Standart library imports
 import unittest
+import time
+import os.path
+import shutil
+import logging
+from pathlib import Path
 
 import sys
-import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from util.extractor import Extractor
-import time
-import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-import shutil
-
-import logging
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
-class testExtractor(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testExtractor(unittest.TestCase):
     """Class for unit-testing Extractor class
 
     Attributes:
@@ -38,11 +37,12 @@ class testExtractor(unittest.TestCase):
         self.zip_archive_path : str = self.out_path + 'geckodriver-v0.29.0-win64.zip'
         self.tar_archive_path : str = self.out_path + 'geckodriver-v0.29.1-macos-aarch64.tar.gz'
         self.tar_bz2_archive_path : str = self.out_path + 'phantomjs-2.1.1-linux-x86_64.tar.bz2'
-        self.startTime : float = time.time()
+
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_extract_all_zip_archive_failure(self):
@@ -79,7 +79,7 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(Path(geckodriver_path).exists())
         Path(geckodriver_path).unlink()
         self.assertFalse(Path(geckodriver_path).exists())
-    
+
     #@unittest.skip('Temporary not needed')
     def test06_check_extract_all_tar_gz_archive(self):
         result, message = self.extractor.extract_all_tar_gz_archive(archive_path=self.tar_archive_path,out_path=self.out_path, delete_archive = False)
@@ -89,7 +89,7 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(Path(geckodriver_path).exists())
         Path(geckodriver_path).unlink()
         self.assertFalse(Path(geckodriver_path).exists())
-    
+
     #@unittest.skip('Temporary not needed')
     def test07_check_extract_all_zip_archive_with_specific_name(self):
         result, message = self.extractor.extract_all_zip_archive_with_specific_name(archive_path=self.zip_archive_path,out_path=self.out_path, delete_archive = False,
@@ -100,7 +100,7 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(Path(geckodriver_path).exists())
         Path(geckodriver_path).unlink()
         self.assertFalse(Path(geckodriver_path).exists())
-    
+
     #@unittest.skip('Temporary not needed')
     def test08_check_extract_all_tar_archive_with_specific_name(self):
         result, message = Extractor.extract_all_zip_archive_with_specific_name(archive_path=self.tar_archive_path,out_path=self.out_path, delete_archive = False,
@@ -121,7 +121,8 @@ class testExtractor(unittest.TestCase):
         self.assertTrue(Path(phantom_path).exists())
         shutil.rmtree(phantom_path)
         self.assertFalse(Path(phantom_path).exists())
-    
-    
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

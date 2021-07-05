@@ -125,7 +125,7 @@ chromiumbrowser_updater = "sudo apt-get install chromium-browser"
 
 chromiumchromedriver_updater = "sudo apt-get install chromedriver"
 
-
+# pylint: disable=missing-function-docstring
 class testSetting(unittest.TestCase): 
     """Class for unit-testing settings
 
@@ -141,12 +141,12 @@ class testSetting(unittest.TestCase):
         cls.setting = setting
 
     def setUp(self):
-        
-        self.startTime : float = time.time()
+
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_count_main_param(self):
@@ -154,7 +154,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
-        self.assertEqual(len(self.setting["Program"]), 2)
+        self.assertEqual(len(self.setting["Program"]), 3)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
         self.assertEqual(len(self.setting["GeckoDriver"]), 3)
         self.assertEqual(len(self.setting["OperaDriver"]), 4)
@@ -177,6 +177,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["Program"]["version"], info.version)
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], r'([0-9.]*\.[0-9]+)')
+        self.assertEqual(self.setting["Program"]["driversPath"], base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep)
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -196,8 +197,8 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
-        self.assertEqual(self.setting["EdgeDriver"]["LinkAllReleases"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000")
         self.assertEqual(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000")
+        self.assertEqual(self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}")
 
         self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
 

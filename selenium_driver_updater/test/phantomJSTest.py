@@ -1,24 +1,25 @@
+#Standart library imports
 import unittest
+import os.path
+import time
+import platform
+import logging
+from pathlib import Path
 
 import sys
 import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from _phantomJS import PhantomJS
-import time
-import platform
+
 from util.requests_getter import RequestsGetter
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-import logging
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
-class testPhantomJS(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testPhantomJS(unittest.TestCase):
     """Class for unit-testing PhantomJS class
 
     Attributes:
@@ -33,16 +34,19 @@ class testPhantomJS(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        path : str = str(setting["Program"]["driversPath"])
 
-        cls.phantomjs = PhantomJS(path=path, upgrade=True, chmod=True, 
+        parametres = dict(path=path, upgrade=True, chmod=True, 
         check_driver_is_up_to_date = True, info_messages=True, filename='phantomjs_test', version='')
 
-        cls.phantomjs_failure = PhantomJS(path='failure', upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='phatomjs1_test', version='blablabla')
+        cls.phantomjs = PhantomJS(**parametres)
+
+        parametres.update(path='failure', filename='phatomjs1_test', version='blablabla')
+
+        cls.phantomjs_failure = PhantomJS(**parametres)
 
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.phantomjs
@@ -50,9 +54,9 @@ class testPhantomJS(unittest.TestCase):
 
     def setUp(self):
 
-        self.path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        self.path : str = str(setting["Program"]["driversPath"])
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
         self.specific_version : str = '2.1.1'
         self.specific_version_failure : str = 'blablablanotversion'
@@ -63,8 +67,8 @@ class testPhantomJS(unittest.TestCase):
         self.phantomjs_path = self.path + self.phantomjs_name
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_phantomjs(self):
@@ -74,7 +78,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_download_driver(self):
+    def test02_check_download_driver_failure(self):
         result, message, current_version = self.phantomjs_failure._PhantomJS__download_driver(version=self.specific_version_failure)
         self.assertFalse(result, message)
         self.assertGreaterEqual(len(message), 0, len(message))
@@ -190,3 +194,4 @@ class testPhantomJS(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

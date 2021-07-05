@@ -1,24 +1,23 @@
-import unittest
-
-import sys
-import os.path
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-
-from _setting import setting
-from _chromeDriver import ChromeDriver
+#Standart library imports
 import time
 import platform
-from util.requests_getter import RequestsGetter
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
+import unittest
+import os.path
 import logging
-logging.basicConfig(level=logging.INFO)
-
 from pathlib import Path
 
-class testChromeDriver(unittest.TestCase): 
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+# Local imports
+from _setting import setting
+from _chromeDriver import ChromeDriver
+from util.requests_getter import RequestsGetter
+
+logging.basicConfig(level=logging.INFO)
+
+# pylint: disable=missing-function-docstring
+class testChromeDriver(unittest.TestCase):
     """Class for unit-testing ChromeDriver class
 
     Attributes:
@@ -33,18 +32,20 @@ class testChromeDriver(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        path : str = str(setting["Program"]["driversPath"])
 
-        cls.chrome_driver = ChromeDriver(path=path, upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver_test', version='', 
+        parametres = dict(path=path, upgrade=True, chmod=True, 
+        check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver_test', version='',
         check_browser_is_up_to_date = False)
 
-        cls.chrome_driver_failure = ChromeDriver(path='failure', upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver1_test', version='blablabla', 
-        check_browser_is_up_to_date = False)
+        cls.chrome_driver = ChromeDriver(**parametres)
+
+        parametres.update(path='failure', filename='chromedriver1_test', version='blablabla')
+
+        cls.chrome_driver_failure = ChromeDriver(**parametres)
 
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.chrome_driver
@@ -52,9 +53,9 @@ class testChromeDriver(unittest.TestCase):
 
     def setUp(self):
 
-        self.path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        self.path : str = str(setting["Program"]["driversPath"])
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
         self.specific_version : str = '89.0.4389.23'
         self.specific_version_failure : str = 'blablablanotversion'
@@ -65,8 +66,8 @@ class testChromeDriver(unittest.TestCase):
         self.chromedriver_path = self.path + self.chromedriver_name
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_chrome_selenium_failure(self):
@@ -113,7 +114,7 @@ class testChromeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertEqual(status_code, 200, status_code)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
-    
+
     #@unittest.skip('Temporary not needed')
     def test07_check_get_result_by_request(self):
         result, message, latest_version = self.chrome_driver._ChromeDriver__get_latest_version_chromedriver()
@@ -176,14 +177,14 @@ class testChromeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test11_check_get_latest_version_chrome_driver(self):
         result, message, latest_version = self.chrome_driver._ChromeDriver__get_latest_version_chromedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test12_check_delete_current_chromedriver_for_current_os(self):
         result, message = self.chrome_driver._ChromeDriver__delete_current_chromedriver_for_current_os()
@@ -237,7 +238,7 @@ class testChromeDriver(unittest.TestCase):
         result, message = self.chrome_driver._ChromeDriver__check_if_version_is_valid(url=url,version_url=self.specific_version)
         self.assertTrue(result, result)
         self.assertEqual(len(message), 0, len(message))
-     
+
 
 
 if __name__ == '__main__':

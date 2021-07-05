@@ -1,24 +1,23 @@
+#Standart library imports
 import unittest
+import os.path
+import time
+import platform
+from pathlib import Path
+import logging
 
 import sys
-import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from _edgeDriver import EdgeDriver
 from util.requests_getter import RequestsGetter
-import time
-import platform
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-import logging
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
-class testEdgeDriver(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testEdgeDriver(unittest.TestCase):
     """Class for unit-testing EdgeDriver class
 
     Attributes:
@@ -34,27 +33,29 @@ class testEdgeDriver(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        path : str = str(setting["Program"]["driversPath"])
 
-        cls.edgedriver = EdgeDriver(path=path, upgrade=True, chmod=True, 
+        parametres = dict(path=path, upgrade=True, chmod=True,
         check_driver_is_up_to_date = True, info_messages=True, filename='edgedriver_test', version='',
         check_browser_is_up_to_date = False)
 
-        cls.edgedriver_failure = EdgeDriver(path='failure', upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='edgedriver1_test', version='blablabla',
-        check_browser_is_up_to_date = False)
+        cls.edgedriver = EdgeDriver(**parametres)
+
+        parametres.update(path='failure', filename='edgedriver1_test', version='blablabla')
+
+        cls.edgedriver_failure = EdgeDriver(**parametres)
 
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.edgedriver
         del cls.edgedriver_failure
 
     def setUp(self):
-        self.path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
-        
-        self.startTime : float = time.time()
+        self.path : str = str(setting["Program"]["driversPath"])
+
+        self.start_time : float = time.time()
 
         self.specific_version : str = '90.0.818.49'
         self.specific_version_failure : str = 'blablablanotversion'
@@ -65,8 +66,8 @@ class testEdgeDriver(unittest.TestCase):
         self.edgedriver_path = self.path + self.edgedriver_name
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_edge_selenium_failure(self):
@@ -161,14 +162,14 @@ class testEdgeDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test10_check_get_latest_version_edge_driver(self):
         result, message, latest_version = self.edgedriver._EdgeDriver__get_latest_version_edgedriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test11_check_delete_current_edgedriver_for_current_os(self):
         result, message = self.edgedriver._EdgeDriver__delete_current_edgedriver_for_current_os()
@@ -222,6 +223,6 @@ class testEdgeDriver(unittest.TestCase):
         result, message = self.edgedriver._EdgeDriver__check_if_version_is_valid(url=url,version_url=self.specific_version)
         self.assertTrue(result, result)
         self.assertEqual(len(message), 0, len(message))
-        
+
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

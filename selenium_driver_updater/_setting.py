@@ -121,7 +121,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "3.16.0"
+    version = "4.0.0"
 
 setting = dict(
     {
@@ -129,6 +129,7 @@ setting = dict(
         {
             'version'                   : info.version,
             'wedriverVersionPattern'    : r'([0-9.]*\.[0-9]+)',
+            'driversPath'               : base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep,
         },
         "ChromeDriver":
         {   
@@ -153,11 +154,11 @@ setting = dict(
         },
         "EdgeDriver":
         {
-            "LinkLastRelease"           : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE',
-            "LinkLastReleaseFile"       : edgedriver_latest_release, 
-            "LastReleasePlatform"       : edgedriver_platform_release,
-            "LinkAllReleases"           : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&maxresults=1000&restype=container&comp=list&_=1622636146441&timeout=60000',
-            "LinkCheckVersionIsValid"   : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000",
+            "LinkLastRelease"                   : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE',
+            "LinkLastReleaseFile"               : edgedriver_latest_release, 
+            "LastReleasePlatform"               : edgedriver_platform_release,
+            "LinkCheckVersionIsValid"           : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000",
+            "LinkLatestReleaseSpecificVersion"  : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}",
         },
         "ChromiumChromeDriver":
         {

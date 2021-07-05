@@ -1,94 +1,72 @@
+#Standart library imports
 import shutil
 import subprocess
-import wget
 import os
 import traceback
 import logging
 import time
-import os
+from typing import Tuple, Any
+import platform
+import stat
+from shutil import copyfile
+from pathlib import Path
+import re
+
+# Third party imports
+import wget
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
-from typing import Tuple
-
-import sys
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-
+# Local imports
 from _setting import setting
-
-import platform
-
-import stat
-
-from shutil import copyfile
 
 from util.extractor import Extractor
 from util.github_viewer import GithubViewer
+
 from util.requests_getter import RequestsGetter
 from browsers._operaBrowser import OperaBrowser
 
-from pathlib import Path
-
-import re
-
-from typing import Any
-
 class OperaDriver():
+    """Class for working with Selenium operadriver binary"""
 
     _repo_name = 'operasoftware/operachromiumdriver'
-    
-    def __init__(self, path : str, **kwargs):
-        """Class for working with Selenium operadriver binary
 
-        Args:
-            path (str)                          : Specified path which will used for downloading or updating Selenium operadriver binary. Must be folder path.
-            upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make operadriver binary executable. Defaults to True.
-            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
-            filename (str)                      : Specific name for operadriver. If given, it will replace name for operadriver. Defaults to empty string.
-            version (str)                       : Specific version for operadriver. If given, it will downloads given version. Defaults to empty string.
-            check_browser_is_up_to_date (bool)  : If true, it will check opera browser version before operadriver update/upgrade.
-            system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
-        """
+    def __init__(self, **kwargs):
+
         self.setting : Any = setting
 
-        self.path : str = path
-                    
+        self.path : str = str(kwargs.get('path'))
+
         self.upgrade : bool = bool(kwargs.get('upgrade'))
 
         self.chmod : bool = bool(kwargs.get('chmod'))
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        specific_system = str(kwargs.get('system_name'))
-        self.system_name = "operadriver_win64.zip" if specific_system == 'windows' or specific_system == 'windows64' else\
-                           "operadriver_win32.zip" if specific_system == 'windows32' else\
-                           "operadriver_linux64.zip" if specific_system == 'linux' or specific_system == 'linux64' else\
-                           "operadriver_mac64.zip" if specific_system == 'macos' else\
-                           logging.error(f"You specified system_name: {specific_system} which unsupported by operadriver - so used default instead.")\
-                           if specific_system else ''
-
         self.specific_driver_name = ''
+        self.system_name = ''
 
-        if not self.system_name:
-        
-            specific_filename = str(kwargs.get('filename'))
+        specific_filename = str(kwargs.get('filename'))
+
+        specific_system = str(kwargs.get('system_name', ''))
+        if specific_system:
+            self.system_name = f"operadriver_{specific_system}.zip"
+
+            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
+                            specific_filename
+
+            self.specific_driver_name =    "operadriver.exe" if 'win' in specific_system else\
+                                            "operadriver"
+
+            self.operadriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
+
+
+        else:
+
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
             self.operadriver_path : str =  self.path + self.setting['OperaDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
-
-        else:
-
-            specific_filename = str(kwargs.get('filename'))
-            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
-                            specific_filename
-                        
-            self.specific_driver_name =    "operadriver.exe" if 'windows' in specific_system else\
-                                            "operadriver"
-                                    
-            self.operadriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -99,7 +77,7 @@ class OperaDriver():
         self.extractor = Extractor
         self.github_viewer = GithubViewer
         self.requests_getter = RequestsGetter
-        self.operabrowser = OperaBrowser(path=self.path, check_browser_is_up_to_date=self.check_browser_is_up_to_date)
+        self.operabrowser = OperaBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:
         """Main function, checks for the latest version, downloads or updates operadriver binary or
@@ -109,17 +87,17 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_path (str)       : Path where operadriver was downloaded or updated.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
-        
+
         try:
 
             result, message = self.operabrowser.main()
@@ -143,7 +121,7 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -157,7 +135,7 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_version (str)    : Current operadriver version.
 
         Raises:
@@ -167,7 +145,7 @@ class OperaDriver():
 
             OSError: Occurs when chromedriver made for another CPU type
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -175,15 +153,14 @@ class OperaDriver():
         message_run : str = ''
         driver_version : str = ''
         driver_version_terminal : str = ''
-        
+
         try:
-            
+
             if Path(self.operadriver_path).exists():
-            
-                process = subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE)
-        
-                driver_version_terminal = process.communicate()[0].decode('UTF-8')
-                
+
+                with subprocess.Popen([self.operadriver_path, '--version'], stdout=subprocess.PIPE) as process:
+                    driver_version_terminal = process.communicate()[0].decode('UTF-8')
+
                 find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
@@ -206,10 +183,10 @@ class OperaDriver():
             logging.error(message_run)
             return True, message_run, driver_version
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, driver_version
 
     def __get_latest_version_operadriver(self) -> Tuple[bool, str, str]:
@@ -220,11 +197,11 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             latest_version (str)    : Latest version of operadriver
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -233,7 +210,7 @@ class OperaDriver():
         latest_version : str = ''
 
         try:
-            
+
             repo_name = OperaDriver._repo_name
             result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
             if not result:
@@ -245,7 +222,7 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -259,10 +236,10 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+            message_run (str)       : Returns an error message if an error occurs in the function.
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -274,16 +251,16 @@ class OperaDriver():
             if Path(self.operadriver_path).exists():
                 logging.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
                 Path(self.operadriver_path).unlink()
-            
+
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
-    
+
     def __check_if_operadriver_is_up_to_date(self) -> Tuple[bool, str, str]:
         """Main function, checks for the latest version, downloads or updates operadriver binary
 
@@ -291,17 +268,17 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_path (str)       : Path where operadriver was downloaded or updated.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         driver_path : str = ''
-        
+
         try:
 
             if self.check_driver_is_up_to_date and not self.system_name:
@@ -327,7 +304,8 @@ class OperaDriver():
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
-                    message = f'Problem with updating operadriver current_version: {current_version} latest_version: {latest_version}'
+                    message = ('Problem with updating operadriver'
+                                f'current_version: {current_version} latest_version: {latest_version}')
                     logging.error(message)
                     message = 'Trying to download previous latest version of operadriver'
                     logging.info(message)
@@ -339,7 +317,7 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -352,11 +330,11 @@ class OperaDriver():
             Tuple of bool, str and bool
 
             result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of operadriver is up to date. Defaults to False.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -364,7 +342,7 @@ class OperaDriver():
         is_driver_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
-        
+
         try:
 
             result, message, current_version = self.__get_current_version_operadriver()
@@ -382,12 +360,13 @@ class OperaDriver():
 
             if current_version == latest_version:
                 is_driver_up_to_date = True
-                message = f'Your existing operadriver is up to date. current_version: {current_version} latest_version: {latest_version}' 
+                message = ('Your existing operadriver is up to date.' 
+                        f'current_version: {current_version} latest_version: {latest_version}')
                 logging.info(message)
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -404,16 +383,16 @@ class OperaDriver():
             Tuple of bool, str and bool
 
             result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            
+            message_run (str)           : Returns an error message if an error occurs in the function.
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         renamed_driver_path : str = ''
-        
+
         try:
 
             new_path = archive_folder_path + os.path.sep + self.filename
@@ -422,7 +401,7 @@ class OperaDriver():
                 Path(new_path).unlink()
 
             os.rename(archive_operadriver_path, new_path)
-            
+
             renamed_driver_path = self.path + self.filename
             if Path(renamed_driver_path).exists():
                 Path(renamed_driver_path).unlink()
@@ -431,7 +410,7 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -444,15 +423,15 @@ class OperaDriver():
             Tuple of bool and str
 
             result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            
+            message_run (str)           : Returns an error message if an error occurs in the function.
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             if Path(self.operadriver_path).exists():
@@ -466,12 +445,12 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run
-    
+
     def __get_latest_previous_version_operadriver_via_requests(self) -> Tuple[bool, str, str]:
         """Gets previous latest operadriver version
 
@@ -480,11 +459,11 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)               : Returns an error message if an error occurs in the function.
             latest_version_previous (str)   : Latest previous version of operadriver.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -505,7 +484,7 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -522,7 +501,7 @@ class OperaDriver():
             Tuple of bool and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
         """
         result_run : bool = False
         message_run : str = ''
@@ -550,10 +529,10 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run
 
     def __download_driver(self, version : str = '', previous_version : bool = False) -> Tuple[bool, str, str]:
@@ -567,11 +546,11 @@ class OperaDriver():
             Tuple of bool, str and str
 
             result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_path (str)       : Path to unzipped driver.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -678,7 +657,7 @@ class OperaDriver():
 
             if Path(archive_folder_path).exists():
                 shutil.rmtree(archive_folder_path)
-            
+
             driver_path = self.operadriver_path
 
             logging.info(f'Operadriver was successfully unpacked by path: {driver_path}')
@@ -691,8 +670,9 @@ class OperaDriver():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
         return result_run, message_run, driver_path
+        

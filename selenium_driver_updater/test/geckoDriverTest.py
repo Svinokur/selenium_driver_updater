@@ -1,23 +1,23 @@
+#Standart library imports
 import unittest
+import os.path
+import logging
+import time
+import platform
+from pathlib import Path
 
 import sys
 import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from _geckoDriver import GeckoDriver
 from util.requests_getter import RequestsGetter
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-import logging
-import time
-import platform
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
+# pylint: disable=missing-function-docstring
 class testGeckoDriver(unittest.TestCase): 
     """Class for unit-testing GeckoDriver class
 
@@ -34,27 +34,29 @@ class testGeckoDriver(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        path : str = str(setting["Program"]["driversPath"])
 
-        cls.gecko_driver = GeckoDriver(path=path, upgrade=True, chmod=True, 
+        parametres = dict(path=path, upgrade=True, chmod=True, 
         check_driver_is_up_to_date = True, info_messages=True, filename='geckodriver_test', version='',
         check_browser_is_up_to_date = False)
 
-        cls.gecko_driver_failure = GeckoDriver(path='failure', upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='geckodriver1_test', version='blablablanotversion',
-        check_browser_is_up_to_date = False)
+        cls.gecko_driver = GeckoDriver(**parametres)
+
+        parametres.update(path='failure', filename='geckodriver1_test', version='blablablanotversion')
+
+        cls.gecko_driver_failure = GeckoDriver(**parametres)
 
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.gecko_driver
         del cls.gecko_driver_failure
 
     def setUp(self):
-        self.path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
-        
-        self.startTime : float = time.time()
+        self.path : str = str(setting["Program"]["driversPath"])
+
+        self.start_time : float = time.time()
 
         self.specific_version : str = '0.29.1'
         self.specific_version_failure : str = 'blablablanotversion'
@@ -65,8 +67,8 @@ class testGeckoDriver(unittest.TestCase):
         self.geckodriver_path = self.path + self.geckodriver_name
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_geckodriver_selenium_failure(self):
@@ -154,14 +156,14 @@ class testGeckoDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test09_check_get_latest_version_gecko_driver(self):
         result, message, latest_version = self.gecko_driver._GeckoDriver__get_latest_version_geckodriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test10_check_delete_current_geckodriver_for_current_os(self):
         result, message = self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
@@ -210,7 +212,8 @@ class testGeckoDriver(unittest.TestCase):
         result, message = self.gecko_driver._GeckoDriver__check_if_version_is_valid(url=url,version_url=self.specific_version)
         self.assertTrue(result, result)
         self.assertEqual(len(message), 0, len(message))
-        
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

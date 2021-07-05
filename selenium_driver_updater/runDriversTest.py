@@ -2,9 +2,6 @@ import unittest
 import os
 import sys
 
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-
 import logging
 
 import traceback
@@ -84,15 +81,15 @@ try:
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
-    
-    
+
+
     runner = unittest.TextTestRunner(verbosity=2, failfast=True)
     result = runner.run(testSuite)
 
     if result.wasSuccessful():
 
         logging.debug('OK')
-   
+
     else:
 
         failures = ''
@@ -100,7 +97,7 @@ try:
 
         for failures in result.failures:
             failures = str(failures) + "\r\n"
-        
+
         logging.error(failures)
 
         for errors in result.errors:
@@ -108,10 +105,10 @@ try:
 
         logging.error(errors)
 
-        exit(1)
+        sys.exit(1)
 
-except:
+except Exception:
     message_run = f'Unexcepted error: {traceback.format_exc()}'
     logging.error(message_run)
 
-    exit(1)
+    sys.exit(1)

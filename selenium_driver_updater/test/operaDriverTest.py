@@ -1,24 +1,24 @@
+#Standart library imports
 import unittest
+import os.path
+import time
+import platform
+import logging
+from pathlib import Path
 
 import sys
 import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from _operaDriver import OperaDriver
 from util.requests_getter import RequestsGetter
-import time
-import platform
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-import logging
 logging.basicConfig(level=logging.INFO)
 
-from pathlib import Path
-
-class testOperaDriver(unittest.TestCase): 
+# pylint: disable=missing-function-docstring
+class testOperaDriver(unittest.TestCase):
     """Class for unit-testing OperaDriver class
 
     Attributes:
@@ -33,27 +33,29 @@ class testOperaDriver(unittest.TestCase):
     def setUpClass(cls):
         cls.setting = setting
 
-        path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
+        path : str = str(setting["Program"]["driversPath"])
 
-        cls.operadriver = OperaDriver(path=path, upgrade=True, chmod=True, 
+        parametres = dict(path=path, upgrade=True, chmod=True,
         check_driver_is_up_to_date = True, info_messages=True, filename='operadriver_test', version='',
         check_browser_is_up_to_date = False)
 
-        cls.operadriver_failure = OperaDriver(path='failure', upgrade=True, chmod=True, 
-        check_driver_is_up_to_date = True, info_messages=True, filename='operadriver1_test', version='blablabla',
-        check_browser_is_up_to_date = False)
+        cls.operadriver = OperaDriver(**parametres)
+
+        parametres.update(path='failure', filename='operadriver1_test', version='blablabla')
+
+        cls.operadriver_failure = OperaDriver(**parametres)
 
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.operadriver
         del cls.operadriver_failure
 
     def setUp(self):
-        self.path : str = os.path.abspath(base_dir) + os.path.sep + 'drivers' + os.path.sep
-        
-        self.startTime : float = time.time()
+        self.path : str = str(setting["Program"]["driversPath"])
+
+        self.start_time : float = time.time()
 
         self.specific_version : str = '89.0.4389.82'
         self.specific_version_failure : str = 'blablablanotversion'
@@ -64,8 +66,8 @@ class testOperaDriver(unittest.TestCase):
         self.operadriver_path = self.operadriver_path
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_operadriver_selenium_failure(self):
@@ -153,14 +155,14 @@ class testOperaDriver(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test09_check_get_latest_version_operadriver(self):
         result, message, latest_version = self.operadriver._OperaDriver__get_latest_version_operadriver()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test10_check_delete_current_operadriver_for_current_os(self):
         result, message = self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
@@ -212,3 +214,4 @@ class testOperaDriver(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

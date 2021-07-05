@@ -1,50 +1,43 @@
+#Standart library imports
 import subprocess
 import traceback
 import logging
 import time
 import os
-
+import re
 import platform
+from typing import Tuple, Any
+from pathlib import Path
 
-from typing import Tuple
+# Third party imports
+from bs4 import BeautifulSoup
 
-import sys
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-
-from _setting import setting
-
+# Selenium imports
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
-from util.extractor import Extractor
+# Local imports
+from _setting import setting
+
 from util.requests_getter import RequestsGetter
 
-from bs4 import BeautifulSoup
-
-import re
-
-from typing import Any
-
-from pathlib import Path
-
 class FirefoxBrowser():
+    """Class for working with Firefox browser"""
 
-    def __init__(self, path : str, check_browser_is_up_to_date : bool):
+    def __init__(self, **kwargs):
         self.setting : Any = setting
-        self.check_browser_is_up_to_date = check_browser_is_up_to_date
+        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
-        self.geckodriver_path = path
-        self.extractor = Extractor
+        self.geckodriver_path = str(kwargs.get('path'))
+
         self.requests_getter = RequestsGetter
 
     def main(self):
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             if self.check_browser_is_up_to_date:
@@ -52,11 +45,11 @@ class FirefoxBrowser():
                 if not result:
                     logging.error(message)
                     return result, message
-        
+
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -70,14 +63,14 @@ class FirefoxBrowser():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
-        
+
         try:
 
             firefoxbrowser_updater_path = str(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"])
@@ -114,7 +107,7 @@ class FirefoxBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -136,22 +129,22 @@ class FirefoxBrowser():
 
             WebDriverException: Occurs when current geckodriver could not start or critical error occured.
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
         result_run : bool = False
         message_run : str = ''
         browser_version : str = ''
-        
+
         try:
-            
+
             result, message, browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
             if not result:
                 logging.error(message)
                 message = 'Trying to get current version of firefox browser via geckodriver'
                 logging.info(message)
-            
+
             if Path(self.geckodriver_path).exists() and not result or not browser_version:
 
                 options = FirefoxOptions()
@@ -176,10 +169,10 @@ class FirefoxBrowser():
             logging.error(message_run)
             return True, message_run, browser_version
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, browser_version
 
     def __get_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
@@ -192,9 +185,9 @@ class FirefoxBrowser():
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             latest_version (str)    : Latest version of firefox browser.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -203,7 +196,7 @@ class FirefoxBrowser():
         latest_version : str = ''
 
         try:
-            
+
             url = self.setting["FirefoxBrowser"]["LinkAllLatestReleases"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
@@ -212,12 +205,12 @@ class FirefoxBrowser():
 
             soup = BeautifulSoup(json_data, 'html.parser')
             latest_version = soup.findAll('html')[0].attrs.get('data-latest-firefox')
-            
+
             logging.info(f'Latest version of firefox browser: {latest_version}')
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -231,20 +224,20 @@ class FirefoxBrowser():
 
             result_run (bool)       : True if function passed correctly, False otherwise.
             message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
         message_run : str = ''
         try:
             is_admin : bool = True if os.getuid() == 0 else False
-        except:
+        except Exception:
             is_admin : bool = False
-            
+
         update_command : str = self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"]
-        
+
         try:
 
             message = f'Trying to update firefox browser to the latest version.'
@@ -259,18 +252,18 @@ class FirefoxBrowser():
                     message = 'You have not ran library with sudo privileges to update firefox browser - so updating is impossible.'
                     logging.error(message)
                     return True, message_run
-            
+
             else:
 
                 os.system(update_command)
                 time.sleep(60) #wait for the updating - too long
-            
-            message = f'Firefox browser was successfully updated to the latest version.'
+
+            message = 'Firefox browser was successfully updated to the latest version.'
             logging.info(message)
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -285,9 +278,9 @@ class FirefoxBrowser():
             result_run (bool)               : True if function passed correctly, False otherwise.
             message_run (str)               : Empty string if function passed correctly, non-empty string if error.
             is_browser_up_to_date (bool)    : If true current version of firefox browser is up to date. Defaults to False.
-            
+
         Raises:
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
         result_run : bool = False
@@ -295,7 +288,7 @@ class FirefoxBrowser():
         is_browser_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
-        
+
         try:
 
             result, message, current_version = self.__get_current_version_firefox_browser_selenium()
@@ -315,7 +308,7 @@ class FirefoxBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
 
@@ -334,7 +327,7 @@ class FirefoxBrowser():
 
         Raises:
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
@@ -342,9 +335,9 @@ class FirefoxBrowser():
         message_run : str = ''
         browser_version : str = ''
         browser_version_terminal : str = ''
-        
+
         try:
-            
+
             firefox_path = self.setting["FirefoxBrowser"]["Path"]
             if firefox_path:
 
@@ -354,17 +347,16 @@ class FirefoxBrowser():
 
                     for command in firefox_path:
 
-                        process = subprocess.Popen(command, stdout=subprocess.PIPE)
-            
-                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
+                        with subprocess.Popen(command, stdout=subprocess.PIPE) as process:
+                            browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                        if not 'invalid' in browser_version_terminal.lower():
+                        if 'invalid' not in browser_version_terminal.lower():
                             break
 
                 elif platform.system() == 'Darwin':
-                    process = subprocess.Popen([firefox_path, '--version'], stdout=subprocess.PIPE)
-            
-                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                    with subprocess.Popen([firefox_path, '--version'], stdout=subprocess.PIPE) as process:
+                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
 
                 find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
@@ -372,8 +364,8 @@ class FirefoxBrowser():
 
             result_run = True
 
-        except:
+        except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
             logging.error(message_run)
-        
+
         return result_run, message_run, browser_version

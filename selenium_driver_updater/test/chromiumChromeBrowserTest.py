@@ -1,18 +1,20 @@
+#Standart library imports
 import unittest
+import time
+import logging
 
 import sys
 import os.path
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
+# Local imports
 from _setting import setting
 from browsers._chromiumChromeBrowser import ChromiumChromeBrowser
 from util.requests_getter import RequestsGetter
 
-import time
-import logging
 logging.basicConfig(level=logging.INFO)
 
+# pylint: disable=missing-function-docstring
 class testChromiumChromeBrowser(unittest.TestCase): 
     """Class for unit-testing ChromiumChromeBrowser class
 
@@ -29,19 +31,19 @@ class testChromiumChromeBrowser(unittest.TestCase):
         cls.setting = setting
         cls.chromium_chromebrowser = ChromiumChromeBrowser(check_browser_is_up_to_date = True)
         cls.requests_getter = RequestsGetter
-        
+
     @classmethod
     def tearDownClass(cls):
         del cls.chromium_chromebrowser
 
     def setUp(self):
 
-        self.startTime : float = time.time()
+        self.start_time : float = time.time()
 
     def tearDown(self):
-        t = time.time() - self.startTime
-        print("%.3f" % t)
-    
+        end_time = time.time() - self.start_time
+        print("%.3f" % end_time)
+
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
         url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
@@ -56,14 +58,14 @@ class testChromiumChromeBrowser(unittest.TestCase):
         self.assertTrue(result, message)
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test03_check_get_latest_version_chromiumbrowser(self):
         result, message, latest_version = self.chromium_chromebrowser._ChromiumChromeBrowser__get_latest_version_chromiumbrowser()
         self.assertTrue(result, message)
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test04_check_get_latest_chromium_browser_for_current_os(self):
         result, message = self.chromium_chromebrowser._ChromiumChromeBrowser__get_latest_chromium_browser_for_current_os()
@@ -77,3 +79,4 @@ class testChromiumChromeBrowser(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    
