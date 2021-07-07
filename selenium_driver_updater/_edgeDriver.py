@@ -23,7 +23,6 @@ from util.requests_getter import RequestsGetter
 from browsers._edgeBrowser import EdgeBrowser
 
 class EdgeDriver():
-
     """Class for working with Selenium edgedriver binary"""
 
     _tmp_folder_path = 'tmp'
@@ -55,18 +54,18 @@ class EdgeDriver():
             self.specific_driver_name = "msedgedriver.exe" if 'win' in specific_system or 'arm' in specific_system else\
                                      "msedgedriver"
 
-            self.edgedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
+            name = self.specific_driver_name
 
         else:
 
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
-            self.edgedriver_path : str =  self.path + str(self.setting['EdgeDriver']['LastReleasePlatform']) if not specific_filename else self.path + self.filename
+            name = str(self.setting['EdgeDriver']['LastReleasePlatform'])
+
+        self.edgedriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
-
-        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
         self.info_messages = bool(kwargs.get('info_messages'))
 

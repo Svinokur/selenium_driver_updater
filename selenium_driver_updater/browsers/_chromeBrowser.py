@@ -368,7 +368,7 @@ class ChromeBrowser():
 
         try:
 
-            message = f'Trying to update chrome browser to the latest version.'
+            message = 'Trying to update chrome browser to the latest version.'
             logging.info(message)
 
             if platform.system() == 'Linux':

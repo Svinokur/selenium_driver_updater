@@ -44,6 +44,7 @@ class ChromeDriver():
         specific_filename = str(kwargs.get('filename'))
 
         specific_system = str(kwargs.get('system_name', ''))
+        specific_system = specific_system.replace('win64', 'win32').replace('linux32', 'linux64')
 
         if specific_system:
             self.system_name = f"chromedriver_{specific_system}.zip"
@@ -54,19 +55,18 @@ class ChromeDriver():
             self.specific_driver_name =    "chromedriver.exe" if 'win' in specific_system else\
                                                 "chromedriver"
 
-            self.chromedriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
+            name = self.specific_driver_name
 
         else:
 
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
-            self.chromedriver_path : str =  self.path + self.setting['ChromeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+            name = self.setting['ChromeDriver']['LastReleasePlatform']
 
+        self.chromedriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
-
-        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
         self.info_messages = bool(kwargs.get('info_messages'))
 
@@ -95,12 +95,10 @@ class ChromeDriver():
 
         try:
 
-            if self.check_browser_is_up_to_date:
-
-                result, message = self.chromebrowser.main()
-                if not result:
-                    logging.error(message)
-                    return result, message, driver_path
+            result, message = self.chromebrowser.main()
+            if not result:
+                logging.error(message)
+                return result, message, driver_path
 
             if not self.version:
 

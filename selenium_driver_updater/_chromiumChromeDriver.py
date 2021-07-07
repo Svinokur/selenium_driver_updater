@@ -28,8 +28,6 @@ class ChromiumChromeDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
-
         self.chromium_chromedriver_name = 'chromedriver'
 
         self.requests_getter = RequestsGetter

@@ -49,6 +49,8 @@ class OperaDriver():
         specific_filename = str(kwargs.get('filename'))
 
         specific_system = str(kwargs.get('system_name', ''))
+        specific_system = specific_system.replace('linux32', 'linux64')
+
         if specific_system:
             self.system_name = f"operadriver_{specific_system}.zip"
 
@@ -58,19 +60,18 @@ class OperaDriver():
             self.specific_driver_name =    "operadriver.exe" if 'win' in specific_system else\
                                             "operadriver"
 
-            self.operadriver_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
-
+            name = self.specific_driver_name
 
         else:
 
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
-            self.operadriver_path : str =  self.path + self.setting['OperaDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
+            name = self.setting['OperaDriver']['LastReleasePlatform']
+
+        self.operadriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
-
-        self.check_browser_is_up_to_date = bool(kwargs.get('check_browser_is_up_to_date'))
 
         self.info_messages = bool(kwargs.get('info_messages'))
 
@@ -636,10 +637,9 @@ class OperaDriver():
                 return result, message, driver_path
 
             platform : str = self.setting['OperaDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
-            archive_folder_name = self.setting["OperaDriver"]["NamePlatformRelease"] if not self.system_name else self.system_name.replace(".zip", '')
 
-            archive_folder_path = self.path + archive_folder_name
-            archive_operadriver_path = archive_folder_path + os.path.sep + platform
+            archive_folder_path = self.path + Path(archive_path).stem + os.path.sep
+            archive_operadriver_path = archive_folder_path + platform
 
             if not self.filename:
                 

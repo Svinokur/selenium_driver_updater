@@ -1,3 +1,19 @@
+[4.0.1] 07/07/2021
+This version provides some improvements and minor fixes.
+This code was written and tested on Python 3.9.6
+
+# Improvements
+
+- Improved overall code optimization
+
+# Fixes
+
+- Fixed an issues with incorrect checking of system_name for chromedriver
+
+# Operations
+
+- Removed some duplicated code
+
 [4.0.0] 05/07/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.5

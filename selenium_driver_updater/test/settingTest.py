@@ -69,7 +69,7 @@ phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' e
 
 #
 # BROWSERS AND THEIR UPDATERS
-#                                 
+#
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
@@ -154,10 +154,10 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
-        self.assertEqual(len(self.setting["Program"]), 3)
+        self.assertEqual(len(self.setting["Program"]), 4)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
         self.assertEqual(len(self.setting["GeckoDriver"]), 3)
-        self.assertEqual(len(self.setting["OperaDriver"]), 4)
+        self.assertEqual(len(self.setting["OperaDriver"]), 3)
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
@@ -178,6 +178,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["Program"]["version"], info.version)
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], r'([0-9.]*\.[0-9]+)')
         self.assertEqual(self.setting["Program"]["driversPath"], base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep)
+        self.assertEqual(self.setting["Program"]["DriversFileFormat"], ".exe" if platform.system() == 'Windows' else '')
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
@@ -191,8 +192,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
-        self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)
-        self.assertEqual(self.setting["OperaDriver"]["NamePlatformRelease"], operadriver_name_platform_release)
+        self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)  
 
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)

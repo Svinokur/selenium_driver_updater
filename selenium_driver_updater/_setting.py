@@ -121,7 +121,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "4.0.0"
+    version = "4.0.1"
 
 setting = dict(
     {
@@ -130,6 +130,7 @@ setting = dict(
             'version'                   : info.version,
             'wedriverVersionPattern'    : r'([0-9.]*\.[0-9]+)',
             'driversPath'               : base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep,
+            'DriversFileFormat'         : ".exe" if platform.system() == 'Windows' else '',
         },
         "ChromeDriver":
         {   
@@ -150,7 +151,6 @@ setting = dict(
             "LinkLastRelease"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest',
             "LinkLastReleasePlatform"   : operadriver_latest_release, 
             "LastReleasePlatform"       : operadriver_platform_release, 
-            "NamePlatformRelease"       : operadriver_name_platform_release,
         },
         "EdgeDriver":
         {

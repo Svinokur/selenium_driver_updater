@@ -1,7 +1,6 @@
 #Standart library imports
 import shutil
 import subprocess
-import wget
 import os
 import traceback
 import logging
@@ -12,6 +11,7 @@ from typing import Tuple, Any
 from pathlib import Path
 import re
 from shutil import copyfile
+import wget
 
 # Local imports
 from _setting import setting
@@ -63,15 +63,16 @@ class PhantomJS():
             self.specific_driver_name =    "phantomjs.exe" if 'windows' in specific_system else\
                                         "phantomjs"
 
-            self.phantomjs_path : str =  self.path + self.specific_driver_name if not specific_filename else self.path + self.filename
-
+            name = self.specific_driver_name
 
         else:
 
             self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
                             specific_filename
 
-            self.phantomjs_path : str =  self.path + self.setting["PhantomJS"]["LastReleasePlatform"] if not specific_filename else self.path + self.filename
+            name = self.setting["PhantomJS"]["LastReleasePlatform"]
+
+        self.phantomjs_path : str =  self.path + name if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -637,14 +638,16 @@ class PhantomJS():
 
             out_path = self.path
 
-            result, message = self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
+            parameters = dict(archive_path=archive_path, out_path=out_path)
+
+            result, message = self.extractor.extract_and_detect_archive_format(**parameters)
             if not result:
                 logging.error(message)
                 return result, message, driver_path
 
             platform : str = self.setting["PhantomJS"]["LastReleasePlatform"] if not self.specific_driver_name else self.specific_driver_name 
 
-            archive_path_folder = self.path + url.split('/')[len(url.split('/'))-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
+            archive_path_folder = self.path + Path(archive_path).stem + os.path.sep
             archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
             driver_archive_path = archive_path_folder_bin + platform
 
@@ -654,7 +657,8 @@ class PhantomJS():
 
             else:
 
-                result, message = self.__rename_driver(archive_folder_path=archive_path_folder_bin, archive_driver_path=driver_archive_path)
+                parameters = dict(archive_folder_path=archive_path_folder_bin, archive_driver_path=driver_archive_path)
+                result, message = self.__rename_driver(**parameters)
                 if not result:
                     logging.error(message)
                     return result, message, driver_path
