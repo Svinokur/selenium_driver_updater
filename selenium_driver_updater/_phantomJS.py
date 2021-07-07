@@ -647,7 +647,7 @@ class PhantomJS():
 
             platform : str = self.setting["PhantomJS"]["LastReleasePlatform"] if not self.specific_driver_name else self.specific_driver_name 
 
-            archive_path_folder = self.path + Path(archive_path).stem + os.path.sep
+            archive_path_folder = self.path + url.split('/')[len(url.split('/'))-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
             archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
             driver_archive_path = archive_path_folder_bin + platform
 
