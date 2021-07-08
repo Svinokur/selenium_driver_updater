@@ -55,6 +55,8 @@ class PhantomJS():
             else:
                 self.system_name = self.system_name + '.zip'
 
+        self.setting['PhantomJS']['LastReleasePlatform'] = 'phantomjs'
+
         #assign of filename
         specific_filename = str(kwargs.get('filename'))
         if specific_filename:

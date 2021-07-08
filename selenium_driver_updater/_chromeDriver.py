@@ -46,6 +46,8 @@ class ChromeDriver():
         if specific_system:
             self.system_name = f"chromedriver_{specific_system}.zip"
 
+        self.setting['ChromeDriver']['LastReleasePlatform'] = 'chromedriver'
+
         #assign of filename
         specific_filename = str(kwargs.get('filename'))
         if specific_filename:

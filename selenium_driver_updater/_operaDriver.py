@@ -51,6 +51,8 @@ class OperaDriver():
         if specific_system:
             self.system_name = f"operadriver_{specific_system}.zip"
 
+        self.setting['OperaDriver']['LastReleasePlatform'] = 'operadriver'
+
         #assign of filename
         specific_filename = str(kwargs.get('filename'))
         if specific_filename:

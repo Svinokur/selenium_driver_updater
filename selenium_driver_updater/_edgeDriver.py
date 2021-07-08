@@ -47,6 +47,8 @@ class EdgeDriver():
         if specific_system:
             self.system_name = f"edgedriver_{specific_system}.zip"
 
+        self.setting['EdgeDriver']['LastReleasePlatform'] = 'msedgedriver'
+
         #assign of filename
         specific_filename = str(kwargs.get('filename'))
         if specific_filename:

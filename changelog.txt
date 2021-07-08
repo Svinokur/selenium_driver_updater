@@ -1,3 +1,11 @@
+[4.1.1] 08/07/2021
+This version provides some minor fixes.
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Fixed an issue with incorrect filename extension on Windows
+
 [4.1.0] 08/07/2021
 This version provides some improvements and minor fixes.
 This code was written and tested on Python 3.9.6

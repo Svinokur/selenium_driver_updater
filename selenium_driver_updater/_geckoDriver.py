@@ -51,6 +51,8 @@ class GeckoDriver():
             else:
                 self.system_name = "geckodriver-v{}-" + f"{specific_system}.tar.gz"
 
+        self.setting['GeckoDriver']['LastReleasePlatform'] = 'geckodriver'
+
         #assign of filename
         specific_filename = str(kwargs.get('filename'))
         if specific_filename:
