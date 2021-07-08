@@ -7,7 +7,6 @@ import time
 from typing import Tuple, Any
 import re
 from pathlib import Path
-import platform
 import stat
 
 # Third party imports
@@ -40,36 +39,26 @@ class GeckoDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.specific_driver_name = ''
         self.system_name = ''
+        self.filename = ''
 
+        #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
         specific_system = specific_system.replace('mac64_m1', 'macos-aarch64').replace('mac64', 'macos')
-
         if specific_system:
             if 'win' in specific_system:
                 self.system_name = "geckodriver-v{}-" + f"{specific_system}.zip"
             else:
                 self.system_name = "geckodriver-v{}-" + f"{specific_system}.tar.gz"
 
-            specific_filename = str(kwargs.get('filename'))
-            self.filename = f"{specific_filename}.exe" if 'win' in specific_system and specific_filename else\
-                            specific_filename
+        #assign of filename
+        specific_filename = str(kwargs.get('filename'))
+        if specific_filename:
+            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
 
-            self.specific_driver_name =    "geckodriver.exe" if 'win' in specific_system else\
-                                    "geckodriver"
+        self.setting['GeckoDriver']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
 
-            name = self.specific_driver_name
-
-        else:
-
-            specific_filename = str(kwargs.get('filename'))
-            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                            specific_filename
-
-            name = self.setting['GeckoDriver']['LastReleasePlatform']
-
-        self.geckodriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
+        self.geckodriver_path : str =  self.path + self.setting['GeckoDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -78,6 +67,8 @@ class GeckoDriver():
         self.extractor = Extractor
         self.github_viewer = GithubViewer
         self.requests_getter = RequestsGetter
+
+        kwargs.update(path=self.geckodriver_path)
         self.firefoxbrowser = FirefoxBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:
@@ -581,7 +572,7 @@ class GeckoDriver():
                     return result, message, driver_path
 
             else:
-                filename = self.setting['GeckoDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
+                filename = self.setting['GeckoDriver']['LastReleasePlatform']
                 parameters.update(dict(filename=filename, filename_replace=self.filename))
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
                 if not result:

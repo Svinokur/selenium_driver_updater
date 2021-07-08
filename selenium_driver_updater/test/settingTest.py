@@ -9,67 +9,54 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from _setting import setting
 from _setting import info
 
+#pylint: disable=invalid-name
 base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
 
 os_bit = platform.architecture()[0][:-3]
 
 latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
 
-chromedriver_latest_release =   latest_release + "chromedriver_win32.zip" if platform.system() == 'Windows' else\
-                                latest_release + "chromedriver_linux64.zip" if platform.system() == "Linux" else\
-                                latest_release + "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                                latest_release + "chromedriver_mac64.zip"
-
-chromedriver_platform_release = "chromedriver.exe" if platform.system() == 'Windows' else\
-                                "chromedriver"
+chromedriver_latest_release =   "chromedriver_win32.zip" if platform.system() == 'Windows' else\
+                                "chromedriver_linux64.zip" if platform.system() == "Linux" else\
+                                "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine)\
+                                and platform.system() == 'Darwin' else\
+                                "chromedriver_mac64.zip"
+chromedriver_latest_release = latest_release + chromedriver_latest_release
 
 
 latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
-geckodriver_platform_release =  latest_release_geckodriver + "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_geckodriver + "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
-                                latest_release_geckodriver + "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine) and platform.system() == 'Darwin' else\
-                                latest_release_geckodriver + "geckodriver-v{}-macos.tar.gz"
-
-geckodriver_platform_last_release = "geckodriver.exe" if platform.system() == 'Windows' else\
-                                "geckodriver"
+geckodriver_platform_release =  "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+                                "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine)\
+                                and platform.system() == 'Darwin' else\
+                                "geckodriver-v{}-macos.tar.gz"
+geckodriver_platform_release = latest_release_geckodriver + geckodriver_platform_release
 
 
 latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/v.{}/'
-operadriver_latest_release =    latest_release_operadriver + f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_operadriver + "operadriver_linux64.zip" if platform.system() == "Linux" else\
-                                latest_release_operadriver + "operadriver_mac64.zip"
-
-operadriver_platform_release = "operadriver.exe" if platform.system() == 'Windows' else\
-                                    "operadriver"
-
-operadriver_name_platform_release = f"operadriver_win{os_bit}" if platform.system() == 'Windows' else\
-                                    "operadriver_linux64" if platform.system() == "Linux" else\
-                                    "operadriver_mac64"
-
-
+operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                "operadriver_linux64.zip" if platform.system() == "Linux" else\
+                                "operadriver_mac64.zip"
+operadriver_latest_release += latest_release_operadriver + operadriver_latest_release
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
-edgedriver_latest_release =     latest_release_edgedriver + f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                latest_release_edgedriver + "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
-                                latest_release_edgedriver + "edgedriver_linux64" if platform.system() == 'Linux' else\
-                                latest_release_edgedriver + "edgedriver_arm64.zip"
-                                
-edgedriver_platform_release =  "msedgedriver.exe" if platform.system() == 'Windows' else\
-                             "msedgedriver"
+edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
+                                "edgedriver_linux64" if platform.system() == 'Linux' else\
+                                "edgedriver_arm64.zip"
+edgedriver_latest_release = latest_release_edgedriver + edgedriver_latest_release
+
 
 url_release_phantomjs = "https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads/"
 os_bit_linux = 'x86_64' if os_bit == '64' else "i686"
-phantomjs_latest_release =      url_release_phantomjs + "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
-                                url_release_phantomjs + "phantomjs-{}-linux-{}.tar.bz2".format({}, os_bit_linux) if platform.system() == "Linux" else\
-                                url_release_phantomjs + "phantomjs-{}-macosx.zip"
-
-phantomjs_platform_release = "phantomjs.exe" if platform.system() == 'Windows' else\
-                                "phantomjs"
-
+phantomjs_latest_release =  "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
+                            "phantomjs-{}-" + f"linux-{os_bit_linux}.tar.bz2" if platform.system() == "Linux" else\
+                            "phantomjs-{}-macosx.zip"
+phantomjs_latest_release = url_release_phantomjs + phantomjs_latest_release
 
 #
 # BROWSERS AND THEIR UPDATERS
-#
+#   
 
 chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
@@ -182,28 +169,28 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
-        self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], chromedriver_platform_release)
+        self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], 'chromedriver')
         self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
         self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/")
 
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
-        self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], geckodriver_platform_last_release)
+        self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], 'geckodriver')
 
         self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
-        self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], operadriver_platform_release)  
+        self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], 'operadriver')  
 
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastRelease"], 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE')
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
-        self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], edgedriver_platform_release)
+        self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], 'msedgedriver')
         self.assertEqual(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000")
         self.assertEqual(self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}")
 
         self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
 
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
-        self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], phantomjs_platform_release)
+        self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], 'phantomjs')
         self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], url_release_phantomjs)
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
@@ -243,3 +230,4 @@ class testSetting(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
+    

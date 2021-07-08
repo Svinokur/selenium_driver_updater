@@ -54,7 +54,7 @@ class ChromiumChromeDriver():
         message_run : str = ''
         driver_path : str = ''
         try:
-            is_admin : bool = True if os.getuid() == 0 else False
+            is_admin : bool = bool(os.getuid() == 0)
         except Exception:
             is_admin : bool = False
 

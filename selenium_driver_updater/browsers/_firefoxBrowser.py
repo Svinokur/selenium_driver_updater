@@ -35,6 +35,19 @@ class FirefoxBrowser():
         self.requests_getter = RequestsGetter
 
     def main(self):
+        """Main function, checks for the latest version, downloads or updates firefox browser
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where phantomjs was downloaded or updated.
+
+        Raises:
+            Except: If unexpected error raised.
+
+        """
         result_run : bool = False
         message_run : str = ''
 
@@ -145,7 +158,7 @@ class FirefoxBrowser():
                 message = 'Trying to get current version of firefox browser via geckodriver'
                 logging.info(message)
 
-            if Path(self.geckodriver_path).exists() and not result or not browser_version:
+            if Path(self.geckodriver_path).exists() and (not result or not browser_version):
 
                 options = FirefoxOptions()
                 options.add_argument("--headless")
@@ -232,7 +245,7 @@ class FirefoxBrowser():
         result_run : bool = False
         message_run : str = ''
         try:
-            is_admin : bool = True if os.getuid() == 0 else False
+            is_admin : bool = bool(os.getuid() == 0)
         except Exception:
             is_admin : bool = False
 
@@ -295,6 +308,9 @@ class FirefoxBrowser():
             if not result:
                 logging.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
+
+            if not current_version:
+                return True, message, True, current_version, latest_version
 
             result, message, latest_version = self.__get_latest_version_firefox_browser()
             if not result:

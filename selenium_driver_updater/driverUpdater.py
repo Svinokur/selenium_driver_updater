@@ -446,6 +446,9 @@ class DriverUpdater():
                                 info_messages=info._info_messages,
                                 system_name=system_name )
 
+            if system_name:
+                setting['Program']['DriversFileFormat'] = '.exe' if 'win' in system_name or 'arm' in system_name else ''
+
             if DriverUpdater.chromedriver == driver_name:
 
                 chrome_driver = ChromeDriver(**parametres)

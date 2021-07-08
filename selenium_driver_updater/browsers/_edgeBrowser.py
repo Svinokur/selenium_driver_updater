@@ -34,6 +34,19 @@ class EdgeBrowser():
         self.requests_getter = RequestsGetter
 
     def main(self):
+        """Main function, checks for the latest version, downloads or updates edge browser
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where phantomjs was downloaded or updated.
+
+        Raises:
+            Except: If unexpected error raised.
+
+        """
         result_run : bool = False
         message_run : str = ''
 
@@ -144,7 +157,7 @@ class EdgeBrowser():
                 message = 'Trying to get current version of edge browser via edgedriver'
                 logging.info(message)
 
-            if Path(self.edgedriver_path).exists() and not result or not browser_version:
+            if Path(self.edgedriver_path).exists() and (not result or not browser_version):
 
                 desired_cap = {}
 
@@ -277,6 +290,9 @@ class EdgeBrowser():
             if not result:
                 logging.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
+
+            if not current_version:
+                return True, message, True, current_version, latest_version
 
             result, message, latest_version = self.__get_latest_version_edge_browser()
             if not result:

@@ -8,7 +8,6 @@ import time
 from typing import Tuple, Any
 import re
 from pathlib import Path
-import platform
 import stat
 
 # Third party imports
@@ -39,31 +38,23 @@ class EdgeDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.specific_driver_name = ''
         self.system_name = ''
+        self.filename = ''
+
+        #assign of specific os
         specific_filename = str(kwargs.get('filename'))
-
         specific_system = str(kwargs.get('system_name', ''))
-
         if specific_system:
             self.system_name = f"edgedriver_{specific_system}.zip"
 
-            self.filename = f"{specific_filename}.exe" if 'win' in specific_system or 'arm' in specific_system and specific_filename else\
-                            specific_filename
+        #assign of filename
+        specific_filename = str(kwargs.get('filename'))
+        if specific_filename:
+            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
 
-            self.specific_driver_name = "msedgedriver.exe" if 'win' in specific_system or 'arm' in specific_system else\
-                                     "msedgedriver"
+        self.setting['EdgeDriver']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
 
-            name = self.specific_driver_name
-
-        else:
-
-            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                            specific_filename
-
-            name = str(self.setting['EdgeDriver']['LastReleasePlatform'])
-
-        self.edgedriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
+        self.edgedriver_path : str =  self.path + self.setting['EdgeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -71,6 +62,8 @@ class EdgeDriver():
 
         self.extractor = Extractor
         self.requests_getter = RequestsGetter
+
+        kwargs.update(path=self.edgedriver_path)
         self.edgebrowser = EdgeBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:
@@ -583,7 +576,7 @@ class EdgeDriver():
             else:
 
 
-                filename = str(self.setting['EdgeDriver']['LastReleasePlatform']) if not self.specific_driver_name else self.specific_driver_name
+                filename = str(self.setting['EdgeDriver']['LastReleasePlatform'])
                 parameters.update(dict(filename=filename, filename_replace=self.filename))
 
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(**parameters)

@@ -8,7 +8,6 @@ import subprocess
 import re
 from pathlib import Path
 from typing import Any, Tuple
-import platform
 
 # Third party imports
 import wget
@@ -38,33 +37,23 @@ class ChromeDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.specific_driver_name = ''
         self.system_name = ''
+        self.filename = ''
 
-        specific_filename = str(kwargs.get('filename'))
-
+        #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
         specific_system = specific_system.replace('win64', 'win32').replace('linux32', 'linux64')
-
         if specific_system:
             self.system_name = f"chromedriver_{specific_system}.zip"
 
-            self.filename = f"{specific_filename}.exe" if 'win' in specific_system and specific_filename else\
-                            specific_filename
+        #assign of filename
+        specific_filename = str(kwargs.get('filename'))
+        if specific_filename:
+            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
 
-            self.specific_driver_name =    "chromedriver.exe" if 'win' in specific_system else\
-                                                "chromedriver"
+        self.setting['ChromeDriver']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
 
-            name = self.specific_driver_name
-
-        else:
-
-            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                            specific_filename
-
-            name = self.setting['ChromeDriver']['LastReleasePlatform']
-
-        self.chromedriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
+        self.chromedriver_path : str =  self.path + self.setting['ChromeDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -72,6 +61,8 @@ class ChromeDriver():
 
         self.extractor = Extractor
         self.requests_getter = RequestsGetter
+
+        kwargs.update(path=self.chromedriver_path)
         self.chromebrowser = ChromeBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:
@@ -651,7 +642,7 @@ class ChromeDriver():
 
             else:
 
-                filename = self.setting['ChromeDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
+                filename = self.setting['ChromeDriver']['LastReleasePlatform']
                 parameters.update(dict(filename=filename, filename_replace=self.filename))
                 result, message = self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
                 if not result:

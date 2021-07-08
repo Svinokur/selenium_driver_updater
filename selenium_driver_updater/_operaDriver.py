@@ -6,7 +6,6 @@ import traceback
 import logging
 import time
 from typing import Tuple, Any
-import platform
 import stat
 from shutil import copyfile
 from pathlib import Path
@@ -43,33 +42,23 @@ class OperaDriver():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.specific_driver_name = ''
         self.system_name = ''
+        self.filename = ''
 
-        specific_filename = str(kwargs.get('filename'))
-
+        #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
         specific_system = specific_system.replace('linux32', 'linux64')
-
         if specific_system:
             self.system_name = f"operadriver_{specific_system}.zip"
 
-            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
-                            specific_filename
+        #assign of filename
+        specific_filename = str(kwargs.get('filename'))
+        if specific_filename:
+            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
 
-            self.specific_driver_name =    "operadriver.exe" if 'win' in specific_system else\
-                                            "operadriver"
+        self.setting['OperaDriver']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
 
-            name = self.specific_driver_name
-
-        else:
-
-            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                            specific_filename
-
-            name = self.setting['OperaDriver']['LastReleasePlatform']
-
-        self.operadriver_path : str =  self.path + name if not specific_filename else self.path + self.filename
+        self.operadriver_path : str =  self.path + self.setting['OperaDriver']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -78,6 +67,8 @@ class OperaDriver():
         self.extractor = Extractor
         self.github_viewer = GithubViewer
         self.requests_getter = RequestsGetter
+
+        kwargs.update(path=self.operadriver_path)
         self.operabrowser = OperaBrowser(**kwargs)
 
     def main(self) -> Tuple[bool, str, str]:

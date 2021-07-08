@@ -6,7 +6,6 @@ import traceback
 import logging
 import time
 import stat
-import platform
 from typing import Tuple, Any
 from pathlib import Path
 import re
@@ -38,11 +37,10 @@ class PhantomJS():
 
         self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
 
-        self.specific_driver_name = ''
         self.system_name = ''
+        self.filename = ''
 
-        specific_filename = str(kwargs.get('filename'))
-
+        #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
         specific_system = specific_system.replace('linux64', 'linux-x86_64').replace('linux', 'linux-x86_64')
         specific_system = specific_system.replace('linux32', 'linux-i686').replace('macos', 'macosx')
@@ -57,22 +55,14 @@ class PhantomJS():
             else:
                 self.system_name = self.system_name + '.zip'
 
-            self.filename = f"{specific_filename}.exe" if 'windows' in specific_system and specific_filename else\
-                            specific_filename
+        #assign of filename
+        specific_filename = str(kwargs.get('filename'))
+        if specific_filename:
+            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
 
-            self.specific_driver_name =    "phantomjs.exe" if 'windows' in specific_system else\
-                                        "phantomjs"
+        self.setting['PhantomJS']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
 
-            name = self.specific_driver_name
-
-        else:
-
-            self.filename = f"{specific_filename}.exe" if platform.system() == 'Windows' and specific_filename else\
-                            specific_filename
-
-            name = self.setting["PhantomJS"]["LastReleasePlatform"]
-
-        self.phantomjs_path : str =  self.path + name if not specific_filename else self.path + self.filename
+        self.phantomjs_path : str = self.path + self.setting['PhantomJS']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
 
         self.version = str(kwargs.get('version'))
 
@@ -645,7 +635,7 @@ class PhantomJS():
                 logging.error(message)
                 return result, message, driver_path
 
-            platform : str = self.setting["PhantomJS"]["LastReleasePlatform"] if not self.specific_driver_name else self.specific_driver_name 
+            platform : str = self.setting["PhantomJS"]["LastReleasePlatform"]
 
             archive_path_folder = self.path + url.split('/')[len(url.split('/'))-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
             archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep

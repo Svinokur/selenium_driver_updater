@@ -28,6 +28,19 @@ class ChromiumChromeBrowser():
         self.requests_getter = RequestsGetter
 
     def main(self):
+        """Main function, checks for the latest version, downloads or updates chromium browser
+
+        Returns:
+            Tuple of bool, str and str
+
+            result_run (bool)       : True if function passed correctly, False otherwise.
+            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
+            driver_path (str)       : Path where phantomjs was downloaded or updated.
+
+        Raises:
+            Except: If unexpected error raised.
+
+        """
         result_run : bool = False
         message_run : str = ''
 
@@ -122,6 +135,9 @@ class ChromiumChromeBrowser():
                 logging.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
 
+            if not current_version:
+                return True, message, True, current_version, latest_version
+
             result, message, latest_version = self.__get_latest_version_chromiumbrowser()
             if not result:
                 logging.error(message)
@@ -129,7 +145,8 @@ class ChromiumChromeBrowser():
 
             if current_version == latest_version:
                 is_browser_up_to_date = True
-                message = f"Your existing chromiumbrowser is up to date. current_version: {current_version} latest_version: {latest_version}"
+                message = (f"Your existing chromiumbrowser is up to date."
+                            f"current_version: {current_version} latest_version: {latest_version}")
                 logging.info(message)
 
             result_run = True
@@ -156,7 +173,7 @@ class ChromiumChromeBrowser():
 
             WebDriverException: Occurs when current chromedriver could not start or critical error occured.
 
-            Except: If unexpected error raised. 
+            Except: If unexpected error raised.
 
         """
 
