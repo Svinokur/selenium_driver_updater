@@ -12,6 +12,8 @@
 [![macOS](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/macOS-tests.yml/badge.svg)](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/macOS-tests.yml)
 [![Ubuntu](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/ubuntu-tests.yml/badge.svg)](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/ubuntu-tests.yml)
 
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/Svinokur/selenium_driver_updater)
+
 It is a fast and convenience package that can automatically download or update Selenium webdriver binaries and their browsers for different OS.
 
 ## Installation
