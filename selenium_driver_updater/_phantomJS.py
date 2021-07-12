@@ -42,7 +42,7 @@ class PhantomJS():
 
         #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
-        specific_system = specific_system.replace('linux64', 'linux-x86_64').replace('linux', 'linux-x86_64')
+        specific_system = specific_system.replace('linux64', 'linux-x86_64')
         specific_system = specific_system.replace('linux32', 'linux-i686').replace('macos', 'macosx')
 
         if specific_system:

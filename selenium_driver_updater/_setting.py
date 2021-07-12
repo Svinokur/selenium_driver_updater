@@ -108,7 +108,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "4.1.1"
+    version = "4.1.2"
 
 setting = dict(
     {

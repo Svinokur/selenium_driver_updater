@@ -56,7 +56,7 @@ class DriverUpdater():
     windows32 = 'win32'
     windows64 = 'win64'
 
-    linux = 'linux'
+    linux = 'linux64'
     linux32 = 'linux32'
     linux64 = 'linux64'
 
