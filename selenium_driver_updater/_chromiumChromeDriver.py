@@ -13,11 +13,11 @@ from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
 # Local imports
-from _setting import setting
+from selenium_driver_updater._setting import setting
 
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
-from browsers._chromiumChromeBrowser import ChromiumChromeBrowser
+from selenium_driver_updater.browsers._chromiumChromeBrowser import ChromiumChromeBrowser
 
 class ChromiumChromeDriver():
     """Class for working with Selenium chromedriver binary"""

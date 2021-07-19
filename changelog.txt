@@ -1,3 +1,15 @@
+[4.1.3] 19/07/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Fixed an issue with incorrect folder imports
+
+# Comments 
+
+(For example there was two folders - one folder in library and one from another directory, 
+library takes folder from another directory, not from herself)
+
 [4.1.2] 12/07/2021
 This version provides some minor fixes.
 This code was written and tested on Python 3.9.6

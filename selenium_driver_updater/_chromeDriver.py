@@ -13,12 +13,12 @@ from typing import Any, Tuple
 import wget
 
 # Local imports
-from _setting import setting
+from selenium_driver_updater._setting import setting
 
-from util.extractor import Extractor
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.extractor import Extractor
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
-from browsers._chromeBrowser import ChromeBrowser
+from selenium_driver_updater.browsers._chromeBrowser import ChromeBrowser
 
 class ChromeDriver():
     """Class for working with Selenium chromedriver binary"""

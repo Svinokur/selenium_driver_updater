@@ -17,13 +17,13 @@ from selenium.common.exceptions import SessionNotCreatedException
 from selenium.common.exceptions import WebDriverException
 
 # Local imports
-from _setting import setting
+from selenium_driver_updater._setting import setting
 
-from util.extractor import Extractor
-from util.github_viewer import GithubViewer
+from selenium_driver_updater.util.extractor import Extractor
+from selenium_driver_updater.util.github_viewer import GithubViewer
 
-from util.requests_getter import RequestsGetter
-from browsers._operaBrowser import OperaBrowser
+from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.browsers._operaBrowser import OperaBrowser
 
 class OperaDriver():
     """Class for working with Selenium operadriver binary"""

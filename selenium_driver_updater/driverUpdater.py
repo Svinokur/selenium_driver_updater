@@ -6,21 +6,18 @@ import os
 import traceback
 from typing import Tuple
 import time
-
 import sys
-import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 # Local imports
-from _chromeDriver import ChromeDriver
-from _geckoDriver import GeckoDriver
-from _operaDriver import OperaDriver
-from _edgeDriver import EdgeDriver
-from _chromiumChromeDriver import ChromiumChromeDriver
-from _phantomJS import PhantomJS
-from _setting import setting
+from selenium_driver_updater._chromeDriver import ChromeDriver
+from selenium_driver_updater._geckoDriver import GeckoDriver
+from selenium_driver_updater._operaDriver import OperaDriver
+from selenium_driver_updater._edgeDriver import EdgeDriver
+from selenium_driver_updater._chromiumChromeDriver import ChromiumChromeDriver
+from selenium_driver_updater._phantomJS import PhantomJS
+from selenium_driver_updater._setting import setting
 
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
 @dataclass
 class info():

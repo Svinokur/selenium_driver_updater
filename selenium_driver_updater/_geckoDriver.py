@@ -14,13 +14,13 @@ import wget
 
 # Local imports
 
-from _setting import setting
+from selenium_driver_updater._setting import setting
 
-from util.extractor import Extractor
-from util.github_viewer import GithubViewer
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.extractor import Extractor
+from selenium_driver_updater.util.github_viewer import GithubViewer
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
-from browsers._firefoxBrowser import FirefoxBrowser
+from selenium_driver_updater.browsers._firefoxBrowser import FirefoxBrowser
 
 class GeckoDriver():
     """Class for working with Selenium geckodriver binary"""
