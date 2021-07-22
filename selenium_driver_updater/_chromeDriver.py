@@ -42,7 +42,7 @@ class ChromeDriver():
 
         #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
-        specific_system = specific_system.replace('win64', 'win32').replace('linux32', 'linux64')
+        specific_system = specific_system.replace('win64', 'win32')
         if specific_system:
             self.system_name = f"chromedriver_{specific_system}.zip"
 

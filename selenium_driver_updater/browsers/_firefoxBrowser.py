@@ -366,7 +366,7 @@ class FirefoxBrowser():
                         with subprocess.Popen(command, stdout=subprocess.PIPE) as process:
                             browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                        if 'invalid' not in browser_version_terminal.lower():
+                        if 'invalid' not in browser_version_terminal.lower() or 'cannot find path' not in browser_version_terminal.lower():
                             break
 
                 elif platform.system() == 'Darwin':
