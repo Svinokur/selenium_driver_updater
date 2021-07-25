@@ -1,6 +1,5 @@
 #Standart library imports
 import traceback
-import logging
 import zipfile
 import os
 import shutil
@@ -10,6 +9,9 @@ from pathlib import Path
 
 # Third party imports
 import tarfile
+
+#Local imports
+from selenium_driver_updater.util.logger import logger
 
 class Extractor():
     """Class for working with different archive types"""
@@ -46,7 +48,7 @@ class Extractor():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -82,7 +84,7 @@ class Extractor():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -113,7 +115,7 @@ class Extractor():
             driver_folder_path = out_path + 'tmp'
             message = ('Created new safety directory for replacing'
                         f'filename: {filename} filename_replace: {filename_replace}')
-            logging.info(message)
+            logger.info(message)
 
             if os.path.exists(driver_folder_path):
                 shutil.rmtree(driver_folder_path)
@@ -136,7 +138,7 @@ class Extractor():
 
             else:
                 message = f'Unknown archive format was specified archive_path: {archive_path}'
-                logging.error(message)
+                logger.error(message)
                 return result_run, message
 
             old_path = driver_folder_path + os.path.sep + filename
@@ -157,7 +159,7 @@ class Extractor():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -191,7 +193,7 @@ class Extractor():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -225,33 +227,33 @@ class Extractor():
 
                 result, message = Extractor.extract_all_zip_archive(**parameters)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
             elif archive_path.endswith('.tar.gz'):
 
                 result, message = Extractor.extract_all_tar_gz_archive(**parameters)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
             elif archive_path.endswith('.tar.bz2'):
 
                 result, message = Extractor.extract_all_tar_bz2_archive(**parameters)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
             else:
                 message = f'Unknown archive format was specified archive_path: {archive_path}'
-                logging.error(message)
+                logger.error(message)
                 return result_run, message
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
         

@@ -2,7 +2,6 @@
 import subprocess
 import os
 import traceback
-import logging
 import re
 from typing import Tuple, Any
 
@@ -15,9 +14,10 @@ from selenium.common.exceptions import WebDriverException
 # Local imports
 from selenium_driver_updater._setting import setting
 
-from selenium_driver_updater.util.requests_getter import RequestsGetter
-
 from selenium_driver_updater.browsers._chromiumChromeBrowser import ChromiumChromeBrowser
+
+from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class ChromiumChromeDriver():
     """Class for working with Selenium chromedriver binary"""
@@ -62,29 +62,29 @@ class ChromiumChromeDriver():
 
             if platform.system() != 'Linux':
                 message = 'chromium_chromedriver webdriver downloading/updating is only supported for Linux only. Please wait for the new releases.'
-                logging.error(message)
+                logger.error(message)
                 return False, message, driver_path
 
             if not is_admin:
                 message = 'You have not ran library with sudo privileges to download or update chromium_chromedriver - so that is impossible.'
-                logging.error(message)
+                logger.error(message)
                 return False, message, driver_path
 
             result, message = self.chromium_chromebrowser.main()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             result, message, driver_path = self.__check_if_chromedriver_is_up_to_date()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -113,18 +113,18 @@ class ChromiumChromeDriver():
             url = self.setting["ChromeDriver"]["LinkLastRelease"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, latest_version
 
             latest_version = str(json_data)
 
-            logging.info(f'Latest version of chromium_chromedriver: {latest_version}')
+            logger.info(f'Latest version of chromium_chromedriver: {latest_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_version
 
@@ -158,9 +158,9 @@ class ChromiumChromeDriver():
 
             result, message, driver_version = self.__get_current_version_chromium_chromedriver_via_terminal()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 message = 'Trying to get current version of chromium_chromedriver via webdriver'
-                logging.info(message)
+                logger.info(message)
 
             if not result or not driver_version:
 
@@ -173,28 +173,28 @@ class ChromiumChromeDriver():
                 driver.close()
                 driver.quit()
 
-            logging.info(f'Current version of chromium_chromedriver: {driver_version}')
+            logger.info(f'Current version of chromium_chromedriver: {driver_version}')
 
             result_run = True
 
         except SessionNotCreatedException:
             message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except WebDriverException:
             message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_version
 
@@ -222,7 +222,7 @@ class ChromiumChromeDriver():
 
         try:
 
-            logging.info('Trying to get current version of chromium_chromedriver via terminal')
+            logger.info('Trying to get current version of chromium_chromedriver via terminal')
 
             with subprocess.Popen(self.chromium_chromedriver_name + ' --version', stdout=subprocess.PIPE, shell=True) as process:
                 driver_version_terminal = process.communicate()[0].decode('UTF-8')
@@ -234,7 +234,7 @@ class ChromiumChromeDriver():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_version
 
@@ -262,25 +262,25 @@ class ChromiumChromeDriver():
 
             result, message, current_version = self.__get_current_version_chromium_chromedriver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             result, message, latest_version = self.__get_latest_version_chromium_chromedriver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             if current_version == latest_version:
                 is_driver_up_to_date = True
                 message = ('Your existing chromium_chromedriver is up to date.'
                             f'current_version: {current_version} latest_version: {latest_version}')
-                logging.info(message)
+                logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
 
@@ -308,7 +308,7 @@ class ChromiumChromeDriver():
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if is_driver_up_to_date:
@@ -316,26 +316,26 @@ class ChromiumChromeDriver():
 
             result, message, driver_path = self.__get_latest_chromium_chromedriver_for_current_os()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             if self.check_driver_is_up_to_date:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
                     message = f'Problem with updating chromedriver current_version: {current_version} latest_version: {latest_version}'
-                    logging.error(message)
+                    logger.error(message)
                     return result_run, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -360,17 +360,17 @@ class ChromiumChromeDriver():
         try:
 
             message = 'Trying to update chromium_chromedriver to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             os.system(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"])
 
             message = 'Chromium_chromedriver was successfully updated to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path

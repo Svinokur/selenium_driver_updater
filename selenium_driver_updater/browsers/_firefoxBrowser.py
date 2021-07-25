@@ -1,7 +1,6 @@
 #Standart library imports
 import subprocess
 import traceback
-import logging
 import time
 import os
 import re
@@ -22,6 +21,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium_driver_updater._setting import setting
 
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class FirefoxBrowser():
     """Class for working with Firefox browser"""
@@ -56,7 +56,7 @@ class FirefoxBrowser():
             if self.check_browser_is_up_to_date:
                 result, message = self.__check_if_firefox_browser_is_up_to_date()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
 
@@ -64,7 +64,7 @@ class FirefoxBrowser():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -89,40 +89,40 @@ class FirefoxBrowser():
             firefoxbrowser_updater_path = str(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"])
             if not firefoxbrowser_updater_path:
                 message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                logging.info(message)
+                logger.info(message)
                 return True, message
 
             if not Path(firefoxbrowser_updater_path).exists():
                 message = f'firefoxbrowser_updater_path: {firefoxbrowser_updater_path} is not exists. Please report your OS information and path to {firefoxbrowser_updater_path} file in repository.'
-                logging.info(message)
+                logger.info(message)
                 return True, message
 
             result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message
 
             if not is_browser_up_to_date:
 
                 result, message = self.__get_latest_firefox_browser_for_current_os()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
                 result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
                 if not is_browser_up_to_date:
                     message = f'Problem with updating firefox browser current_version: {current_version} latest_version: {latest_version}'
-                    logging.info(message)
+                    logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -154,9 +154,9 @@ class FirefoxBrowser():
 
             result, message, browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 message = 'Trying to get current version of firefox browser via geckodriver'
-                logging.info(message)
+                logger.info(message)
 
             if Path(self.geckodriver_path).exists() and (not result or not browser_version):
 
@@ -168,23 +168,23 @@ class FirefoxBrowser():
                 driver.close()
                 driver.quit()
 
-            logging.info(f'Current version of firefox browser: {browser_version}')
+            logger.info(f'Current version of firefox browser: {browser_version}')
 
             result_run = True
 
         except SessionNotCreatedException:
             message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, browser_version
 
         except WebDriverException:
             message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, browser_version
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, browser_version
 
@@ -213,19 +213,19 @@ class FirefoxBrowser():
             url = self.setting["FirefoxBrowser"]["LinkAllLatestReleases"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, latest_version
 
             soup = BeautifulSoup(json_data, 'html.parser')
             latest_version = soup.findAll('html')[0].attrs.get('data-latest-firefox')
 
-            logging.info(f'Latest version of firefox browser: {latest_version}')
+            logger.info(f'Latest version of firefox browser: {latest_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_version
 
@@ -254,7 +254,7 @@ class FirefoxBrowser():
         try:
 
             message = f'Trying to update firefox browser to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             if platform.system() == 'Linux':
 
@@ -263,7 +263,7 @@ class FirefoxBrowser():
 
                 elif not is_admin:
                     message = 'You have not ran library with sudo privileges to update firefox browser - so updating is impossible.'
-                    logging.error(message)
+                    logger.error(message)
                     return True, message_run
 
             else:
@@ -272,13 +272,13 @@ class FirefoxBrowser():
                 time.sleep(60) #wait for the updating - too long
 
             message = 'Firefox browser was successfully updated to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -306,7 +306,7 @@ class FirefoxBrowser():
 
             result, message, current_version = self.__get_current_version_firefox_browser_selenium()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
 
             if not current_version:
@@ -314,19 +314,19 @@ class FirefoxBrowser():
 
             result, message, latest_version = self.__get_latest_version_firefox_browser()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
 
             if current_version == latest_version:
                 is_browser_up_to_date = True
                 message = f"Your existing firefox browser is up to date. current_version: {current_version} latest_version: {latest_version}"
-                logging.info(message)
+                logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
 
@@ -357,7 +357,7 @@ class FirefoxBrowser():
             firefox_path = self.setting["FirefoxBrowser"]["Path"]
             if firefox_path:
 
-                logging.info('Trying to get current version of firefox browser via terminal')
+                logger.info('Trying to get current version of firefox browser via terminal')
 
                 if platform.system() == 'Windows':
 
@@ -382,6 +382,6 @@ class FirefoxBrowser():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, browser_version

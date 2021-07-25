@@ -1,11 +1,11 @@
 #Standart library imports
 from typing import Any, Tuple
 import traceback
-import logging
 
 # Local imports
 from selenium_driver_updater._setting import setting
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class GithubViewer():
     """Class for working with github repositories"""
@@ -34,7 +34,7 @@ class GithubViewer():
 
             result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, json_data
 
             result_run = True
@@ -42,7 +42,7 @@ class GithubViewer():
         except Exception:
 
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, json_data
 
@@ -70,7 +70,7 @@ class GithubViewer():
 
             result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, json_data
 
             json_data = json_data[len(json_data)-1]
@@ -80,7 +80,7 @@ class GithubViewer():
         except Exception:
 
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, json_data
 
@@ -108,7 +108,7 @@ class GithubViewer():
 
             result, message, status_code, json_data = RequestsGetter.get_result_by_request(url=url, is_json=True)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, json_data
 
             result_run = True
@@ -116,6 +116,6 @@ class GithubViewer():
         except Exception:
 
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, json_data

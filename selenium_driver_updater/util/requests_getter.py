@@ -1,12 +1,14 @@
 #Standart library imports
 from typing import Any, Optional, Tuple
 import traceback
-import logging
 import json
 
 #Requests imports
 import requests
 from requests.models import Response
+
+#Local imports
+from selenium_driver_updater.util.logger import logger
 
 class RequestsGetter(): # pylint: disable=too-few-public-methods
     """Class for working with requests module"""
@@ -62,7 +64,7 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
                 else:
                     message_run = (f'url: {url} status_code: {status_code}'
                                   f'not equal 200 request_text: {request.text}')
-                    logging.error(message_run)
+                    logger.error(message_run)
 
                 return result_run, message_run, status_code, request.text
 
@@ -76,10 +78,10 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
 
         except json.decoder.JSONDecodeError:
             message_run = f'Json error: {str(traceback.format_exc())} request_text: {request.text}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         except Exception:
             message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, status_code, request_text

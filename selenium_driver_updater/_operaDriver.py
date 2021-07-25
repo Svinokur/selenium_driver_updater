@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import os
 import traceback
-import logging
 import time
 from typing import Tuple, Any
 import stat
@@ -21,8 +20,9 @@ from selenium_driver_updater._setting import setting
 
 from selenium_driver_updater.util.extractor import Extractor
 from selenium_driver_updater.util.github_viewer import GithubViewer
-
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
+
 from selenium_driver_updater.browsers._operaBrowser import OperaBrowser
 
 class OperaDriver():
@@ -96,28 +96,28 @@ class OperaDriver():
 
             result, message = self.operabrowser.main()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             if not self.version:
 
                 result, message, driver_path = self.__check_if_operadriver_is_up_to_date()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             else:
 
                 result, message, driver_path = self.__download_driver(version=self.version)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -158,28 +158,28 @@ class OperaDriver():
                 find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
-                logging.info(f'Current version of operadriver: {driver_version}')
+                logger.info(f'Current version of operadriver: {driver_version}')
 
             result_run = True
 
         except SessionNotCreatedException:
             message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except WebDriverException:
             message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_version
 
@@ -212,13 +212,13 @@ class OperaDriver():
 
             latest_version = json_data.get('name')
 
-            logging.info(f'Latest version of operadriver: {latest_version}')
+            logger.info(f'Latest version of operadriver: {latest_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_version
 
@@ -243,7 +243,7 @@ class OperaDriver():
         try:
 
             if Path(self.operadriver_path).exists():
-                logging.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
+                logger.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
                 Path(self.operadriver_path).unlink()
 
 
@@ -251,7 +251,7 @@ class OperaDriver():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -279,7 +279,7 @@ class OperaDriver():
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if is_driver_up_to_date:
@@ -287,33 +287,33 @@ class OperaDriver():
 
             result, message, driver_path = self.__download_driver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
                     message = ('Problem with updating operadriver'
                                 f'current_version: {current_version} latest_version: {latest_version}')
-                    logging.error(message)
+                    logger.error(message)
                     message = 'Trying to download previous latest version of operadriver'
-                    logging.info(message)
+                    logger.info(message)
 
                     result, message, driver_path = self.__download_driver(previous_version=True)
                     if not result:
-                        logging.error(message)
+                        logger.error(message)
                         return result, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -341,7 +341,7 @@ class OperaDriver():
 
             result, message, current_version = self.__get_current_version_operadriver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             if not current_version:
@@ -349,20 +349,20 @@ class OperaDriver():
 
             result, message, latest_version = self.__get_latest_version_operadriver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             if current_version == latest_version:
                 is_driver_up_to_date = True
                 message = ('Your existing operadriver is up to date.' 
                         f'current_version: {current_version} latest_version: {latest_version}')
-                logging.info(message)
+                logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
 
@@ -406,7 +406,7 @@ class OperaDriver():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -430,18 +430,18 @@ class OperaDriver():
 
             if Path(self.operadriver_path).exists():
 
-                logging.info('Trying to give operadriver needed permissions')
+                logger.info('Trying to give operadriver needed permissions')
 
                 st = os.stat(self.operadriver_path)
                 os.chmod(self.operadriver_path, st.st_mode | stat.S_IEXEC)
 
-                logging.info('Needed rights for operadriver were successfully issued')
+                logger.info('Needed rights for operadriver were successfully issued')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -474,13 +474,13 @@ class OperaDriver():
 
             latest_previous_version = json_data[1].get('name')
 
-            logging.info(f'Latest previous version of operadriver: {latest_previous_version}')
+            logger.info(f'Latest previous version of operadriver: {latest_previous_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_previous_version
 
@@ -506,7 +506,7 @@ class OperaDriver():
 
             result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(OperaDriver._repo_name)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message
 
             for data in json_data:
@@ -518,14 +518,14 @@ class OperaDriver():
 
             if not is_found:
                 message = f'Wrong version or system_name was specified. version_url: {version_url} url: {url}'
-                logging.error(message)
+                logger.error(message)
                 return False, message
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -562,48 +562,48 @@ class OperaDriver():
 
                 result, message = self.__delete_current_operadriver_for_current_os()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             if version:
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(version, version)
 
-                logging.info(f'Started download operadriver specific_version: {version}')
+                logger.info(f'Started download operadriver specific_version: {version}')
 
             elif previous_version:
 
                 result, message, latest_previous_version = self.__get_latest_previous_version_operadriver_via_requests()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
 
-                logging.info(f'Started download operadriver latest_previous_version: {latest_previous_version}')
+                logger.info(f'Started download operadriver latest_previous_version: {latest_previous_version}')
 
             else:
 
                 result, message, latest_version = self.__get_latest_version_operadriver()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
 
-                logging.info(f'Started download operadriver latest_version: {latest_version}')
+                logger.info(f'Started download operadriver latest_version: {latest_version}')
 
             if self.system_name:
                 url = url.replace(url.split("/")[len(url.split("/"))-1], '')
                 url = url + self.system_name
 
-                logging.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+                logger.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
             if any([version, self.system_name ,latest_previous_version]):
                 version_url = version if version else latest_previous_version if latest_previous_version else latest_version
                 result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             archive_name = url.split("/")[len(url.split("/"))-1]
@@ -612,21 +612,21 @@ class OperaDriver():
             if Path(out_path).exists():
                 Path(out_path).unlink()
 
-            logging.info(f'Started download operadriver by url: {url}')
+            logger.info(f'Started download operadriver by url: {url}')
 
             if self.info_messages:
                 archive_path = wget.download(url=url, out=out_path)
             else:
                 archive_path = wget.download(url=url, out=out_path, bar=None)
 
-            logging.info(f'Operadriver was downloaded to path: {archive_path}')
+            logger.info(f'Operadriver was downloaded to path: {archive_path}')
 
             time.sleep(2)
 
             out_path = self.path
             result, message = self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             platform : str = self.setting['OperaDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
@@ -653,7 +653,7 @@ class OperaDriver():
 
             driver_path = self.operadriver_path
 
-            logging.info(f'Operadriver was successfully unpacked by path: {driver_path}')
+            logger.info(f'Operadriver was successfully unpacked by path: {driver_path}')
 
             if self.chmod:
 
@@ -665,7 +665,7 @@ class OperaDriver():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
         

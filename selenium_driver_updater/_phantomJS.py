@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import os
 import traceback
-import logging
 import time
 import stat
 from typing import Tuple, Any
@@ -18,6 +17,7 @@ from selenium_driver_updater._setting import setting
 from selenium_driver_updater.util.extractor import Extractor
 from selenium_driver_updater.util.github_viewer import GithubViewer
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class PhantomJS():
     "Class for working with Selenium phantomjs binary"
@@ -108,18 +108,18 @@ class PhantomJS():
                 find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
                 driver_version = find_string[0] if len(find_string) > 0 else ''
 
-                logging.info(f'Current version of phantomjs: {driver_version}')
+                logger.info(f'Current version of phantomjs: {driver_version}')
 
             result_run = True
 
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, driver_version
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_version
 
@@ -155,16 +155,16 @@ class PhantomJS():
 
             if not latest_version:
                 message = 'Unable to determine latest version of PhantomJS, maybe the tags were deleted.'
-                logging.error(message)
+                logger.error(message)
                 return False, message, latest_version
 
-            logging.info(f'Latest version of phantomjs: {latest_version}')
+            logger.info(f'Latest version of phantomjs: {latest_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_version
 
@@ -192,7 +192,7 @@ class PhantomJS():
 
             result, message, current_version = self.__get_current_version_phantomjs()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             if not current_version:
@@ -200,19 +200,19 @@ class PhantomJS():
 
             result, message, latest_version = self.__get_latest_version_phantomjs()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_driver_up_to_date, current_version, latest_version
 
             if current_version == latest_version:
                 is_driver_up_to_date = True
                 message = f'Your existing phantomjs is up to date. current_version: {current_version} latest_version: {latest_version}' 
-                logging.info(message)
+                logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, is_driver_up_to_date, current_version, latest_version
 
@@ -240,7 +240,7 @@ class PhantomJS():
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if is_driver_up_to_date:
@@ -248,32 +248,32 @@ class PhantomJS():
 
             result, message, driver_path = self.__download_driver()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             if self.check_driver_is_up_to_date and not self.system_name:
 
                 result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
                 if not is_driver_up_to_date:
                     message = f'Problem with updating phantomjs current_version: {current_version} latest_version: {latest_version}'
-                    logging.error(message)
+                    logger.error(message)
                     message = 'Trying to download previous latest version of phantomjs'
-                    logging.info(message)
+                    logger.info(message)
 
                     result, message, driver_path = self.__download_driver(previous_version=True)
                     if not result:
-                        logging.error(message)
+                        logger.error(message)
                         return result, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -299,14 +299,14 @@ class PhantomJS():
 
             if Path(self.phantomjs_path).exists():
 
-                logging.info(f'Deleted existing phantomjs phantomjs_path: {self.phantomjs_path}')
+                logger.info(f'Deleted existing phantomjs phantomjs_path: {self.phantomjs_path}')
                 Path(self.phantomjs_path).unlink()
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -330,18 +330,18 @@ class PhantomJS():
 
             if Path(self.phantomjs_path).exists():
 
-                logging.info('Trying to give phantomjs needed permissions')
+                logger.info('Trying to give phantomjs needed permissions')
 
                 st = os.stat(self.phantomjs_path)
                 os.chmod(self.phantomjs_path, st.st_mode | stat.S_IEXEC)
 
-                logging.info('Needed rights for phantomjs were successfully issued')
+                logger.info('Needed rights for phantomjs were successfully issued')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -385,7 +385,7 @@ class PhantomJS():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -414,21 +414,21 @@ class PhantomJS():
 
                 result, message, driver_path = self.__check_if_phantomjs_is_up_to_date()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             else:
 
                 result, message, driver_path = self.__download_driver(version=self.version)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path
 
@@ -458,7 +458,7 @@ class PhantomJS():
             url = self.setting["PhantomJS"]["LinkAllReleases"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url, is_json=True)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, latest_previous_version
 
             values = json_data.get('values')
@@ -476,13 +476,13 @@ class PhantomJS():
 
             latest_previous_version = all_versions[len(all_versions)-2]
 
-            logging.info(f'Latest previous version of phantomjs: {latest_previous_version}')
+            logger.info(f'Latest previous version of phantomjs: {latest_previous_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, latest_previous_version
 
@@ -510,7 +510,7 @@ class PhantomJS():
 
                 result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url_releases, is_json=True)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
                 for data in json_data.get('values'):
@@ -524,14 +524,14 @@ class PhantomJS():
 
             if not is_found:
                 message = f'Wrong version or system_name was specified. archive_name: {archive_name} url: {url}'
-                logging.error(message)
+                logger.error(message)
                 return False, message
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -568,12 +568,12 @@ class PhantomJS():
 
                 result, message = self.__delete_current_phantomjs_for_current_os()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             if version:
 
-                logging.info(f'Started download phantomjs specific_version: {version}')
+                logger.info(f'Started download phantomjs specific_version: {version}')
 
                 url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(version)
 
@@ -581,20 +581,20 @@ class PhantomJS():
 
                 result, message, latest_previous_version = self.__get_latest_previous_version_phantomjs_via_requests()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
-                logging.info(f'Started download phantomjs latest_previous_version: {latest_previous_version}')
+                logger.info(f'Started download phantomjs latest_previous_version: {latest_previous_version}')
 
                 url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_previous_version)
 
             else:
                 result, message, latest_version = self.__get_latest_version_phantomjs()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
-                logging.info(f'Started download phantomjs latest_version: {latest_version}')
+                logger.info(f'Started download phantomjs latest_version: {latest_version}')
 
                 url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_version)
 
@@ -603,13 +603,13 @@ class PhantomJS():
                 url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
                 url + self.system_name.format(version)
 
-                logging.info(f'Started downloading geckodriver for specific system: {self.system_name}')
+                logger.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
             if any([version, self.system_name ,latest_previous_version]):
 
                 result, message = self.__check_if_version_is_valid(url=url)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             archive_name = url.split("/")[len(url.split("/"))-1]
@@ -618,7 +618,7 @@ class PhantomJS():
             if Path(out_path).exists():
                 Path(out_path).unlink()
 
-            logging.info(f'Started download phantomjs by url: {url}')
+            logger.info(f'Started download phantomjs by url: {url}')
 
             if self.info_messages:
                 archive_path = wget.download(url=url, out=out_path)
@@ -626,7 +626,7 @@ class PhantomJS():
                 archive_path = wget.download(url=url, out=out_path, bar=None)
             time.sleep(2)
 
-            logging.info(f'PhantomJS was downloaded to path: {archive_path}')
+            logger.info(f'PhantomJS was downloaded to path: {archive_path}')
 
             out_path = self.path
 
@@ -634,7 +634,7 @@ class PhantomJS():
 
             result, message = self.extractor.extract_and_detect_archive_format(**parameters)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, driver_path
 
             platform : str = self.setting["PhantomJS"]["LastReleasePlatform"]
@@ -652,7 +652,7 @@ class PhantomJS():
                 parameters = dict(archive_folder_path=archive_path_folder_bin, archive_driver_path=driver_archive_path)
                 result, message = self.__rename_driver(**parameters)
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message, driver_path
 
             if Path(archive_path_folder).exists():
@@ -660,7 +660,7 @@ class PhantomJS():
             
             driver_path = self.phantomjs_path
 
-            logging.info(f'PhantomJS was successfully unpacked by path: {driver_path}')
+            logger.info(f'PhantomJS was successfully unpacked by path: {driver_path}')
 
             if self.chmod:
 
@@ -672,6 +672,6 @@ class PhantomJS():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, driver_path

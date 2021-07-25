@@ -1,7 +1,6 @@
 #Standart library imports
 import subprocess
 import traceback
-import logging
 import time
 import os
 import re
@@ -19,8 +18,10 @@ from selenium.common.exceptions import WebDriverException
 
 # Local imports
 from selenium_driver_updater._setting import setting
+
 from selenium_driver_updater.util.extractor import Extractor
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class ChromeBrowser():
     """Class for working with Chrome browser"""
@@ -55,14 +56,14 @@ class ChromeBrowser():
             if self.check_browser_is_up_to_date:
                 result, message = self.__check_if_chrome_browser_is_up_to_date()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -88,40 +89,40 @@ class ChromeBrowser():
                 chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
                 if not chromebrowser_updater_path:
                     message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                    logging.info(message)
+                    logger.info(message)
                     return True, message
 
                 if not Path(chromebrowser_updater_path).exists():
                     message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
-                    logging.info(message)
+                    logger.info(message)
                     return True, message
 
             result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message
 
             if not is_browser_up_to_date:
 
                 result, message = self.__get_latest_chrome_browser_for_current_os()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
                 result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
                 if not result:
-                    logging.error(message)
+                    logger.error(message)
                     return result, message
 
                 if not is_browser_up_to_date:
                     message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
-                    logging.info(message)
+                    logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
 
@@ -149,7 +150,7 @@ class ChromeBrowser():
 
             result, message, current_version = self.__get_current_version_chrome_browser_selenium()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
 
             if not current_version:
@@ -157,19 +158,19 @@ class ChromeBrowser():
 
             result, message, latest_version = self.__get_latest_version_chrome_browser()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, is_browser_up_to_date, current_version, latest_version
 
             if current_version == latest_version:
                 is_browser_up_to_date = True
                 message = f"Your existing chrome browser is up to date. current_version: {current_version} latest_version: {latest_version}"
-                logging.info(message)
+                logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, is_browser_up_to_date, current_version, latest_version
 
@@ -201,9 +202,9 @@ class ChromeBrowser():
 
             result, message, browser_version = self.__get_current_version_chrome_browser_selenium_via_terminal()
             if not result:
-                logging.error(message)
+                logger.error(message)
                 message = 'Trying to get current version of chrome browser via chromedriver'
-                logging.info(message)
+                logger.info(message)
 
             if Path(self.chromedriver_path).exists() and (not result or not browser_version):
 
@@ -216,23 +217,23 @@ class ChromeBrowser():
                 driver.close()
                 driver.quit()
 
-            logging.info(f'Current version of chrome browser: {browser_version}')
+            logger.info(f'Current version of chrome browser: {browser_version}')
 
             result_run = True
 
         except SessionNotCreatedException:
             message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, browser_version
 
         except WebDriverException:
             message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
             return True, message_run, browser_version
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, browser_version
 
@@ -263,7 +264,7 @@ class ChromeBrowser():
             chromebrowser_path = self.setting["ChromeBrowser"]["Path"]
             if chromebrowser_path:
 
-                logging.info('Trying to get current version of chrome browser via terminal')
+                logger.info('Trying to get current version of chrome browser via terminal')
 
                 if platform.system() == 'Windows':
 
@@ -288,7 +289,7 @@ class ChromeBrowser():
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run, browser_version
 
@@ -318,7 +319,7 @@ class ChromeBrowser():
             url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
             result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
             if not result:
-                logging.error(message)
+                logger.error(message)
                 return result, message, latest_version
 
             soup = BeautifulSoup(json_data, 'html.parser')
@@ -337,10 +338,10 @@ class ChromeBrowser():
 
             if not latest_stable_version_element:
                 message = f'Could not determine latest stable channel post of Chrome Browser. Maybe the text "{stable_channel_header_text}" is changed'
-                logging.error(message)
+                logger.error(message)
 
                 message = 'Trying to determine latest stable channel post of Chrome Browser without OS detection'
-                logging.info(message)
+                logger.info(message)
 
                 latest_stable_version_element = [news.text for news in elements_news if stable_channel_header_text in news.text][0]
                 if not latest_stable_version_element:
@@ -350,13 +351,13 @@ class ChromeBrowser():
 
             if not no_messages:
 
-                logging.info(f'Latest version of chrome browser: {latest_version}')
+                logger.info(f'Latest version of chrome browser: {latest_version}')
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run , latest_version
 
@@ -385,7 +386,7 @@ class ChromeBrowser():
         try:
 
             message = 'Trying to update chrome browser to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             if platform.system() == 'Linux':
 
@@ -394,7 +395,7 @@ class ChromeBrowser():
 
                 elif not is_admin:
                     message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
-                    logging.error(message)
+                    logger.error(message)
                     return True, message_run
 
             else:
@@ -403,12 +404,12 @@ class ChromeBrowser():
                 time.sleep(60) #wait for the updating
 
             message = 'Chrome browser was successfully updated to the latest version.'
-            logging.info(message)
+            logger.info(message)
 
             result_run = True
 
         except Exception:
             message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            logger.error(message_run)
 
         return result_run, message_run
