@@ -1,3 +1,23 @@
+[5.0.0b2] 26/07/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added firsts custom user-defined exceptions
+- Added parameter "old_return" for returning old variables like "result and message"
+
+# Improvements
+
+- Improved specific driver version validating
+
+# Fixes
+
+- Fixed an issue with incorrect operadriver downloading
+
+# Other
+
+- Removed error handling pattern everywhere
+
 [5.0.0b1] 25/07/2021
 This code was written and tested on Python 3.9.6
 

@@ -66,8 +66,9 @@ try:
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
-    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) #Temporary could not test it in Github Workflow
-    #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) #Temporary could not test it in Github Workflow
+    if platform.system() == 'Darwin':
+        testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) #Temporary could not test it in Github Workflow
+        testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) #Temporary could not test it in Github Workflow
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
@@ -79,7 +80,7 @@ try:
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 
-    testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
+    #testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
 

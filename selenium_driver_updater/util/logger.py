@@ -1,7 +1,7 @@
 #Standart library imports
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('selenium_driver_updater')
 logger.propagate = False
 levels = {
     "info": logging.INFO,

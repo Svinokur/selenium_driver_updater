@@ -9,11 +9,12 @@ import platform
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 # Local imports
-from _setting import setting
-from browsers._edgeBrowser import EdgeBrowser
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater._setting import setting
+from selenium_driver_updater.browsers._edgeBrowser import EdgeBrowser
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
 logging.basicConfig(level=logging.INFO)
 
@@ -57,27 +58,22 @@ class testEdgeBrowser(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
         url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
-        result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
-        self.assertTrue(result, message)
-        self.assertEqual(status_code, 200, status_code)
+        json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
     def test02_check_get_latest_version_edge_browser(self):
-        result, message, latest_version = self.edgebrowser._EdgeBrowser__get_latest_version_edge_browser()
-        self.assertTrue(result, message)
+        latest_version = self.edgebrowser._EdgeBrowser__get_latest_version_edge_browser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test03_check_get_latest_edge_browser_for_current_os(self):
-        result, message = self.edgebrowser._EdgeBrowser__get_latest_edge_browser_for_current_os()
-        self.assertTrue(result, message)
+        self.edgebrowser._EdgeBrowser__get_latest_edge_browser_for_current_os()
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test04_check_compare_current_version_and_latest_version_edge_browser(self):
-        result, message, is_browser_is_up_to_date, current_version, latest_version = self.edgebrowser._EdgeBrowser__compare_current_version_and_latest_version_edge_browser()
-        self.assertTrue(result, message)
+        is_browser_is_up_to_date, current_version, latest_version = self.edgebrowser._EdgeBrowser__compare_current_version_and_latest_version_edge_browser()
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)
@@ -89,8 +85,7 @@ class testEdgeBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test05_check_if_edgebrowser_is_up_to_date(self):
-        result, message = self.edgebrowser.main()
-        self.assertTrue(result, message)
+        self.edgebrowser.main()
 
 
 if __name__ == '__main__':

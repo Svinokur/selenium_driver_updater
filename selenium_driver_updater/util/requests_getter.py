@@ -1,14 +1,12 @@
 #Standart library imports
-from typing import Any, Optional, Tuple
-import traceback
-import json
+from typing import Any, Optional
 
 #Requests imports
 import requests
 from requests.models import Response
 
 #Local imports
-from selenium_driver_updater.util.logger import logger
+from selenium_driver_updater.util.exceptions import StatusCodeNotEqualException
 
 class RequestsGetter(): # pylint: disable=too-few-public-methods
     """Class for working with requests module"""
@@ -22,8 +20,7 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
     @staticmethod
     def get_result_by_request(
         url : str, is_json : bool = False,
-        return_text : bool = True,
-        no_error_status_code : bool = False) -> Tuple[bool, str, int, Any]:
+        no_error_status_code : bool = False) -> Any:
         """Gets html text and status_code from the specified url by get request
 
         Args:
@@ -33,11 +30,8 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
             no_error_status_code (bool) : Will not throw an error if status_code not equal to 200.
 
         Returns:
-            Tuple[bool, str, int, Any]
+            str
 
-            result_run (bool)   : True if successful, False otherwise.
-            message_run (str)   : Empty string if successful, Non-empty string if error.
-            status_code (int)   : Returns the status code of the given url
             request_text (str)  : Returns the html text of the given url
 
         Raises:
@@ -45,43 +39,21 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         status_code : int = 0
         request_text : str = ''
         request : Optional[Response] = None
 
-        try:
+        request = requests.get(url=url, headers=RequestsGetter._headers)
+        status_code = request.status_code
+        request_text = request.text
 
-            request = requests.get(url=url, headers=RequestsGetter._headers)
-            status_code = request.status_code
+        if status_code != 200 and not no_error_status_code:
 
-            if status_code != 200:
+            message_run = (f'url: {url} status_code: {status_code}'
+                            f'not equal to 200 request_text: {request.text}')
+            raise StatusCodeNotEqualException(message_run)
 
-                if no_error_status_code:
-                    result_run = True
+        if is_json:
+            request_text = request.json()
 
-                else:
-                    message_run = (f'url: {url} status_code: {status_code}'
-                                  f'not equal 200 request_text: {request.text}')
-                    logger.error(message_run)
-
-                return result_run, message_run, status_code, request.text
-
-            if return_text:
-                if is_json:
-                    request_text = json.loads(request.text)
-                else:
-                    request_text = request.text
-
-            result_run = True
-
-        except json.decoder.JSONDecodeError:
-            message_run = f'Json error: {str(traceback.format_exc())} request_text: {request.text}'
-            logger.error(message_run)
-
-        except Exception:
-            message_run = f'Unexcepted error: {str(traceback.format_exc())}'
-            logger.error(message_run)
-
-        return result_run, message_run, status_code, request_text
+        return request_text

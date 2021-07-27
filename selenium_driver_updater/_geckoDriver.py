@@ -22,6 +22,8 @@ from selenium_driver_updater.util.logger import logger
 
 from selenium_driver_updater.browsers._firefoxBrowser import FirefoxBrowser
 
+from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
+
 class GeckoDriver():
     """Class for working with Selenium geckodriver binary"""
 
@@ -73,63 +75,40 @@ class GeckoDriver():
         kwargs.update(path=self.geckodriver_path)
         self.firefoxbrowser = FirefoxBrowser(**kwargs)
 
-    def main(self) -> Tuple[bool, str, str]:
+    def main(self) -> str:
         """Main function, checks for the latest version, downloads or updates geckodriver binary or
         downloads specific version of geckodriver.
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool) : True if function passed correctly, False otherwise.
-            message_run (str) : Returns an error message if an error occurs in the function.
             driver_path (str) : Path where geckodriver was downloaded or updated.
 
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
         driver_path : str = ''
 
-        try:
+        self.firefoxbrowser.main()
 
-            result, message = self.firefoxbrowser.main()
-            if not result:
-                logger.error(message)
-                return result, message, driver_path
+        if not self.version:
 
-            if not self.version:
+            driver_path = self.__check_if_geckodriver_is_up_to_date()
 
-                result, message, driver_path = self.__check_if_geckodriver_is_up_to_date()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+        else:
 
-            else:
+            driver_path = self.__download_driver(version=self.version)
 
-                result, message, driver_path = self.__download_driver(version=self.version)
-            if not result:
-                logger.error(message)
-                return result, message, driver_path
+        return driver_path
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run, driver_path
-
-    def __get_current_version_geckodriver(self) -> Tuple[bool, str, str]:
+    def __get_current_version_geckodriver(self) -> str:
         """Gets current geckodriver version via command in terminal
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_version (str)    : Current geckodriver version.
 
         Raises:
@@ -140,8 +119,6 @@ class GeckoDriver():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         driver_version : str = ''
         driver_version_terminal : str = ''
 
@@ -157,28 +134,20 @@ class GeckoDriver():
 
                 logger.info(f'Current version of geckodriver: {driver_version}')
 
-            result_run = True
-
         except OSError:
             message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
             logger.error(message_run)
-            return True, message_run, driver_version
+            return driver_version
 
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
+        return driver_version
 
-        return result_run, message_run, driver_version
-
-    def __get_latest_version_geckodriver(self) -> Tuple[bool, str, str]:
+    def __get_latest_version_geckodriver(self) -> str:
         """Gets latest geckodriver version
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Returns an error message if an error occurs in the function.
             latest_version (str)    : Latest version of geckodriver
 
         Raises:
@@ -186,124 +155,67 @@ class GeckoDriver():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         latest_version : str = ''
 
-        try:
+        repo_name = GeckoDriver._repo_name
+        json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
 
-            repo_name = GeckoDriver._repo_name
-            result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
-            if not result:
-                return result, message, latest_version
+        latest_version = json_data.get('name')
 
-            latest_version = json_data.get('name')
+        logger.info(f'Latest version of geckodriver: {latest_version}')
 
-            logger.info(f'Latest version of geckodriver: {latest_version}')
+        return latest_version
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run , latest_version
-
-    def __delete_current_geckodriver_for_current_os(self) -> Tuple[bool, str]:
+    def __delete_current_geckodriver_for_current_os(self) -> None:
         """Deletes geckodriver from folder
-
-
-        Returns:
-            Tuple of bool, str and str
-
-            result_run (bool) : True if function passed correctly, False otherwise.
-            message_run (str) : Returns an error message if an error occurs in the function.
 
         Raises:
             Except: If unexpected error raised.
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
+        if Path(self.geckodriver_path).exists():
+            logger.info(f'Deleted existing geckodriver geckodriver_path: {self.geckodriver_path}')
+            Path(self.geckodriver_path).unlink()
 
-        try:
-
-            if Path(self.geckodriver_path).exists():
-                logger.info(f'Deleted existing geckodriver geckodriver_path: {self.geckodriver_path}')
-                Path(self.geckodriver_path).unlink()
-
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run
-
-    def __check_if_geckodriver_is_up_to_date(self) -> Tuple[bool, str, str]:
+    def __check_if_geckodriver_is_up_to_date(self) -> str:
         """Main function, checks for the latest version, downloads or updates geckodriver binary
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Returns an error message if an error occurs in the function.
             driver_path (str)       : Path where geckodriver was downloaded or updated.
 
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
         driver_path : str = ''
 
-        try:
+        if self.check_driver_is_up_to_date and not self.system_name:
 
-            if self.check_driver_is_up_to_date and not self.system_name:
+            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
 
-                result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+            if is_driver_up_to_date:
+                return self.geckodriver_path
 
-                if is_driver_up_to_date:
-                    return True, message, self.geckodriver_path
+        driver_path = self.__download_driver()
 
-            result, message, driver_path = self.__download_driver()
-            if not result:
+        if self.check_driver_is_up_to_date and not self.system_name:
+
+            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
+
+            if not is_driver_up_to_date:
+                message = f'Problem with updating geckodriver current_version: {current_version} latest_version: {latest_version}'
                 logger.error(message)
-                return result, message, driver_path
+                message = 'Trying to download previous latest version of geckodriver'
+                logger.info(message)
 
-            if self.check_driver_is_up_to_date and not self.system_name:
+                driver_path = self.__download_driver(previous_version=True)
 
-                result, message, is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+        return driver_path
 
-                if not is_driver_up_to_date:
-                    message = f'Problem with updating geckodriver current_version: {current_version} latest_version: {latest_version}'
-                    logger.error(message)
-                    message = 'Trying to download previous latest version of geckodriver'
-                    logger.info(message)
-
-                    result, message, driver_path = self.__download_driver(previous_version=True)
-                    if not result:
-                        logger.error(message)
-                        return result, message, driver_path
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run, driver_path
-
-    def __compare_current_version_and_latest_version(self) -> Tuple[bool, str, bool, str, str]:
+    def __compare_current_version_and_latest_version(self) -> Tuple[bool, str, str]:
         """Compares current version of geckodriver to latest version
 
         Returns:
@@ -317,84 +229,48 @@ class GeckoDriver():
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
         is_driver_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
 
-        try:
+        current_version = self.__get_current_version_geckodriver()
 
-            result, message, current_version = self.__get_current_version_geckodriver()
-            if not result:
-                logger.error(message)
-                return result, message, is_driver_up_to_date, current_version, latest_version
+        if not current_version:
+            return is_driver_up_to_date, current_version, latest_version
 
-            if not current_version:
-                return True, message_run, is_driver_up_to_date, current_version, latest_version
+        latest_version = self.__get_latest_version_geckodriver()
 
-            result, message, latest_version = self.__get_latest_version_geckodriver()
-            if not result:
-                logger.error(message)
-                return result, message, is_driver_up_to_date, current_version, latest_version
+        if current_version == latest_version:
+            is_driver_up_to_date = True
+            message = f'Your existing geckodriver is up to date. current_version: {current_version} latest_version: {latest_version}' 
+            logger.info(message)
 
-            if current_version == latest_version:
-                is_driver_up_to_date = True
-                message = f'Your existing geckodriver is up to date. current_version: {current_version} latest_version: {latest_version}' 
-                logger.info(message)
+        return is_driver_up_to_date, current_version, latest_version
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run, is_driver_up_to_date, current_version, latest_version
-
-    def __chmod_driver(self) -> Tuple[bool, str]:
+    def __chmod_driver(self) -> None:
         """Tries to give geckodriver needed permissions
-
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Returns an error message if an error occurs in the function.
 
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
 
-        try:
+        if Path(self.geckodriver_path).exists():
 
-            if Path(self.geckodriver_path).exists():
+            logger.info('Trying to give geckodriver needed permissions')
 
-                logger.info('Trying to give geckodriver needed permissions')
+            st = os.stat(self.geckodriver_path)
+            os.chmod(self.geckodriver_path, st.st_mode | stat.S_IEXEC)
 
-                st = os.stat(self.geckodriver_path)
-                os.chmod(self.geckodriver_path, st.st_mode | stat.S_IEXEC)
+            logger.info('Needed rights for geckodriver were successfully issued')
 
-                logger.info('Needed rights for geckodriver were successfully issued')
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run
-
-    def __get_latest_previous_version_geckodriver_via_requests(self) -> Tuple[bool, str, str]:
+    def __get_latest_previous_version_geckodriver_via_requests(self) -> str:
         """Gets previous latest geckodriver version
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Returns an error message if an error occurs in the function.
             latest_version_previous (str)   : Latest previous version of geckodriver.
 
         Raises:
@@ -402,76 +278,44 @@ class GeckoDriver():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         latest_previous_version : str = ''
 
-        try:
+        repo_name = GeckoDriver._repo_name
+        json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
 
-            repo_name = GeckoDriver._repo_name
-            result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
-            if not result:
-                return result, message, latest_previous_version
+        latest_previous_version = latest_previous_version = json_data[1].get('name')
 
-            latest_previous_version = latest_previous_version = json_data[1].get('name')
+        logger.info(f'Latest previous version of geckodriver: {latest_previous_version}')
 
-            logger.info(f'Latest previous version of geckodriver: {latest_previous_version}')
+        return latest_previous_version
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run , latest_previous_version
-
-    def __check_if_version_is_valid(self, url : str, version_url : str) -> Tuple[bool, str]:
+    def __check_if_version_is_valid(self, url : str) -> None:
         """Checks the specified version for existence.
 
         Args:
             url (str)           : Full download url of geckodriver.
-            version_url (str)   : Version that will be downloaded.
 
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Returns an error message if an error occurs in the function.
         """
-        result_run : bool = False
-        message_run : str = ''
         archive_name : str = url.split("/")[len(url.split("/"))-1]
         is_found : bool = False
+        find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], url)
+        driver_version = find_string[0] if len(find_string) > 0 else ''
 
-        try:
+        json_data = self.github_viewer.get_all_releases_data_by_repo_name(GeckoDriver._repo_name)
 
-            result, message, json_data = self.github_viewer.get_all_releases_data_by_repo_name(GeckoDriver._repo_name)
-            if not result:
-                logger.error(message)
-                return result, message
+        for data in json_data:
+            if data.get('name') == driver_version:
+                for asset in data.get('assets'):
+                    if asset.get('name') == archive_name:
+                        is_found = True
+                        break
+                break
 
-            for data in json_data:
-                if data.get('name') == version_url:
-                    for asset in data.get('assets'):
-                        if asset.get('name') == archive_name:
-                            is_found = True
-                            break
-                    break
+        if not is_found:
+            message = f'Wrong version or system_name was specified. driver_version: {driver_version} url: {url}'
+            raise DriverVersionInvalidException(message)
 
-            if not is_found:
-                message = f'Wrong version or system_name was specified. version_url: {version_url} url: {url}'
-                logger.error(message)
-                return False, message
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run
-
-    def __download_driver(self, version : str = '', previous_version : bool = False) -> Tuple[bool, str, str]:
+    def __download_driver(self, version : str = '', previous_version : bool = False) -> str:
         """Function to download, delete or upgrade current geckodriver
 
         Args:
@@ -479,10 +323,8 @@ class GeckoDriver():
             previous_version (boll)     : If true, geckodriver latest previous version will be downloaded. Defaults to False.
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             driver_path (str)       : Path to unzipped driver.
 
         Raises:
@@ -490,115 +332,85 @@ class GeckoDriver():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         url : str = ''
         latest_version : str = ''
         latest_previous_version : str = ''
 
         driver_path : str = ''
 
-        try:
+        if self.upgrade:
 
-            if self.upgrade:
+            self.__delete_current_geckodriver_for_current_os()
 
-                result, message = self.__delete_current_geckodriver_for_current_os()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+        if version:
+            
+            url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(version, version)
+            logger.info(f'Started download geckodriver specific_version: {version}')
 
-            if version:
-                
-                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(version, version)
-                logger.info(f'Started download geckodriver specific_version: {version}')
+        elif previous_version:
 
-            elif previous_version:
+            latest_previous_version = self.__get_latest_previous_version_geckodriver_via_requests()
 
-                result, message, latest_previous_version = self.__get_latest_previous_version_geckodriver_via_requests()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+            url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
+            logger.info(f'Started download geckodriver latest_previous_version: {latest_previous_version}')
 
-                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_previous_version, latest_previous_version)
-                logger.info(f'Started download geckodriver latest_previous_version: {latest_previous_version}')
+        else:
 
-            else:
+            latest_version = self.__get_latest_version_geckodriver()
 
-                result, message, latest_version = self.__get_latest_version_geckodriver()
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+            url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
+            logger.info(f'Started download geckodriver latest_version: {latest_version}')
 
-                url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(latest_version, latest_version)
-                logger.info(f'Started download geckodriver latest_version: {latest_version}')
+        if self.system_name:
+            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+            url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
+            url + self.system_name.format(version)    
 
-            if self.system_name:
-                url = url.replace(url.split("/")[len(url.split("/"))-1], '')
-                url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
-                url + self.system_name.format(version)    
+            logger.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
-                logger.info(f'Started downloading geckodriver for specific system: {self.system_name}')
+        if any([version, self.system_name ,latest_previous_version]):
+            self.__check_if_version_is_valid(url=url)
 
-            if any([version, self.system_name ,latest_previous_version]):
-                version_url = version if version else latest_previous_version if latest_previous_version else latest_version
-                result, message = self.__check_if_version_is_valid(url=url, version_url=version_url)
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+        archive_name = url.split("/")[len(url.split("/"))-1]
+        out_path = self.path + archive_name
 
-            archive_name = url.split("/")[len(url.split("/"))-1]
-            out_path = self.path + archive_name
+        if Path(out_path).exists():
+            Path(out_path).unlink()
 
-            if Path(out_path).exists():
-                Path(out_path).unlink()
+        logger.info(f'Started download geckodriver by url: {url}')
 
-            logger.info(f'Started download geckodriver by url: {url}')
+        if self.info_messages:
+            archive_path = wget.download(url=url, out=out_path)
+        else:
+            archive_path = wget.download(url=url, out=out_path, bar=None)
+        time.sleep(2)
 
-            if self.info_messages:
-                archive_path = wget.download(url=url, out=out_path)
-            else:
-                archive_path = wget.download(url=url, out=out_path, bar=None)
-            time.sleep(2)
+        logger.info(f'Geckodriver was downloaded to path: {archive_path}')
 
-            logger.info(f'Geckodriver was downloaded to path: {archive_path}')
+        out_path = self.path
 
-            out_path = self.path
+        parameters = dict(archive_path=archive_path, out_path=out_path)
 
-            parameters = dict(archive_path=archive_path, out_path=out_path)
+        if not self.filename:
 
-            if not self.filename:
+            self.extractor.extract_and_detect_archive_format(**parameters)
 
-                result, message = self.extractor.extract_and_detect_archive_format(**parameters)
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+        else:
+            filename = self.setting['GeckoDriver']['LastReleasePlatform']
+            parameters.update(dict(filename=filename, filename_replace=self.filename))
 
-            else:
-                filename = self.setting['GeckoDriver']['LastReleasePlatform']
-                parameters.update(dict(filename=filename, filename_replace=self.filename))
-                result, message = self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
-                if not result:
-                    logger.error(message)
-                    return result, message, driver_path
+            self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
 
-            if Path(archive_path).exists():
-                Path(archive_path).unlink()
+        if Path(archive_path).exists():
+            Path(archive_path).unlink()
 
-            driver_path = self.geckodriver_path
+        driver_path = self.geckodriver_path
 
-            logger.info(f'Geckodriver was successfully unpacked by path: {driver_path}')
+        logger.info(f'Geckodriver was successfully unpacked by path: {driver_path}')
 
-            if self.chmod:
+        if self.chmod:
 
-                result, message = self.__chmod_driver()
-                if not result:
-                    return result, message, driver_path
+            self.__chmod_driver()
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logger.error(message_run)
-
-        return result_run, message_run, driver_path
+        return driver_path
         
