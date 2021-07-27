@@ -8,7 +8,7 @@ This code was written and tested on Python 3.9.6
 
 # Improvements
 
-- Improved specific driver version validating
+- Improved driver version validating if specific version was given
 
 # Fixes
 
