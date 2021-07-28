@@ -37,7 +37,7 @@ latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriv
 operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
                                 "operadriver_linux64.zip" if platform.system() == "Linux" else\
                                 "operadriver_mac64.zip"
-operadriver_latest_release += latest_release_operadriver + operadriver_latest_release
+operadriver_latest_release = latest_release_operadriver + operadriver_latest_release
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
 edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\

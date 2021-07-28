@@ -629,7 +629,7 @@ class OperaDriver():
                 logging.error(message)
                 return result, message, driver_path
 
-            platform : str = self.setting['OperaDriver']['LastReleasePlatform'] if not self.specific_driver_name else self.specific_driver_name
+            platform : str = self.setting['OperaDriver']['LastReleasePlatform']
 
             archive_folder_path = self.path + Path(archive_path).stem + os.path.sep
             archive_operadriver_path = archive_folder_path + platform

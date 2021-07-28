@@ -1,3 +1,10 @@
+[4.1.5] 28/07/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Fixed an issue with incorrect operadriver downloading
+
 [4.1.4] 22/07/2021
 This code was written and tested on Python 3.9.6
 
