@@ -146,18 +146,18 @@ class DriverUpdater():
 
                 list_of_paths : list[str] = []
 
-                for driver in info._driver_name:
+                for i, driver in enumerate(info._driver_name):
 
                     time.sleep(1) #small sleep
 
-                    filename_driver = str(info._filename[info._driver_name.index(driver)]) if len(info._filename) > info._driver_name.index(driver) and info._filename else ''
+                    filename_driver = str(info._filename[i]) if len(info._filename) > i and info._filename else ''
                     filename_driver = filename_driver.replace('.', '')
 
-                    system_name_driver = str(info._system_name[info._driver_name.index(driver)]) if len(info._system_name) > info._driver_name.index(driver) and info._system_name else ''
+                    system_name_driver = str(info._system_name[i]) if len(info._system_name) > i and info._system_name else ''
 
-                    version_driver = str(info._version[info._driver_name.index(driver)]) if len(info._version) > info._driver_name.index(driver) and info._version else ''
+                    version_driver = str(info._version[i]) if len(info._version) > i and info._version else ''
 
-                    result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, filename=filename_driver, system_name=system_name_driver, version=version_driver)
+                    result, message, driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, filename=filename_driver, system_name=system_name_driver, version=version_driver, index=i)
                     if not result:
                         logging.error(message)
                         return result, message, driver_path
