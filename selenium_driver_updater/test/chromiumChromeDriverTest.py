@@ -17,7 +17,7 @@ from selenium_driver_updater.util.requests_getter import RequestsGetter
 logging.basicConfig(level=logging.INFO)
 
 # pylint: disable=missing-function-docstring
-class testChromiumChromeDriver(unittest.TestCase): 
+class testChromiumChromeDriver(unittest.TestCase):
     """Class for unit-testing ChromiumChromeDriver class
 
     Attributes:
@@ -63,7 +63,7 @@ class testChromiumChromeDriver(unittest.TestCase):
         latest_version = self.chromium_chromedriver._ChromiumChromeDriver__get_latest_version_chromium_chromedriver()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
-    
+
     #@unittest.skip('Temporary not needed')
     def test04_check_get_latest_chromium_chromedriver_for_current_os(self):
         driver_path = self.chromium_chromedriver._ChromiumChromeDriver__get_latest_chromium_chromedriver_for_current_os()

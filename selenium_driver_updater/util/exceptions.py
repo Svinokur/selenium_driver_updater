@@ -6,3 +6,9 @@ class StatusCodeNotEqualException(Error):
 
 class DriverVersionInvalidException(Error):
     pass
+
+class GithubApiLimitException(Error):
+    pass
+
+class UnknownArchiveFormatException(Error):
+    pass

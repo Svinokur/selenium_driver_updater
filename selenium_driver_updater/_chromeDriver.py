@@ -78,9 +78,6 @@ class ChromeDriver():
 
             driver_path (str) : Path where chromedriver was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -112,12 +109,7 @@ class ChromeDriver():
         return driver_path
 
     def __compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser(self) -> Tuple[bool, str, str]:
-        """Compares latest main version of chromedriver and latest main version of chrome browser
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Compares latest main version of chromedriver and latest main version of chrome browser"""
         is_equal : bool = False
         latest_version_chromedriver_main : str = ''
         latest_version_browser_main : str = ''
@@ -141,9 +133,6 @@ class ChromeDriver():
             str
 
             driver_path (str) : Path where chromedriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         driver_path : str = ''
@@ -175,14 +164,10 @@ class ChromeDriver():
     def __get_latest_version_chromedriver(self, no_messages : bool = False) -> str:
         """Gets latest chromedriver version
 
-
         Returns:
             str
 
             latest_version (str)  : Latest version of chromedriver.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -200,12 +185,7 @@ class ChromeDriver():
         return latest_version
 
     def __delete_current_chromedriver_for_current_os(self) -> None:
-        """Deletes chromedriver from folder if parameter "upgrade" is True
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Deletes chromedriver from folder if parameter "upgrade" is True"""
 
         if Path(self.chromedriver_path).exists():
 
@@ -215,7 +195,6 @@ class ChromeDriver():
     def __get_current_version_chromedriver(self) -> str:
         """Gets current chromedriver version via command in terminal
 
-
         Returns:
             str
 
@@ -224,8 +203,6 @@ class ChromeDriver():
         Raises:
 
             OSError: Occurs when chromedriver made for another CPU type
-
-            Except: If unexpected error raised.
 
         """
 
@@ -261,9 +238,6 @@ class ChromeDriver():
             message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of chromedriver is up to date. Defaults to False.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         is_driver_up_to_date : bool = False
@@ -285,12 +259,7 @@ class ChromeDriver():
         return is_driver_up_to_date, current_version, latest_version
 
     def __chmod_driver(self) -> None:
-        """Tries to give chromedriver needed permissions
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Tries to give chromedriver needed permissions"""
 
         if Path(self.chromedriver_path).exists():
 
@@ -306,14 +275,9 @@ class ChromeDriver():
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Returns an error message if an error occurs in the function.
             latest_version_previous (str)   : Latest previous version of chromedriver.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -370,9 +334,6 @@ class ChromeDriver():
 
             driver_path (str) : Path to unzipped driver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         url : str = ''
@@ -404,7 +365,7 @@ class ChromeDriver():
             logger.info(f'Started download chromedriver latest_version: {latest_version}')
 
         if self.system_name:
-            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+            url = url.replace(url.split("/")[-1], '')
             url = url + self.system_name
 
             logger.info(f'Started downloading chromedriver for specific system: {self.system_name}')
@@ -412,7 +373,7 @@ class ChromeDriver():
         if any([version, self.system_name ,latest_previous_version]):
             self.__check_if_version_is_valid(url=url)
 
-        archive_name = url.split("/")[len(url.split("/"))-1]
+        archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
 
         if Path(out_path).exists():

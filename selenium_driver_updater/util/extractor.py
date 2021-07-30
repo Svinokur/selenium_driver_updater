@@ -10,6 +10,7 @@ import tarfile
 
 #Local imports
 from selenium_driver_updater.util.logger import logger
+from selenium_driver_updater.util.exceptions import UnknownArchiveFormatException
 
 class Extractor():
     """Class for working with different archive types"""
@@ -93,8 +94,7 @@ class Extractor():
 
         else:
             message = f'Unknown archive format was specified archive_path: {archive_path}'
-            logger.error(message)
-            return result_run, message
+            raise UnknownArchiveFormatException(message)
 
         old_path = driver_folder_path + os.path.sep + filename
         new_path = driver_folder_path + os.path.sep + filename_replace
@@ -170,6 +170,5 @@ class Extractor():
 
         else:
             message = f'Unknown archive format was specified archive_path: {archive_path}'
-            logger.error(message)
-            return result_run, message
+            raise UnknownArchiveFormatException(message)
         

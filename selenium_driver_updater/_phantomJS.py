@@ -88,8 +88,6 @@ class PhantomJS():
 
             OSError: Occurs when chromedriver made for another CPU type
 
-            Except: If unexpected error raised.
-
         """
 
         driver_version : str = ''
@@ -123,22 +121,12 @@ class PhantomJS():
 
             latest_version (str)    : Latest version of phantomjs.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
 
         repo_name = PhantomJS._repo_name
-        json_data = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name=repo_name)
-
-        find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data.get('ref'))
-        latest_version = find_string[0] if len(find_string) > 0 else ''
-
-        if not latest_version:
-            message = 'Unable to determine latest version of PhantomJS, maybe the tags were deleted.'
-            logger.error(message)
+        latest_version = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name=repo_name)
 
         logger.info(f'Latest version of phantomjs: {latest_version}')
 
@@ -153,9 +141,6 @@ class PhantomJS():
             result_run (bool)           : True if function passed correctly, False otherwise.
             message_run (str)           : Empty string if function passed correctly, non-empty string if error.
             is_driver_up_to_date (bool) : If true current version of phantomjs is up to date. Defaults to False.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         is_driver_up_to_date : bool = False
@@ -184,9 +169,6 @@ class PhantomJS():
 
             driver_path (str)       : Path where phantomjs was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -214,12 +196,7 @@ class PhantomJS():
         return driver_path
 
     def __delete_current_phantomjs_for_current_os(self) -> None:
-        """Deletes phantomjs from folder if parameter "upgrade" is True
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Deletes phantomjs from folder if parameter "upgrade" is True"""
 
         if Path(self.phantomjs_path).exists():
 
@@ -227,12 +204,7 @@ class PhantomJS():
             Path(self.phantomjs_path).unlink()
 
     def __chmod_driver(self) -> None:
-        """Tries to give phantomjs binary needed permissions
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Tries to give phantomjs binary needed permissions"""
 
         if Path(self.phantomjs_path).exists():
 
@@ -249,9 +221,6 @@ class PhantomJS():
         Args:
             archive_folder_path (str)       : Path to the main folder
             archive_driver_path (str)       : Path to the phantomjs archive
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         renamed_driver_path : str = ''
@@ -278,9 +247,6 @@ class PhantomJS():
 
             driver_path (str)       : Path where phantomjs was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -301,9 +267,6 @@ class PhantomJS():
             str
 
             latest_version_previous (str)   : Latest previous version of phantomjs.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         latest_previous_version : str = ''
@@ -372,9 +335,6 @@ class PhantomJS():
 
             driver_path (str)       : Path to unzipped driver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         url : str = ''
@@ -409,9 +369,9 @@ class PhantomJS():
             url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_version)
 
         if self.system_name:
-            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
-            url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
-            url + self.system_name.format(version)
+            url = url.replace(url.split("/")[-1], '')
+            version = [value for key,value in locals().items() if 'version' in key and value][0]
+            url = url + self.system_name.format(version)
 
             logger.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
@@ -419,7 +379,7 @@ class PhantomJS():
 
             self.__check_if_version_is_valid(url=url)
 
-        archive_name = url.split("/")[len(url.split("/"))-1]
+        archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
 
         if Path(out_path).exists():
@@ -443,7 +403,7 @@ class PhantomJS():
 
         platform : str = self.setting["PhantomJS"]["LastReleasePlatform"]
 
-        archive_path_folder = self.path + url.split('/')[len(url.split('/'))-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
+        archive_path_folder = self.path + url.split("/")[-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
         archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
         driver_archive_path = archive_path_folder_bin + platform
 

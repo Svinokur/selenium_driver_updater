@@ -19,6 +19,8 @@ from selenium_driver_updater.browsers._chromiumChromeBrowser import ChromiumChro
 from selenium_driver_updater.util.requests_getter import RequestsGetter
 from selenium_driver_updater.util.logger import logger
 
+from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
+
 class ChromiumChromeDriver():
     """Class for working with Selenium chromedriver binary"""
 
@@ -42,9 +44,6 @@ class ChromiumChromeDriver():
             str
 
             driver_path (str) : Path where chromium chromedriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -77,9 +76,6 @@ class ChromiumChromeDriver():
 
             latest_version (str)    : Latest version of chromedriver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
@@ -108,8 +104,6 @@ class ChromiumChromeDriver():
             WebDriverException: Occurs when current chromedriver could not start or critical error occured.
 
             OSError: Occurs when chromium_chromedriver made for another CPU type
-
-            Except: If unexpected error raised.
 
         """
 
@@ -151,10 +145,6 @@ class ChromiumChromeDriver():
 
             driver_version (str)    : Current chromium_chromedriver version.
 
-        Raises:
-
-            Except: If unexpected error raised.
-
         """
 
         driver_version : str = ''
@@ -179,9 +169,6 @@ class ChromiumChromeDriver():
             result_run (bool)           : True if function passed correctly, False otherwise.
             message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of chromium_chromedriver is up to date. Defaults to False.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         
@@ -209,9 +196,6 @@ class ChromiumChromeDriver():
 
             driver_path (str)       : Path where chromedriver was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -230,8 +214,7 @@ class ChromiumChromeDriver():
 
             if not is_driver_up_to_date:
                 message = f'Problem with updating chromedriver current_version: {current_version} latest_version: {latest_version}'
-                logger.error(message)
-                return result_run, message, driver_path
+                raise DriverVersionInvalidException(message)
 
 
         return driver_path
@@ -243,9 +226,6 @@ class ChromiumChromeDriver():
             str
 
             driver_path (str)       : Path where chromedriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         driver_path : str = ''

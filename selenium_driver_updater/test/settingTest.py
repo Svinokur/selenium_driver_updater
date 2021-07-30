@@ -145,8 +145,8 @@ class testSetting(unittest.TestCase):
     def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 4)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
-        self.assertEqual(len(self.setting["GeckoDriver"]), 3)
-        self.assertEqual(len(self.setting["OperaDriver"]), 3)
+        self.assertEqual(len(self.setting["GeckoDriver"]), 2)
+        self.assertEqual(len(self.setting["OperaDriver"]), 2)
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
@@ -175,11 +175,9 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
         self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/")
 
-        self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], 'geckodriver')
 
-        self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
         self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], 'operadriver')  
 

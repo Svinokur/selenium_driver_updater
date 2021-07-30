@@ -1,28 +1,15 @@
 #Standart library imports
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 import os
-import traceback
-from typing import Tuple, Any
+from typing import Any
 import time
 import sys
+import traceback
 
 # Local imports
-from selenium_driver_updater._chromeDriver import ChromeDriver
-from selenium_driver_updater._geckoDriver import GeckoDriver
-from selenium_driver_updater._operaDriver import OperaDriver
-from selenium_driver_updater._edgeDriver import EdgeDriver
-from selenium_driver_updater._chromiumChromeDriver import ChromiumChromeDriver
-from selenium_driver_updater._phantomJS import PhantomJS
 
-_all_drivers: Any= {
-    "chromedriver" : ChromeDriver,
-    "geckodriver" : GeckoDriver,
-    "operadriver" : OperaDriver,
-    "edgedriver" : EdgeDriver,
-    "chromium_chromedriver" : ChromiumChromeDriver,
-    "phantomjs" : PhantomJS,
-}
+from selenium_driver_updater.util import ALL_DRIVERS
 
 from selenium_driver_updater._setting import setting
 
@@ -34,12 +21,12 @@ from selenium_driver_updater.util.logger import levels
 @dataclass
 class _info():
 
-    driver_name : Any = ''
+    driver_name: Any = ''
 
     path = ''
     filename = ''
     version = ''
-    system_name = ''
+    system_name: Any = ''
 
     upgrade = False
     chmod = True
@@ -82,11 +69,11 @@ class DriverUpdater():
             driver_name (Union[str, list[str]]) : Specified driver name/names which will be downloaded or updated. Like "DriverUpdater.chromedriver" or etc.
             path (str)                          : Specified path which will used for downloading or updating Selenium driver binary. Must be folder path.
             upgrade (bool)                      : If true, it will overwrite existing driver in the folder. Defaults to False.
-            chmod (bool)                        : If true, it will make chromedriver binary executable. Defaults to True.
-            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to False.
+            chmod (bool)                        : If true, it will make driver binary executable. Defaults to True.
+            check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to True.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
-            filename (str)                      : Specific name for chromedriver. If given, it will replace name for chromedriver. Defaults to empty string.
-            version (str)                       : Specific version for chromedriver. If given, it will downloads given version. Defaults to empty string.
+            filename (str)                      : Specific name for driver. If given, it will replace name for driver. Defaults to empty string.
+            version (str)                       : Specific version for driver. If given, it will downloads given version. Defaults to empty string.
             check_browser_is_up_to_date (bool)  : If true, it will check browser version before specific driver update or upgrade. Defaults to False.
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
@@ -97,9 +84,6 @@ class DriverUpdater():
             str
 
             driver_path (str)       : Path where Selenium driver binary was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -129,7 +113,7 @@ class DriverUpdater():
         _info.enable_library_update_check = bool(kwargs.get('enable_library_update_check', True))
         _info.upgrade = bool(kwargs.get('upgrade', False))
         _info.chmod = bool(kwargs.get('chmod', True))
-        _info.check_driver_is_up_to_date = bool(kwargs.get('check_driver_is_up_to_date', False))
+        _info.check_driver_is_up_to_date = bool(kwargs.get('check_driver_is_up_to_date', True))
 
         _info.version = str(kwargs.get('version', '')) if type(kwargs.get('version', '')) not in [list, dict, tuple] else kwargs.get('version', '')
 
@@ -137,40 +121,46 @@ class DriverUpdater():
 
         _info.system_name = kwargs.get('system_name', '')
 
-        DriverUpdater.__check_enviroment_and_variables()
+        try:
 
-        if isinstance(_info.driver_name, str):
+            DriverUpdater.__check_enviroment_and_variables()
 
-            driver_path = DriverUpdater.__run_specific_driver()
+            if isinstance(_info.driver_name, str):
 
-        elif isinstance(_info.driver_name, list):
+                driver_path = DriverUpdater.__run_specific_driver()
 
-            list_of_paths : list[str] = []
+            elif isinstance(_info.driver_name, list):
 
-            for driver in _info.driver_name:
+                list_of_paths : list[str] = []
 
-                time.sleep(1) #small sleep
+                for i, driver in enumerate(_info.driver_name):
 
-                try:
-                    filename_driver = str(_info.filename[_info.driver_name.index(driver)])
-                    filename_driver = filename_driver.replace('.', '')
-                except IndexError:
-                    filename_driver = ''
+                    time.sleep(1) #small sleep
 
-                try:
-                    system_name_driver = str(_info.system_name[_info.driver_name.index(driver)])
-                except IndexError:
-                    system_name_driver = ''
+                    try:
+                        filename_driver = str(_info.filename[i])
+                        filename_driver = filename_driver.replace('.', '')
+                    except IndexError:
+                        filename_driver = ''
 
-                try:
-                    version_driver = str(_info.version[_info.driver_name.index(driver)])
-                except IndexError:
-                    version_driver = ''
+                    try:
+                        system_name_driver = str(_info.system_name[i])
+                    except IndexError:
+                        system_name_driver = ''
 
-                driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, filename=filename_driver, system_name=system_name_driver, version=version_driver)
-                list_of_paths.append(driver_path)
+                    try:
+                        version_driver = str(_info.version[i])
+                    except IndexError:
+                        version_driver = ''
 
-                driver_path = list_of_paths
+                    driver_path = DriverUpdater.__run_specific_driver(driver_name=driver, filename=filename_driver, system_name=system_name_driver, version=version_driver, index=i)
+                    list_of_paths.append(driver_path)
+
+                    driver_path = list_of_paths
+
+        except Exception:
+            message_run = f'error: {str(traceback.format_exc())}'
+            logger.error(message_run)
 
         if old_return:
             return True, '', driver_path
@@ -179,17 +169,7 @@ class DriverUpdater():
 
     @staticmethod
     def __check_all_input_parameteres() -> None:
-        """Private function for checking all input parameters
-
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-
-        Raises:
-            Except: If unexpected error raised.
-        """
+        """Private function for checking all input parameters"""
 
 
         if not Path(_info.path).exists():
@@ -249,12 +229,7 @@ class DriverUpdater():
 
     @staticmethod
     def __check_library_is_up_to_date() -> None:
-        """Private function for comparing latest version and current version of program
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Private function for comparing latest version and current version of program"""
 
         url : str = str(setting["PyPi"]["urlProjectJson"])
 
@@ -284,20 +259,18 @@ class DriverUpdater():
 
         else:
 
-            message = ('Thanks for participating in beta releases for selenium-driver-updater library,' 
+            message = ('Thanks for participating in beta releases for selenium-driver-updater library,'
                         f'you are using the beta version {str(setting["Program"]["version"])}')
             logger.info(message)
             message = 'Note that beta version does not guarantee errors avoiding. If something goes wrong - please create an issue on github repository'
             logger.info(message)
 
+            message = 'Github repository link: https://github.com/Svinokur/selenium_driver_updater'
+            logger.info(message)
+
     @staticmethod
     def __check_is_python_version_compatible_for_library() -> None:
-        """Private function for checking if python version if compatible with python version 3+
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Private function for checking if python version if compatible with python version 3+"""
 
         major = str(sys.version_info[0])
         minor = str(sys.version_info[1])
@@ -312,12 +285,7 @@ class DriverUpdater():
 
     @staticmethod
     def __check_enviroment_and_variables() -> None:
-        """Private function for checking all input parameters and enviroment
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Private function for checking all input parameters and enviroment"""
 
         DriverUpdater.__check_is_python_version_compatible_for_library()
 
@@ -342,9 +310,6 @@ class DriverUpdater():
 
             driver_path (str) : Path where specific driver located
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         driver_path : str = ''
@@ -362,29 +327,22 @@ class DriverUpdater():
                             system_name=system_name )
 
         if _info.system_name:
-            setting['Program']['DriversFileFormat'] = '.exe' if 'win' in _info.system_name or 'arm' in _info.system_name else ''
+            index = kwargs.get('index', None)
+            if index is not None:
+                setting['Program']['DriversFileFormat'] = '.exe' if 'win' in _info.system_name[index] or 'arm' in _info.system_name[index] else ''
+            else:
+                setting['Program']['DriversFileFormat'] = '.exe' if 'win' in _info.system_name or 'arm' in _info.system_name else ''
 
-        driver = _all_drivers.get(driver_name)(**parametres)
+        driver = ALL_DRIVERS.get(driver_name)(**parametres)
         driver_path = driver.main()
 
         return driver_path
 
     @staticmethod
     def __check_driver_name_is_valid(driver_name) -> None:
-        """Private function for checking if specified driver_name is exists and valid
+        """Private function for checking if specified driver_name is exists and valid"""
 
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
-
-        driver_name_check = _all_drivers.get(driver_name)
+        driver_name_check = ALL_DRIVERS.get(driver_name)
 
         if not driver_name_check:
             message = f'Unknown driver name was specified current driver_name is: {driver_name}'
@@ -392,12 +350,7 @@ class DriverUpdater():
 
     @staticmethod
     def __check_system_name_is_valid(system_name) -> None:
-        """Private function for checking if specified system_name is exists and valid
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Private function for checking if specified system_name is exists and valid"""
 
         system_name_check = system_name in [DriverUpdater.__dict__[item] for item in DriverUpdater.__dict__]
 

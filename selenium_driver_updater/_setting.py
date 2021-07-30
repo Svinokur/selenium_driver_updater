@@ -109,7 +109,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.0b2"
+    version = "5.0.0b3"
 
 setting = dict(
     {
@@ -130,13 +130,11 @@ setting = dict(
         },
         "GeckoDriver":
         {
-            "LinkLastRelease"           : 'https://api.github.com/repos/mozilla/geckodriver/releases/latest',
             "LinkLastReleasePlatform"   : geckodriver_platform_release,
             "LastReleasePlatform"       : 'geckodriver',
         },
         "OperaDriver":
         {
-            "LinkLastRelease"           : 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest',
             "LinkLastReleasePlatform"   : operadriver_latest_release,
             "LastReleasePlatform"       : 'operadriver',
         },

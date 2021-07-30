@@ -84,9 +84,6 @@ class OperaDriver():
 
             driver_path (str)       : Path where operadriver was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -151,29 +148,19 @@ class OperaDriver():
 
             latest_version (str)    : Latest version of operadriver
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
 
         repo_name = OperaDriver._repo_name
-        json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
-
-        latest_version = json_data.get('name')
+        latest_version = self.github_viewer.get_release_version_by_repo_name(repo_name=repo_name)
 
         logger.info(f'Latest version of operadriver: {latest_version}')
 
         return latest_version
 
     def __delete_current_operadriver_for_current_os(self) -> None:
-        """Deletes operadriver from specific folder
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Deletes operadriver from specific folder"""
 
         if Path(self.operadriver_path).exists():
             logger.info(f'Deleted existing operadriver operadriver_path: {self.operadriver_path}')
@@ -186,9 +173,6 @@ class OperaDriver():
             str
 
             driver_path (str)       : Path where operadriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         driver_path : str = ''
@@ -227,9 +211,6 @@ class OperaDriver():
             message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of operadriver is up to date. Defaults to False.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         is_driver_up_to_date : bool = False
@@ -258,9 +239,6 @@ class OperaDriver():
             archive_folder_path (str)       : Path to the main folder
             archive_operadriver_path (str)  : Path to the operadriver archive
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         renamed_driver_path : str = ''
 
@@ -278,12 +256,7 @@ class OperaDriver():
         copyfile(new_path, renamed_driver_path)
 
     def __chmod_driver(self) -> None:
-        """Tries to give operadriver needed permissions
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Tries to give operadriver needed permissions"""
 
         if Path(self.operadriver_path).exists():
 
@@ -303,17 +276,12 @@ class OperaDriver():
 
             latest_version_previous (str)   : Latest previous version of operadriver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_previous_version : str = ''
 
         repo_name = OperaDriver._repo_name
-        json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
-
-        latest_previous_version = json_data[1].get('name')
+        latest_previous_version = self.github_viewer.get_release_version_by_repo_name(repo_name=repo_name, index=1)
 
         logger.info(f'Latest previous version of operadriver: {latest_previous_version}')
 
@@ -357,9 +325,6 @@ class OperaDriver():
 
             driver_path (str)       : Path to unzipped driver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         url : str = ''
@@ -395,15 +360,15 @@ class OperaDriver():
             logger.info(f'Started download operadriver latest_version: {latest_version}')
 
         if self.system_name:
-            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+            url = url.replace(url.split("/")[-1], '')
             url = url + self.system_name
 
-            logger.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+            logger.info(f'Started downloading operadriver for specific system: {self.system_name}')
 
         if any([version, self.system_name ,latest_previous_version]):
             self.__check_if_version_is_valid(url=url)
 
-        archive_name = url.split("/")[len(url.split("/"))-1]
+        archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
 
         if Path(out_path).exists():

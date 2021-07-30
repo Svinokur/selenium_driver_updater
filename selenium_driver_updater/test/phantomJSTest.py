@@ -138,7 +138,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
         self.assertEqual(current_version, self.specific_version)
 
-    @unittest.skip('Temporary not needed')
+    #@unittest.skip('Temporary not needed')
     def test08_check_download_driver_latest_previous_version(self):
         self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
         self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
@@ -169,7 +169,7 @@ class testPhantomJS(unittest.TestCase):
         self.phantomjs._PhantomJS__chmod_driver()
 
     #@unittest.skip('Temporary not needed')
-    def test10_check_phantomjs_is_up_to_date_failure(self):
+    def test10_check_phantomjs_is_up_to_date(self):
         filename = self.phantomjs.main()
         self.assertGreater(len(filename), 0, len(filename))
 

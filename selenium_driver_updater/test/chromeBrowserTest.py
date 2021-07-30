@@ -54,7 +54,7 @@ class testChromeBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
-        url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
+        url = str(self.setting["ChromeBrowser"]["LinkAllLatestRelease"])
         json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 

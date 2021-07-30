@@ -115,13 +115,7 @@ class testGeckoDriver(unittest.TestCase):
             self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_get_result_by_request(self):
-        url = self.setting["GeckoDriver"]["LinkLastRelease"]
-        json_data = self.requests_getter.get_result_by_request(url=url)
-        self.assertGreaterEqual(len(json_data), 0, len(json_data))
-
-    #@unittest.skip('Temporary not needed')
-    def test07_check_download_driver_specific_version(self):
+    def test06_check_download_driver_specific_version(self):
         self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
@@ -138,7 +132,7 @@ class testGeckoDriver(unittest.TestCase):
         self.assertEqual(current_version, self.specific_version)
 
     @unittest.skip('Temporary not needed')
-    def test08_check_download_driver_latest_previous_version(self):
+    def test07_check_download_driver_latest_previous_version(self):
         self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
@@ -154,18 +148,18 @@ class testGeckoDriver(unittest.TestCase):
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test09_check_get_latest_version_gecko_driver(self):
+    def test08_check_get_latest_version_gecko_driver(self):
         latest_version = self.gecko_driver._GeckoDriver__get_latest_version_geckodriver()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test10_check_delete_current_geckodriver_for_current_os(self):
+    def test09_check_delete_current_geckodriver_for_current_os(self):
         self.gecko_driver._GeckoDriver__delete_current_geckodriver_for_current_os()
         self.assertFalse(Path(self.geckodriver_path).exists(), self.geckodriver_path)
 
     #@unittest.skip('Temporary not needed')
-    def test11_check_download_driver(self):
+    def test10_check_download_driver(self):
         file_name = self.gecko_driver._GeckoDriver__download_driver()
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
@@ -174,7 +168,7 @@ class testGeckoDriver(unittest.TestCase):
         self.gecko_driver._GeckoDriver__chmod_driver()
 
     #@unittest.skip('Temporary not needed')
-    def test12_check_compare_current_version_and_latest_version(self):
+    def test11_check_compare_current_version_and_latest_version(self):
         is_driver_is_up_to_date, current_version, latest_version = self.gecko_driver._GeckoDriver__compare_current_version_and_latest_version()
         self.assertIsNotNone(is_driver_is_up_to_date, is_driver_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
@@ -184,18 +178,18 @@ class testGeckoDriver(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test13_check_get_current_version_firefox_selenium(self):
+    def test12_check_get_current_version_firefox_selenium(self):
         current_version = self.gecko_driver._GeckoDriver__get_current_version_geckodriver()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test14_check_geckodriver_is_up_to_date(self):
+    def test13_check_geckodriver_is_up_to_date(self):
         filename = self.gecko_driver.main()
         self.assertGreater(len(filename), 0, len(filename))
 
-    ##@unittest.skip('Temporary not needed')
-    def test15_check_if_version_is_valid(self):
+    #@unittest.skip('Temporary not needed')
+    def test14_check_if_version_is_valid(self):
         url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(self.specific_version, self.specific_version)
 
         self.gecko_driver._GeckoDriver__check_if_version_is_valid(url=url)

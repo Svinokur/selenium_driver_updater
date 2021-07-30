@@ -1,3 +1,15 @@
+[5.0.0b3] 29/07/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added command line control
+- Added alternative method of getting needed data via github if github api limit is restricted (not all methods, but many necessary)
+
+# Fixes
+
+- Fixed an issue if multiply identical drivers and different OS's names were given and later was incorrect filename extension checking
+
 [5.0.0b2] 26/07/2021
 This code was written and tested on Python 3.9.6
 

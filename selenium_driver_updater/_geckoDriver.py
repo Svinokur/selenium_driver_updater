@@ -84,9 +84,6 @@ class GeckoDriver():
 
             driver_path (str) : Path where geckodriver was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         driver_path : str = ''
 
@@ -114,8 +111,6 @@ class GeckoDriver():
         Raises:
 
             OSError: Occurs when geckodriver maded for another CPU type
-
-            Except: If unexpected error raised.
 
         """
 
@@ -150,17 +145,13 @@ class GeckoDriver():
 
             latest_version (str)    : Latest version of geckodriver
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
 
         repo_name = GeckoDriver._repo_name
-        json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name=repo_name)
 
-        latest_version = json_data.get('name')
+        latest_version = self.github_viewer.get_release_version_by_repo_name(repo_name=repo_name)
 
         logger.info(f'Latest version of geckodriver: {latest_version}')
 
@@ -185,9 +176,6 @@ class GeckoDriver():
             str
 
             driver_path (str)       : Path where geckodriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         driver_path : str = ''
@@ -225,9 +213,6 @@ class GeckoDriver():
             message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of geckodriver is up to date. Defaults to False.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         is_driver_up_to_date : bool = False
         current_version : str = ''
@@ -248,12 +233,7 @@ class GeckoDriver():
         return is_driver_up_to_date, current_version, latest_version
 
     def __chmod_driver(self) -> None:
-        """Tries to give geckodriver needed permissions
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Tries to give geckodriver needed permissions"""
 
         if Path(self.geckodriver_path).exists():
 
@@ -273,17 +253,12 @@ class GeckoDriver():
 
             latest_version_previous (str)   : Latest previous version of geckodriver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_previous_version : str = ''
 
         repo_name = GeckoDriver._repo_name
-        json_data = self.github_viewer.get_all_releases_data_by_repo_name(repo_name=repo_name)
-
-        latest_previous_version = latest_previous_version = json_data[1].get('name')
+        latest_previous_version = self.github_viewer.get_release_version_by_repo_name(repo_name=repo_name, index=1)
 
         logger.info(f'Latest previous version of geckodriver: {latest_previous_version}')
 
@@ -327,9 +302,6 @@ class GeckoDriver():
 
             driver_path (str)       : Path to unzipped driver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         url : str = ''
@@ -362,16 +334,16 @@ class GeckoDriver():
             logger.info(f'Started download geckodriver latest_version: {latest_version}')
 
         if self.system_name:
-            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
-            url = url + self.system_name.format(latest_version) if latest_version else url + self.system_name.format(latest_previous_version) if latest_previous_version else\
-            url + self.system_name.format(version)    
+            url = url.replace(url.split("/")[-1], '')
+            version = [value for key,value in locals().items() if 'version' in key and value][0]
+            url = url + self.system_name.format(version)
 
             logger.info(f'Started downloading geckodriver for specific system: {self.system_name}')
 
         if any([version, self.system_name ,latest_previous_version]):
             self.__check_if_version_is_valid(url=url)
 
-        archive_name = url.split("/")[len(url.split("/"))-1]
+        archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
 
         if Path(out_path).exists():

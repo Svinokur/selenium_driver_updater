@@ -5,7 +5,6 @@ import time
 import logging
 
 import sys
-import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
@@ -54,36 +53,36 @@ class testDriverUpdater(unittest.TestCase):
     def test01_check_all_input_parameteres_failure(self):
         try:
             self.driver_updater._DriverUpdater__check_all_input_parameteres()
-        except Exception as e:
-            self.assertTrue(e.__class__ == ValueError, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_enviroment_and_variables_failure(self):
         try:
             self.driver_updater._DriverUpdater__check_enviroment_and_variables()
-        except Exception as e:
-            self.assertTrue(e.__class__ == ValueError, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test03_check_driver_name_is_valid_failure(self):
         try:
             self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name_failure)
-        except Exception as e:
-            self.assertTrue(e.__class__ == ValueError, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test04_check_system_name_is_valid_failure(self):
         try:
             self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name_failure)
-        except Exception as e:
-            self.assertTrue(e.__class__ == ValueError, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test05_check_parameter_type_is_valid(self):
         try:
             self.driver_updater._DriverUpdater__check_parameter_type_is_valid(parameter='aboba', needed_type=list, parameter_name='driver_name')
-        except Exception as e:
-            self.assertTrue(e.__class__ == TypeError, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == TypeError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test06_check_get_result_by_request(self):

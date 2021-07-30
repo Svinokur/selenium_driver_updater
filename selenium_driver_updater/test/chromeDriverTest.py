@@ -37,7 +37,7 @@ class testChromeDriver(unittest.TestCase):
 
         path : str = str(setting["Program"]["driversPath"])
 
-        parametres = dict(path=path, upgrade=True, chmod=True, 
+        parametres = dict(path=path, upgrade=True, chmod=True,
         check_driver_is_up_to_date = True, info_messages=True, filename='chromedriver_test', version='',
         check_browser_is_up_to_date = False)
 
@@ -82,8 +82,8 @@ class testChromeDriver(unittest.TestCase):
         try:
             file_name = self.chrome_driver_failure._ChromeDriver__download_driver(version=self.specific_version_failure)
             self.assertEqual(len(file_name), 0, len(file_name))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test03_check_compare_current_version_and_latest_version_failure(self):
@@ -97,20 +97,20 @@ class testChromeDriver(unittest.TestCase):
         try:
             filename = self.chrome_driver_failure.main()
             self.assertEqual(len(filename), 0, len(filename))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test05_check_if_version_is_valid_failure(self):
         url = 'blablablanoturl'
         try:
             self.chrome_driver_failure._ChromeDriver__check_if_version_is_valid(url=url)
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test06_check_get_result_by_request(self):
-        url = self.setting["ChromeDriver"]["LinkLastRelease"]
+        url = str(self.setting["ChromeDriver"]["LinkLastRelease"])
         json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 

@@ -34,9 +34,6 @@ class RequestsGetter(): # pylint: disable=too-few-public-methods
 
             request_text (str)  : Returns the html text of the given url
 
-        Raises:
-            Except: If unexpected error raised
-
         """
 
         status_code : int = 0

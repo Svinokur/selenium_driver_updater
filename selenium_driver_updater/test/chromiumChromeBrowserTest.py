@@ -16,7 +16,7 @@ from selenium_driver_updater.util.requests_getter import RequestsGetter
 logging.basicConfig(level=logging.INFO)
 
 # pylint: disable=missing-function-docstring
-class testChromiumChromeBrowser(unittest.TestCase): 
+class testChromiumChromeBrowser(unittest.TestCase):
     """Class for unit-testing ChromiumChromeBrowser class
 
     Attributes:

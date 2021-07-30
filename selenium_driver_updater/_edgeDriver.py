@@ -78,9 +78,6 @@ class EdgeDriver():
 
             driver_path (str)       : Path where edgedriver was downloaded or updated.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         driver_path : str = ''
@@ -108,8 +105,6 @@ class EdgeDriver():
         Raises:
 
             OSError: Occurs when chromedriver made for another CPU type
-
-            Except: If unexpected error raised.
 
         """
 
@@ -144,9 +139,6 @@ class EdgeDriver():
 
             latest_version (str)    : Latest version of edgedriver
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         latest_version : str = ''
         url = str(self.setting['EdgeDriver']['LinkLastRelease'])
@@ -160,12 +152,7 @@ class EdgeDriver():
         return latest_version
 
     def __delete_current_edgedriver_for_current_os(self) -> None:
-        """Deletes edgedriver from folder
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Deletes edgedriver from folder"""
 
         if Path(self.edgedriver_path).exists():
 
@@ -179,9 +166,6 @@ class EdgeDriver():
             str
 
             driver_path (str)       : Path where edgedriver was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
         driver_path : str = ''
@@ -221,9 +205,6 @@ class EdgeDriver():
             message_run (str)           : Returns an error message if an error occurs in the function.
             is_driver_up_to_date (bool) : If true current version of edgedriver is up to date. Defaults to False.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
         is_driver_up_to_date : bool = False
         current_version : str = ''
@@ -244,12 +225,7 @@ class EdgeDriver():
         return is_driver_up_to_date, current_version, latest_version
 
     def __chmod_driver(self) -> None:
-        """Tries to give edgedriver needed permissions
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Tries to give edgedriver needed permissions"""
 
         if Path(self.edgedriver_path).exists():
 
@@ -268,9 +244,6 @@ class EdgeDriver():
             str
 
             latest_version_previous (str)   : Latest previous version of edgedriver.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -325,9 +298,6 @@ class EdgeDriver():
 
             file_name (str)         : Path to unzipped driver.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         url : str = ''
@@ -361,15 +331,15 @@ class EdgeDriver():
             url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(latest_version)
 
         if self.system_name:
-            url = url.replace(url.split("/")[len(url.split("/"))-1], '')
+            url = url.replace(url.split("/")[-1], '')
             url = url + self.system_name
 
-            logger.info(f'Started downloading chromedriver for specific system: {self.system_name}')
+            logger.info(f'Started downloading edgedriver for specific system: {self.system_name}')
 
         if any([version, self.system_name ,latest_previous_version]):
             self.__check_if_version_is_valid(url=url)
-
-        archive_name = url.split("/")[len(url.split("/"))-1]
+        
+        archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
 
         logger.info(f'Started download edgedriver by url: {url}')

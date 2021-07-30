@@ -113,13 +113,7 @@ class testOperaDriver(unittest.TestCase):
             self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_get_result_by_request(self):
-        url = self.setting["OperaDriver"]["LinkLastRelease"]
-        json_data = self.requests_getter.get_result_by_request(url=url)
-        self.assertGreaterEqual(len(json_data), 0, len(json_data))
-
-    #@unittest.skip('Temporary not needed')
-    def test07_check_download_driver_specific_version(self):
+    def test06_check_download_driver_specific_version(self):
         self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
@@ -136,7 +130,7 @@ class testOperaDriver(unittest.TestCase):
         self.assertEqual(current_version, self.specific_version)
 
     #@unittest.skip('Temporary not needed')
-    def test08_check_download_driver_latest_previous_version(self):
+    def test07_check_download_driver_latest_previous_version(self):
         self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
@@ -152,18 +146,18 @@ class testOperaDriver(unittest.TestCase):
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test09_check_get_latest_version_operadriver(self):
+    def test08_check_get_latest_version_operadriver(self):
         latest_version = self.operadriver._OperaDriver__get_latest_version_operadriver()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test10_check_delete_current_operadriver_for_current_os(self):
+    def test09_check_delete_current_operadriver_for_current_os(self):
         self.operadriver._OperaDriver__delete_current_operadriver_for_current_os()
         self.assertFalse(Path(self.operadriver_path).exists(), self.operadriver_path)
 
     #@unittest.skip('Temporary not needed')
-    def test11_check_download_driver(self):
+    def test10_check_download_driver(self):
         file_name = self.operadriver._OperaDriver__download_driver()
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
@@ -172,7 +166,7 @@ class testOperaDriver(unittest.TestCase):
         self.operadriver._OperaDriver__chmod_driver()
 
     #@unittest.skip('Temporary not needed')
-    def test12_check_compare_current_version_and_latest_version(self):
+    def test11_check_compare_current_version_and_latest_version(self):
         is_driver_is_up_to_date, current_version, latest_version = self.operadriver._OperaDriver__compare_current_version_and_latest_version()
         self.assertIsNotNone(is_driver_is_up_to_date, is_driver_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
@@ -182,18 +176,18 @@ class testOperaDriver(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test13_check_get_current_version_operadriver_selenium(self):
+    def test12_check_get_current_version_operadriver_selenium(self):
         current_version = self.operadriver._OperaDriver__get_current_version_operadriver()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test14_check_if_operadriver_is_up_to_date(self):
+    def test13_check_if_operadriver_is_up_to_date(self):
         filename = self.operadriver.main()
         self.assertGreater(len(filename), 0, len(filename))
 
     ##@unittest.skip('Temporary not needed')
-    def test15_check_if_version_is_valid(self):
+    def test14_check_if_version_is_valid(self):
         url = self.setting["OperaDriver"]["LinkLastReleasePlatform"].format(self.specific_version)
 
         self.operadriver_failure._OperaDriver__check_if_version_is_valid(url=url)
