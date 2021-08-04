@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation, disable=broad-except
 #Standart library imports
 import subprocess
 import os
@@ -67,7 +68,7 @@ class ChromiumChromeDriver():
 
         return driver_path
 
-    def __get_latest_version_chromium_chromedriver(self) -> str:
+    def _get_latest_version_chromium_chromedriver(self) -> str:
         """Gets latest chromium_chromedriver version
 
 
@@ -89,7 +90,7 @@ class ChromiumChromeDriver():
 
         return latest_version
 
-    def __get_current_version_chromium_chromedriver(self) -> str:
+    def _get_current_version_chromium_chromedriver(self) -> str:
         """Gets current chromium_chromedriver version
 
 
@@ -111,7 +112,7 @@ class ChromiumChromeDriver():
 
         try:
 
-            driver_version = self.__get_current_version_chromium_chromedriver_via_terminal()
+            driver_version = self._get_current_version_chromium_chromedriver_via_terminal()
             if not driver_version:
                 message = 'Trying to get current version of chromium_chromedriver via webdriver'
                 logger.info(message)
@@ -136,7 +137,7 @@ class ChromiumChromeDriver():
 
         return driver_version
 
-    def __get_current_version_chromium_chromedriver_via_terminal(self) -> str:
+    def _get_current_version_chromium_chromedriver_via_terminal(self) -> str:
         """Gets current chromium_chromedriver version via command in terminal
 
 
@@ -160,7 +161,7 @@ class ChromiumChromeDriver():
 
         return driver_version
 
-    def __compare_current_version_and_latest_version(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version(self) -> Tuple[bool, str, str]:
         """Compares current version of chromium_chromedriver to latest version
 
         Returns:
@@ -171,14 +172,14 @@ class ChromiumChromeDriver():
             is_driver_up_to_date (bool) : If true current version of chromium_chromedriver is up to date. Defaults to False.
 
         """
-        
+
         is_driver_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_chromium_chromedriver()
+        current_version = self._get_current_version_chromium_chromedriver()
 
-        latest_version = self.__get_latest_version_chromium_chromedriver()
+        latest_version = self._get_latest_version_chromium_chromedriver()
 
         if current_version == latest_version:
             is_driver_up_to_date = True
@@ -188,7 +189,7 @@ class ChromiumChromeDriver():
 
         return is_driver_up_to_date, current_version, latest_version
 
-    def __check_if_chromedriver_is_up_to_date(self) -> str:
+    def _check_if_chromedriver_is_up_to_date(self) -> str:
         """Сhecks for the latest version, downloads or updates chromedriver binary
 
         Returns:
@@ -201,16 +202,16 @@ class ChromiumChromeDriver():
 
         if self.check_driver_is_up_to_date:
 
-            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
+            is_driver_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version()
 
             if is_driver_up_to_date:
                 return ''
 
-        driver_path = self.__get_latest_chromium_chromedriver_for_current_os()
+        driver_path = self._get_latest_chromium_chromedriver_for_current_os()
 
         if self.check_driver_is_up_to_date:
 
-            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version()
+            is_driver_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version()
 
             if not is_driver_up_to_date:
                 message = f'Problem with updating chromedriver current_version: {current_version} latest_version: {latest_version}'
@@ -219,7 +220,7 @@ class ChromiumChromeDriver():
 
         return driver_path
 
-    def __get_latest_chromium_chromedriver_for_current_os(self) -> str:
+    def _get_latest_chromium_chromedriver_for_current_os(self) -> str:
         """Downloads latest chromium_chromedriver to specific path
 
         Returns:

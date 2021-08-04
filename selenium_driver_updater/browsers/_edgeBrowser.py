@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
 import traceback
@@ -43,11 +44,11 @@ class EdgeBrowser():
 
         if self.check_browser_is_up_to_date:
             try:
-                self.__check_if_edge_browser_is_up_to_date()
+                self._check_if_edge_browser_is_up_to_date()
             except (ValueError, FileNotFoundError):
                 pass
 
-    def __check_if_edge_browser_is_up_to_date(self) -> None:
+    def _check_if_edge_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of edge browser
 
         Raises:
@@ -64,19 +65,19 @@ class EdgeBrowser():
             message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
             raise FileNotFoundError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_edge_browser()
+        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
 
         if not is_browser_up_to_date:
 
-            self.__get_latest_edge_browser_for_current_os()
+            self._get_latest_edge_browser_for_current_os()
 
-            is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_edge_browser()
+            is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
 
             if not is_browser_up_to_date:
                 message = f'Problem with updating edge browser current_version: {current_version} latest_version: {latest_version}'
                 logger.info(message)
 
-    def __get_current_version_edge_browser_selenium(self) -> str:
+    def _get_current_version_edge_browser_selenium(self) -> str:
         """Gets current edge browser version
 
 
@@ -96,7 +97,7 @@ class EdgeBrowser():
 
         try:
 
-            browser_version = self.__get_current_version_edge_browser_selenium_via_terminal()
+            browser_version = self._get_current_version_edge_browser_selenium_via_terminal()
             if not browser_version:
                 message = 'Trying to get current version of edge browser via edgedriver'
                 logger.info(message)
@@ -105,10 +106,8 @@ class EdgeBrowser():
 
                 desired_cap = {}
 
-                driver = webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap)
-                browser_version = str(driver.capabilities['browserVersion'])
-                driver.close()
-                driver.quit()
+                with webdriver.Edge(executable_path = self.edgedriver_path, capabilities=desired_cap) as driver:
+                    browser_version = str(driver.capabilities['browserVersion'])
 
             logger.info(f'Current version of edge browser: {browser_version}')
 
@@ -119,7 +118,7 @@ class EdgeBrowser():
 
         return browser_version
 
-    def __get_latest_version_edge_browser(self) -> str:
+    def _get_latest_version_edge_browser(self) -> str:
         """Gets latest edge browser version
 
 
@@ -147,7 +146,7 @@ class EdgeBrowser():
 
         return latest_version
 
-    def __get_latest_edge_browser_for_current_os(self) -> None:
+    def _get_latest_edge_browser_for_current_os(self) -> None:
         """Trying to update edge browser to its latest version
 
         Raises:
@@ -164,7 +163,7 @@ class EdgeBrowser():
         message = 'Edge browser was successfully updated to the latest version.'
         logger.info(message)
 
-    def __compare_current_version_and_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of edge browser to latest version
 
         Returns:
@@ -183,12 +182,12 @@ class EdgeBrowser():
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_edge_browser_selenium()
+        current_version = self._get_current_version_edge_browser_selenium()
 
         if not current_version:
             return True, current_version, latest_version
 
-        latest_version = self.__get_latest_version_edge_browser()
+        latest_version = self._get_latest_version_edge_browser()
 
         if current_version == latest_version:
             is_browser_up_to_date = True
@@ -197,7 +196,7 @@ class EdgeBrowser():
 
         return is_browser_up_to_date, current_version, latest_version
 
-    def __get_current_version_edge_browser_selenium_via_terminal(self) -> str:
+    def _get_current_version_edge_browser_selenium_via_terminal(self) -> str:
         """Gets current edge browser version via command in terminal
 
 

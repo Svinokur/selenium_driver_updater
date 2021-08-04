@@ -1,3 +1,20 @@
+[5.0.0b4] 03/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added base class for all driver classes
+- Added support for safaridriver (not updating or downloading)
+- Added properly exiting driver with context managers instead of driver.quit()
+
+# Improvements
+
+- Improved getting current version of chrome browser on MacOS (added additional path)
+
+# Fixes
+
+- Fixed an issue with incorrect getting current version of opera browser
+
 [5.0.0b3] 29/07/2021
 This code was written and tested on Python 3.9.6
 

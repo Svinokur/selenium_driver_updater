@@ -37,9 +37,9 @@ class testExceptions(unittest.TestCase):
     def test01_check_StatusCodeNotEqualException(self):
         url = 'https://google.com/aboba'
         try:
-            json_data = self.requests_getter.get_result_by_request(url=url)
-        except Exception as e:
-            self.assertTrue(e.__class__ == StatusCodeNotEqualException, e.__class__)
+            self.requests_getter.get_result_by_request(url=url)
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
 
 if __name__ == '__main__':

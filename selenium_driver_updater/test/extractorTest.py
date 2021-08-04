@@ -1,3 +1,4 @@
+#pylint: disable=broad-except
 #Standart library imports
 import unittest
 import time

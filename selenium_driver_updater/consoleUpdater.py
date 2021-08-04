@@ -7,9 +7,11 @@ from selenium_driver_updater.driverUpdater import DriverUpdater
 
 #pylint: disable=protected-access
 class ConsoleUpdater():
+    """Class for working with command line of selenium driver updater library"""
 
     @staticmethod
     def parse_command_line():
+        "Function for parsing arguments that were specified in command line"
         parser = argparse.ArgumentParser(
             description=f'Download or update your Selenium driver binaries and their browsers automatically with this package. Current version is {str(setting["Program"]["version"])}',
         )
@@ -98,10 +100,11 @@ class ConsoleUpdater():
 
     @staticmethod
     def install():
+        "Main function that initializes all variables and pass it to main module (driver Updater)"
 
         #Initialize all variables
 
         args = ConsoleUpdater.parse_command_line()
         kwargs = vars(args)
-        
+
         DriverUpdater.install(**kwargs)

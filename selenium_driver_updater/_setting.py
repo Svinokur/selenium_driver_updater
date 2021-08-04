@@ -109,7 +109,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.0b3"
+    version = "5.0.0b4"
 
 setting = dict(
     {
@@ -155,6 +155,11 @@ setting = dict(
             "LinkLastReleaseFile"   : phantomjs_latest_release,
             "LastReleasePlatform"   : 'phantomjs',
             "LinkAllReleases"       : url_release_phantomjs,
+        },
+        "SafariDriver":
+        {   
+            "LinkLastRelease"       : 'https://support.apple.com/en-us/HT201222',
+            "LastReleasePlatform"   : 'safaridriver',
         },
         "ChromeBrowser":
         {

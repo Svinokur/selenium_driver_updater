@@ -4,6 +4,7 @@ from selenium_driver_updater._operaDriver import OperaDriver
 from selenium_driver_updater._edgeDriver import EdgeDriver
 from selenium_driver_updater._chromiumChromeDriver import ChromiumChromeDriver
 from selenium_driver_updater._phantomJS import PhantomJS
+from selenium_driver_updater._safari_driver import SafariDriver
 
 ALL_DRIVERS= {
     "chromedriver" : ChromeDriver,
@@ -12,4 +13,5 @@ ALL_DRIVERS= {
     "edgedriver" : EdgeDriver,
     "chromium_chromedriver" : ChromiumChromeDriver,
     "phantomjs" : PhantomJS,
+    "safaridriver" : SafariDriver,
 }

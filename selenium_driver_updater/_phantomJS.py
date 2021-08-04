@@ -1,27 +1,21 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import shutil
-import subprocess
 import os
-import traceback
 import time
-import stat
-from typing import Tuple, Any
+from typing import Tuple
 from pathlib import Path
 import re
 from shutil import copyfile
 import wget
 
 # Local imports
-from selenium_driver_updater._setting import setting
-
-from selenium_driver_updater.util.extractor import Extractor
-from selenium_driver_updater.util.github_viewer import GithubViewer
-from selenium_driver_updater.util.requests_getter import RequestsGetter
 from selenium_driver_updater.util.logger import logger
-
 from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
 
-class PhantomJS():
+from selenium_driver_updater.driver_base import DriverBase
+
+class PhantomJS(DriverBase):
     "Class for working with Selenium phantomjs binary"
 
     _repo_name = 'ariya/phantomjs'
@@ -29,18 +23,11 @@ class PhantomJS():
 
     def __init__(self, **kwargs):
 
-        self.setting : Any = setting
+        kwargs.update(repo_name=PhantomJS._repo_name)
 
-        self.path : str = str(kwargs.get('path'))
-
-        self.upgrade : bool = bool(kwargs.get('upgrade'))
-
-        self.chmod : bool = bool(kwargs.get('chmod'))
-
-        self.check_driver_is_up_to_date : bool = bool(kwargs.get('check_driver_is_up_to_date'))
+        DriverBase.__init__(self, **kwargs)
 
         self.system_name = ''
-        self.filename = ''
 
         #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
@@ -57,62 +44,9 @@ class PhantomJS():
             else:
                 self.system_name = self.system_name + '.zip'
 
-        self.setting['PhantomJS']['LastReleasePlatform'] = 'phantomjs'
+        self.phantomjs_path = self.driver_path
 
-        #assign of filename
-        specific_filename = str(kwargs.get('filename'))
-        if specific_filename:
-            self.filename = specific_filename + self.setting['Program']['DriversFileFormat']
-
-        self.setting['PhantomJS']['LastReleasePlatform'] += self.setting['Program']['DriversFileFormat']
-
-        self.phantomjs_path : str = self.path + self.setting['PhantomJS']['LastReleasePlatform'] if not specific_filename else self.path + self.filename
-
-        self.version = str(kwargs.get('version'))
-
-        self.info_messages = bool(kwargs.get('info_messages'))
-
-        self.extractor = Extractor
-        self.github_viewer = GithubViewer
-        self.requests_getter = RequestsGetter
-
-    def __get_current_version_phantomjs(self) -> str:
-        """Gets current phantomjs version via command in terminal
-
-        Returns:
-            str
-
-            driver_version (str)    : Current phantomjs version.
-
-        Raises:
-
-            OSError: Occurs when chromedriver made for another CPU type
-
-        """
-
-        driver_version : str = ''
-        driver_version_terminal : str = ''
-
-        try:
-
-            if Path(self.phantomjs_path).exists():
-
-                with subprocess.Popen([self.phantomjs_path, '--version'], stdout=subprocess.PIPE) as process:
-                    driver_version_terminal = process.communicate()[0].decode('UTF-8')
-
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], driver_version_terminal)
-                driver_version = find_string[0] if len(find_string) > 0 else ''
-
-                logger.info(f'Current version of phantomjs: {driver_version}')
-
-        except OSError:
-            message_run = f'OSError error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
-            logger.error(message_run)
-            return driver_version
-
-        return driver_version
-
-    def __get_latest_version_phantomjs(self) -> str:
+    def _get_latest_version_phantomjs(self) -> str:
         """Gets latest phantomjs version
 
 
@@ -132,7 +66,7 @@ class PhantomJS():
 
         return latest_version
 
-    def __compare_current_version_and_latest_version_phantomjs(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version_phantomjs(self) -> Tuple[bool, str, str]:
         """Compares current version of phantomjs to latest version
 
         Returns:
@@ -147,12 +81,12 @@ class PhantomJS():
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_phantomjs()
+        current_version = super()._get_current_version_driver()
 
         if not current_version:
             return is_driver_up_to_date, current_version, latest_version
 
-        latest_version = self.__get_latest_version_phantomjs()
+        latest_version = self._get_latest_version_phantomjs()
 
         if current_version == latest_version:
             is_driver_up_to_date = True
@@ -161,7 +95,7 @@ class PhantomJS():
 
         return is_driver_up_to_date, current_version, latest_version
 
-    def __check_if_phantomjs_is_up_to_date(self) -> str:
+    def _check_if_phantomjs_is_up_to_date(self) -> str:
         """Сhecks for the latest version, downloads or updates phantomjs binary
 
         Returns:
@@ -174,16 +108,16 @@ class PhantomJS():
 
         if self.check_driver_is_up_to_date and not self.system_name:
 
-            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
+            is_driver_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_phantomjs()
 
             if is_driver_up_to_date:
                 return self.phantomjs_path
 
-        driver_path = self.__download_driver()
+        driver_path = self._download_driver()
 
         if self.check_driver_is_up_to_date and not self.system_name:
 
-            is_driver_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_phantomjs()
+            is_driver_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_phantomjs()
 
             if not is_driver_up_to_date:
                 message = f'Problem with updating phantomjs current_version: {current_version} latest_version: {latest_version}'
@@ -191,29 +125,9 @@ class PhantomJS():
                 message = 'Trying to download previous latest version of phantomjs'
                 logger.info(message)
 
-                driver_path = self.__download_driver(previous_version=True)
+                driver_path = self._download_driver(previous_version=True)
 
         return driver_path
-
-    def __delete_current_phantomjs_for_current_os(self) -> None:
-        """Deletes phantomjs from folder if parameter "upgrade" is True"""
-
-        if Path(self.phantomjs_path).exists():
-
-            logger.info(f'Deleted existing phantomjs phantomjs_path: {self.phantomjs_path}')
-            Path(self.phantomjs_path).unlink()
-
-    def __chmod_driver(self) -> None:
-        """Tries to give phantomjs binary needed permissions"""
-
-        if Path(self.phantomjs_path).exists():
-
-            logger.info('Trying to give phantomjs needed permissions')
-
-            st = os.stat(self.phantomjs_path)
-            os.chmod(self.phantomjs_path, st.st_mode | stat.S_IEXEC)
-
-            logger.info('Needed rights for phantomjs were successfully issued')
 
     def __rename_driver(self, archive_folder_path : str, archive_driver_path : str) -> None:
         """Renames phantomjs if it was given
@@ -252,15 +166,15 @@ class PhantomJS():
 
         if not self.version:
 
-            driver_path = self.__check_if_phantomjs_is_up_to_date()
+            driver_path = self._check_if_phantomjs_is_up_to_date()
 
         else:
 
-            driver_path = self.__download_driver(version=self.version)
+            driver_path = self._download_driver(version=self.version)
 
         return driver_path
 
-    def __get_latest_previous_version_phantomjs_via_requests(self) -> str:
+    def _get_latest_previous_version_phantomjs_via_requests(self) -> str:
         """Gets previous latest phantomjs version
 
         Returns:
@@ -294,7 +208,7 @@ class PhantomJS():
 
         return latest_previous_version
 
-    def __check_if_version_is_valid(self, url : str) -> None:
+    def _check_if_version_is_valid(self, url : str) -> None:
         """Checks the specified version for existence.
 
         Args:
@@ -323,7 +237,7 @@ class PhantomJS():
             message = f'Wrong version or system_name was specified. archive_name: {archive_name} url: {url}'
             raise DriverVersionInvalidException(message)
 
-    def __download_driver(self, version : str = '', previous_version : bool = False) -> str:
+    def _download_driver(self, version : str = '', previous_version : bool = False) -> str:
         """Function to download, delete or upgrade current phantomjs
 
         Args:
@@ -345,7 +259,7 @@ class PhantomJS():
 
         if self.upgrade:
 
-            self.__delete_current_phantomjs_for_current_os()
+            super()._delete_current_driver_for_current_os()
 
         if version:
 
@@ -355,14 +269,14 @@ class PhantomJS():
 
         elif previous_version:
 
-            latest_previous_version = self.__get_latest_previous_version_phantomjs_via_requests()
+            latest_previous_version = self._get_latest_previous_version_phantomjs_via_requests()
 
             logger.info(f'Started download phantomjs latest_previous_version: {latest_previous_version}')
 
             url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(latest_previous_version)
 
         else:
-            latest_version = self.__get_latest_version_phantomjs()
+            latest_version = self._get_latest_version_phantomjs()
 
             logger.info(f'Started download phantomjs latest_version: {latest_version}')
 
@@ -377,7 +291,7 @@ class PhantomJS():
 
         if any([version, self.system_name ,latest_previous_version]):
 
-            self.__check_if_version_is_valid(url=url)
+            self._check_if_version_is_valid(url=url)
 
         archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
@@ -425,6 +339,6 @@ class PhantomJS():
 
         if self.chmod:
 
-            self.__chmod_driver()
+            super()._chmod_driver()
 
         return driver_path

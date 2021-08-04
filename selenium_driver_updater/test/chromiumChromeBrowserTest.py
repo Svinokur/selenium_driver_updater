@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import time
@@ -47,25 +48,25 @@ class testChromiumChromeBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
-        url = self.setting["ChromeBrowser"]["LinkAllLatestRelease"]
+        url = str(self.setting["ChromeBrowser"]["LinkAllLatestRelease"])
         json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
     def test02_check_get_current_version_chromiumbrowser_selenium(self):
-        current_version = self.chromium_chromebrowser._ChromiumChromeBrowser__get_current_version_chromiumbrowser_selenium()
+        current_version = self.chromium_chromebrowser._get_current_version_chromiumbrowser_selenium()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
     def test03_check_get_latest_version_chromiumbrowser(self):
-        latest_version = self.chromium_chromebrowser._ChromiumChromeBrowser__get_latest_version_chromiumbrowser()
+        latest_version = self.chromium_chromebrowser._get_latest_version_chromiumbrowser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
     def test04_check_get_latest_chromium_browser_for_current_os(self):
-        self.chromium_chromebrowser._ChromiumChromeBrowser__get_latest_chromium_browser_for_current_os()
+        self.chromium_chromebrowser._get_latest_chromium_browser_for_current_os()
 
     #@unittest.skip('Temporary not needed')
     def test05_check_chromedriver_is_up_to_date(self):

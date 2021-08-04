@@ -139,7 +139,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_count_main_param(self):
-        self.assertEqual(len(self.setting), 15)
+        self.assertEqual(len(self.setting), 16)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
@@ -150,6 +150,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
+        self.assertEqual(len(self.setting["SafariDriver"]), 2)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
@@ -160,7 +161,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
         self.assertEqual(len(self.setting["Github"]), 3)
         self.assertEqual(len(self.setting["PyPi"]), 1)
-    
+
     #@unittest.skip('Temporary not needed')
     def test03_check_values_params(self):
 
@@ -192,6 +193,9 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], 'phantomjs')
         self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], url_release_phantomjs)
+
+        self.assertEqual(self.setting["SafariDriver"]["LinkLastRelease"], 'https://support.apple.com/en-us/HT201222')
+        self.assertEqual(self.setting["SafariDriver"]["LastReleasePlatform"], 'safaridriver')
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')

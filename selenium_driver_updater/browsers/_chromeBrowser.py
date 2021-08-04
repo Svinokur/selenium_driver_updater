@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
 import traceback
@@ -39,11 +40,11 @@ class ChromeBrowser():
 
         if self.check_browser_is_up_to_date:
             try:
-                self.__check_if_chrome_browser_is_up_to_date()
+                self._check_if_chrome_browser_is_up_to_date()
             except (ValueError, FileNotFoundError):
                 pass
 
-    def __check_if_chrome_browser_is_up_to_date(self) -> None:
+    def _check_if_chrome_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of chrome browser"""
 
         if platform.system() != 'Linux':
@@ -57,19 +58,19 @@ class ChromeBrowser():
                 message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
                 raise FileNotFoundError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
+        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
 
         if not is_browser_up_to_date:
 
-            self.__get_latest_chrome_browser_for_current_os()
+            self._get_latest_chrome_browser_for_current_os()
 
-            is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_chrome_browser()
+            is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
 
             if not is_browser_up_to_date:
                 message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
                 logger.info(message)
 
-    def __compare_current_version_and_latest_version_chrome_browser(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version_chrome_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of chrome browser to latest version
 
         Returns:
@@ -84,12 +85,12 @@ class ChromeBrowser():
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_chrome_browser_selenium()
+        current_version = self._get_current_version_chrome_browser_selenium()
 
         if not current_version:
             return True, current_version, latest_version
 
-        latest_version = self.__get_latest_version_chrome_browser()
+        latest_version = self._get_latest_version_chrome_browser()
 
         if current_version == latest_version:
             is_browser_up_to_date = True
@@ -98,7 +99,7 @@ class ChromeBrowser():
 
         return is_browser_up_to_date, current_version, latest_version
 
-    def __get_current_version_chrome_browser_selenium(self) -> str:
+    def _get_current_version_chrome_browser_selenium(self) -> str:
         """Gets current chrome browser version
 
 
@@ -120,7 +121,7 @@ class ChromeBrowser():
 
         try:
 
-            browser_version = self.__get_current_version_chrome_browser_selenium_via_terminal()
+            browser_version = self._get_current_version_chrome_browser_selenium_via_terminal()
             if not browser_version:
                 message = 'Trying to get current version of chrome browser via chromedriver'
                 logger.info(message)
@@ -131,10 +132,8 @@ class ChromeBrowser():
 
                 chrome_options.add_argument('--headless')
 
-                driver = webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options)
-                browser_version = str(driver.capabilities['browserVersion'])
-                driver.close()
-                driver.quit()
+                with webdriver.Chrome(executable_path = self.chromedriver_path, options = chrome_options) as driver:
+                    browser_version = str(driver.capabilities['browserVersion'])
 
             logger.info(f'Current version of chrome browser: {browser_version}')
 
@@ -145,7 +144,7 @@ class ChromeBrowser():
 
         return browser_version
 
-    def __get_current_version_chrome_browser_selenium_via_terminal(self) -> str:
+    def _get_current_version_chrome_browser_selenium_via_terminal(self) -> str:
         """Gets current chrome browser version via command in terminal
 
 
@@ -185,7 +184,7 @@ class ChromeBrowser():
 
         return browser_version
 
-    def __get_latest_version_chrome_browser(self, no_messages : bool = False) -> str:
+    def _get_latest_version_chrome_browser(self, no_messages : bool = False) -> str:
         """Gets latest chrome browser version
 
 
@@ -240,9 +239,9 @@ class ChromeBrowser():
 
         return latest_version
 
-    def __get_latest_chrome_browser_for_current_os(self) -> None:
+    def _get_latest_chrome_browser_for_current_os(self) -> None:
         """Trying to update chrome browser to its latest version"""
-    
+
         try:
             is_admin : bool = bool(os.getuid() == 0)
         except Exception:

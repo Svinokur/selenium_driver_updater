@@ -54,24 +54,24 @@ class testGithubViewer(unittest.TestCase):
         try:
             releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = 'mazilla/geckadruver')
             self.assertGreaterEqual(len(releases),0, (len(releases)))
-        except Exception as e:
-            self.assertTrue(e.__class__ == StatusCodeNotEqualException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_get_latest_release_tag_by_repo_name_failure(self):
         try:
             tag = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name = 'mazilla/geckadruver')
             self.assertGreaterEqual(len(tag), 0, len(tag))
-        except Exception as e:
-            self.assertTrue(e.__class__ == StatusCodeNotEqualException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test03_check_get_release_version_by_repo_name_failure(self):
         try:
             version = self.github_viewer.get_release_version_by_repo_name(repo_name = 'mazilla/geckadruver')
             self.assertGreaterEqual(len(version), 0, len(version))
-        except Exception as e:
-            self.assertTrue(e.__class__ == StatusCodeNotEqualException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test04_check_get_all_releases_data_by_repo_name_and_validate_json_schema(self):

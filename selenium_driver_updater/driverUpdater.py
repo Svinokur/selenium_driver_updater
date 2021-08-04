@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation, protected-access, broad-except
 #Standart library imports
 from dataclasses import dataclass
 from pathlib import Path
@@ -36,8 +37,8 @@ class _info():
     check_browser_is_up_to_date = False
     enable_library_update_check = True
 
-#pylint: disable=protected-access
 class DriverUpdater():
+    """Main class for working with all drivers"""
 
     #DRIVERS
     chromedriver = 'chromedriver'
@@ -46,6 +47,7 @@ class DriverUpdater():
     edgedriver = 'edgedriver'
     chromium_chromedriver = 'chromium_chromedriver'
     phantomjs = 'phantomjs'
+    safaridriver = 'safaridriver'
 
     #OS'S
     windows = 'win64'
@@ -319,7 +321,7 @@ class DriverUpdater():
         version = kwargs.get('version', _info.version)
         system_name = kwargs.get('system_name', _info.system_name)
 
-        parametres = dict(  path=_info.path, upgrade=_info.upgrade, chmod=_info.chmod,
+        parametres = dict(  driver_name=driver_name, path=_info.path, upgrade=_info.upgrade, chmod=_info.chmod,
                             check_driver_is_up_to_date=_info.check_driver_is_up_to_date,
                             filename=filename, version=version,
                             check_browser_is_up_to_date=_info.check_browser_is_up_to_date,

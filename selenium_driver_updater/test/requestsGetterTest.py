@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, broad-except
 #Standart library imports
 import unittest
 import time
@@ -41,7 +42,7 @@ class testRequestsGetter(unittest.TestCase):
     def test01_check_get_result_by_request_failure(self):
         url = 'hi'
         try:
-            json_data = self.requests_getter.get_result_by_request(url=url)
+            self.requests_getter.get_result_by_request(url=url)
         except Exception:
             pass
 

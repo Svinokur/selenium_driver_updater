@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
 import traceback
@@ -38,11 +39,11 @@ class OperaBrowser():
 
         if self.check_browser_is_up_to_date:
             try:
-                self.__check_if_opera_browser_is_up_to_date()
+                self._check_if_opera_browser_is_up_to_date()
             except (ValueError, FileNotFoundError):
                 pass
 
-    def __check_if_opera_browser_is_up_to_date(self) -> None:
+    def _check_if_opera_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of opera browser
 
         Raises:
@@ -59,19 +60,19 @@ class OperaBrowser():
             message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
             raise FileNotFoundError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_opera_browser()
+        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
 
         if not is_browser_up_to_date:
 
-            self.__get_latest_opera_browser_for_current_os()
+            self._get_latest_opera_browser_for_current_os()
 
-            is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_opera_browser()
+            is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
 
             if not is_browser_up_to_date:
                 message = f'Problem with updating opera browser current_version: {current_version} latest_version: {latest_version}'
                 logger.info(message)
 
-    def __get_current_version_opera_browser_selenium(self) -> str:
+    def _get_current_version_opera_browser_selenium(self) -> str:
         """Gets current opera browser version
 
 
@@ -91,21 +92,18 @@ class OperaBrowser():
 
         try:
 
-            browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
+            browser_version = self._get_current_version_opera_browser_selenium_via_terminal()
             if not browser_version:
                 message = 'Trying to get current version of opera browser via operadriver'
                 logger.info(message)
-            
+
             if Path(self.operadriver_path).exists() and not browser_version:
 
-                driver = webdriver.Opera(executable_path = self.operadriver_path)
-                browser_version = driver.execute_script("return navigator.userAgent")
+                with webdriver.Opera(executable_path = self.operadriver_path) as driver:
+                    browser_version = driver.execute_script("return navigator.userAgent")
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version)
+                find_string = re.findall('OPR/' + self.setting["Program"]["wedriverVersionPattern"], browser_version)
                 browser_version = find_string[0] if len(find_string) > 0 else ''
-
-                driver.close()
-                driver.quit()
 
             logger.info(f'Current version of opera browser: {browser_version}')
 
@@ -116,7 +114,7 @@ class OperaBrowser():
 
         return browser_version
 
-    def __get_latest_version_opera_browser(self) -> str:
+    def _get_latest_version_opera_browser(self) -> str:
         """Gets latest opera browser version
 
 
@@ -158,7 +156,7 @@ class OperaBrowser():
 
         return latest_version
 
-    def __get_latest_opera_browser_for_current_os(self) -> None:
+    def _get_latest_opera_browser_for_current_os(self) -> None:
         """Trying to update opera browser to its latest version
 
         Raises:
@@ -192,7 +190,7 @@ class OperaBrowser():
         message = 'Opera browser was successfully updated to the latest version.'
         logger.info(message)
 
-    def __compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of opera browser to latest version
 
         Returns:
@@ -211,12 +209,12 @@ class OperaBrowser():
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_opera_browser_selenium()
+        current_version = self._get_current_version_opera_browser_selenium()
 
         if not current_version:
             return True, current_version, latest_version
 
-        latest_version = self.__get_latest_version_opera_browser()
+        latest_version = self._get_latest_version_opera_browser()
 
         if current_version == latest_version:
             is_browser_up_to_date = True
@@ -225,7 +223,7 @@ class OperaBrowser():
 
         return is_browser_up_to_date, current_version, latest_version
 
-    def __get_current_version_opera_browser_selenium_via_terminal(self) -> str:
+    def _get_current_version_opera_browser_selenium_via_terminal(self) -> str:
         """Gets current opera browser version via command in terminal
 
 

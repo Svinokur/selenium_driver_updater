@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -59,24 +60,24 @@ class testChromeBrowser(unittest.TestCase):
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_current_version_chrome_selenium(self):
-        current_version = self.chromebrowser._ChromeBrowser__get_current_version_chrome_browser_selenium()
+    def test01_check_get_current_version_chrome_selenium(self):
+        current_version = self.chromebrowser._get_current_version_chrome_browser_selenium()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreater(len(current_version), 0, len(current_version))
 
     #@unittest.skip('Temporary not needed')
-    def test03_check_get_latest_version_chrome_browser(self):
-        latest_version = self.chromebrowser._ChromeBrowser__get_latest_version_chrome_browser()
+    def test02_check_get_latest_version_chrome_browser(self):
+        latest_version = self.chromebrowser._get_latest_version_chrome_browser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test04_check_get_latest_chrome_browser_for_current_os(self):
-        self.chromebrowser._ChromeBrowser__get_latest_chrome_browser_for_current_os()
+    def test03_check_get_latest_chrome_browser_for_current_os(self):
+        self.chromebrowser._get_latest_chrome_browser_for_current_os()
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
-    def test05_check_compare_current_version_and_latest_version_chrome_browser(self):
-        is_browser_is_up_to_date, current_version, latest_version = self.chromebrowser._ChromeBrowser__compare_current_version_and_latest_version_chrome_browser()
+    def test04_check_compare_current_version_and_latest_version_chrome_browser(self):
+        is_browser_is_up_to_date, current_version, latest_version = self.chromebrowser._compare_current_version_and_latest_version_chrome_browser()
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)
@@ -87,7 +88,7 @@ class testChromeBrowser(unittest.TestCase):
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_chromedriver_is_up_to_date(self):
+    def test05_check_chromedriver_is_up_to_date(self):
         self.chromebrowser.main()
 
 

@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
 import traceback
@@ -44,11 +45,11 @@ class FirefoxBrowser():
 
         if self.check_browser_is_up_to_date:
             try:
-                self.__check_if_firefox_browser_is_up_to_date()
+                self._check_if_firefox_browser_is_up_to_date()
             except (ValueError, FileNotFoundError):
                 pass
 
-    def __check_if_firefox_browser_is_up_to_date(self) -> None:
+    def _check_if_firefox_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of firefox browser
 
         Raises:
@@ -65,19 +66,19 @@ class FirefoxBrowser():
             message = f'firefoxbrowser_updater_path: {firefoxbrowser_updater_path} is not exists. Please report your OS information and path to {firefoxbrowser_updater_path} file in repository.'
             raise FileNotFoundError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
+        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_firefox_browser()
 
         if not is_browser_up_to_date:
 
-            self.__get_latest_firefox_browser_for_current_os()
+            self._get_latest_firefox_browser_for_current_os()
 
-            is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_firefox_browser()
+            is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_firefox_browser()
 
             if not is_browser_up_to_date:
                 message = f'Problem with updating firefox browser current_version: {current_version} latest_version: {latest_version}'
                 logger.info(message)
 
-    def __get_current_version_firefox_browser_selenium(self) -> str:
+    def _get_current_version_firefox_browser_selenium(self) -> str:
         """Gets current firefox browser version
 
 
@@ -97,7 +98,7 @@ class FirefoxBrowser():
 
         try:
 
-            browser_version = self.__get_current_version_firefox_browser_selenium_via_terminal()
+            browser_version = self._get_current_version_firefox_browser_selenium_via_terminal()
             if not browser_version:
                 message = 'Trying to get current version of firefox browser via geckodriver'
                 logger.info(message)
@@ -107,10 +108,8 @@ class FirefoxBrowser():
                 options = FirefoxOptions()
                 options.add_argument("--headless")
 
-                driver = webdriver.Firefox(executable_path = self.geckodriver_path, options=options)
-                browser_version = str(driver.capabilities['browserVersion'])
-                driver.close()
-                driver.quit()
+                with webdriver.Firefox(executable_path = self.geckodriver_path, options=options) as driver:
+                    browser_version = str(driver.capabilities['browserVersion'])
 
             logger.info(f'Current version of firefox browser: {browser_version}')
 
@@ -125,7 +124,7 @@ class FirefoxBrowser():
 
         return browser_version
 
-    def __get_latest_version_firefox_browser(self) -> str:
+    def _get_latest_version_firefox_browser(self) -> str:
         """Gets latest firefox browser version
 
 
@@ -151,7 +150,7 @@ class FirefoxBrowser():
 
         return latest_version
 
-    def __get_latest_firefox_browser_for_current_os(self) -> None:
+    def _get_latest_firefox_browser_for_current_os(self) -> None:
         """Trying to update firefox browser to its latest version
 
         Raises:
@@ -186,7 +185,7 @@ class FirefoxBrowser():
         message = 'Firefox browser was successfully updated to the latest version.'
         logger.info(message)
 
-    def __compare_current_version_and_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
+    def _compare_current_version_and_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of firefox browser to latest version
 
         Returns:
@@ -204,12 +203,12 @@ class FirefoxBrowser():
         current_version : str = ''
         latest_version : str = ''
 
-        current_version = self.__get_current_version_firefox_browser_selenium()
+        current_version = self._get_current_version_firefox_browser_selenium()
 
         if not current_version:
             return True, current_version, latest_version
 
-        latest_version = self.__get_latest_version_firefox_browser()
+        latest_version = self._get_latest_version_firefox_browser()
 
         if current_version == latest_version:
             is_browser_up_to_date = True
@@ -218,7 +217,7 @@ class FirefoxBrowser():
 
         return is_browser_up_to_date, current_version, latest_version
 
-    def __get_current_version_firefox_browser_selenium_via_terminal(self) -> str:
+    def _get_current_version_firefox_browser_selenium_via_terminal(self) -> str:
         """Gets current firefox browser version via command in terminal
 
 

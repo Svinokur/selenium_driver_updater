@@ -1,4 +1,4 @@
-#pylint: disable=wrong-import-position
+#pylint: disable=wrong-import-position,wrong-import-order
 import unittest
 import os
 import sys
@@ -34,6 +34,8 @@ from selenium_driver_updater.test import phantomJSTest
 
 from selenium_driver_updater.test import exceptionsTest
 
+from selenium_driver_updater.test import safariDriverTest
+
 import platform
 
 #refresh logger sometimes issue with writing log file
@@ -42,13 +44,10 @@ for handler in logging.root.handlers[:]:
 
 base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
-level=logging.DEBUG
-format='%(asctime)s %(name)s %(levelname)s [%(module)s %(funcName)s %(lineno)d] %(message)s '
-filename=f'{base_dir}log_test.log'
-filemode='w'
-encoding='utf-8'
+LEVEL=logging.INFO
+FORMAT='%(asctime)s %(name)s %(levelname)s [%(module)s %(funcName)s %(lineno)d] %(message)s '
 
-logging.basicConfig(level=level, format=format, filename=filename, filemode=filemode, encoding=encoding)
+logging.basicConfig(level=LEVEL, format=FORMAT)
 
 #define a Handler which writes INFO messages or higher to the sys.stderr
 console = logging.StreamHandler()
@@ -83,7 +82,9 @@ try:
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 
-    #testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
+    testSuite.addTest(unittest.makeSuite(safariDriverTest.testSafariDriver))
+
+    testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
 

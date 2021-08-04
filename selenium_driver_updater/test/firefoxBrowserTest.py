@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -52,17 +53,17 @@ class testFirefoxBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_latest_version_firefox_browser(self):
-        latest_version = self.firefoxbrowser._FirefoxBrowser__get_latest_version_firefox_browser()
+        latest_version = self.firefoxbrowser._get_latest_version_firefox_browser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test02_check_get_latest_firefox_browser_for_current_os(self):
-        self.firefoxbrowser._FirefoxBrowser__get_latest_firefox_browser_for_current_os()
+        self.firefoxbrowser._get_latest_firefox_browser_for_current_os()
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test03_check_compare_current_version_and_latest_version_firefox_browser(self):
-        is_browser_is_up_to_date, current_version, latest_version = self.firefoxbrowser._FirefoxBrowser__compare_current_version_and_latest_version_firefox_browser()
+        is_browser_is_up_to_date, current_version, latest_version = self.firefoxbrowser._compare_current_version_and_latest_version_firefox_browser()
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)

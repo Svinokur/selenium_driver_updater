@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -7,7 +8,6 @@ import platform
 
 
 import sys
-import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
@@ -57,23 +57,23 @@ class testEdgeBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_result_by_request(self):
-        url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
+        url = str(self.setting["EdgeBrowser"]["LinkAllLatestRelease"])
         json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
     def test02_check_get_latest_version_edge_browser(self):
-        latest_version = self.edgebrowser._EdgeBrowser__get_latest_version_edge_browser()
+        latest_version = self.edgebrowser._get_latest_version_edge_browser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test03_check_get_latest_edge_browser_for_current_os(self):
-        self.edgebrowser._EdgeBrowser__get_latest_edge_browser_for_current_os()
+        self.edgebrowser._get_latest_edge_browser_for_current_os()
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test04_check_compare_current_version_and_latest_version_edge_browser(self):
-        is_browser_is_up_to_date, current_version, latest_version = self.edgebrowser._EdgeBrowser__compare_current_version_and_latest_version_edge_browser()
+        is_browser_is_up_to_date, current_version, latest_version = self.edgebrowser._compare_current_version_and_latest_version_edge_browser()
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)

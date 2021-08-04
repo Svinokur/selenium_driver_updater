@@ -1,3 +1,4 @@
+#pylint: disable=broad-except,wrong-import-position,protected-access
 #Standart library imports
 import unittest
 import os.path

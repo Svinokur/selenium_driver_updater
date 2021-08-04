@@ -1,3 +1,4 @@
+#pylint: disable=broad-except,wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -39,7 +40,7 @@ class testPhantomJS(unittest.TestCase):
 
         path : str = str(setting["Program"]["driversPath"])
 
-        parametres = dict(path=path, upgrade=True, chmod=True, 
+        parametres = dict(driver_name='phantomjs', path=path, upgrade=True, chmod=True, 
         check_driver_is_up_to_date = True, info_messages=True, filename='phantomjs_test', version='')
 
         cls.phantomjs = PhantomJS(**parametres)
@@ -76,97 +77,97 @@ class testPhantomJS(unittest.TestCase):
     #@unittest.skip('Temporary not needed')
     def test01_check_get_current_version_phantomjs(self):
         try:
-            current_version = self.phantomjs_failure._PhantomJS__get_current_version_phantomjs()
+            current_version = self.phantomjs_failure._get_current_version_driver()
             self.assertEqual(len(current_version), 0, len(current_version))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_download_driver_failure(self):
         try:
-            current_version = self.phantomjs_failure._PhantomJS__download_driver(version=self.specific_version_failure)
+            current_version = self.phantomjs_failure._download_driver(version=self.specific_version_failure)
             self.assertEqual(len(current_version), 0, len(current_version))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test03_check_compare_current_version_and_latest_version_failure(self):
         try:
-            is_driver_is_up_to_date, current_version, latest_version = self.phantomjs_failure._PhantomJS__compare_current_version_and_latest_version_phantomjs()
+            is_driver_is_up_to_date, current_version, latest_version = self.phantomjs_failure._compare_current_version_and_latest_version_github()
             self.assertFalse(is_driver_is_up_to_date, is_driver_is_up_to_date)
             self.assertEqual(len(current_version), 0, len(current_version))
             self.assertEqual(len(latest_version), 0, len(latest_version))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test04_check_phantomjs_is_up_to_date_failure(self):
         try:
             filename = self.phantomjs_failure.main()
             self.assertEqual(len(filename), 0, len(filename))
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     ##@unittest.skip('Temporary not needed')
     def test05_check_if_version_is_valid_failure(self):
         try:
-            url = self.setting["PhantomJS"]["LinkAllReleases"].format(self.specific_version_failure)
-            self.phantomjs_failure._PhantomJS__check_if_version_is_valid(url=url)
-        except Exception as e:
-            self.assertTrue(e.__class__ == DriverVersionInvalidException, e.__class__)
+            url = str(self.setting["PhantomJS"]["LinkAllReleases"]).format(self.specific_version_failure)
+            self.phantomjs_failure._check_if_version_is_valid(url=url)
+        except Exception as error:
+            self.assertTrue(error.__class__ == DriverVersionInvalidException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test06_check_get_latest_version_phantomjs(self):
-        latest_version = self.phantomjs._PhantomJS__get_latest_version_phantomjs()
+        latest_version = self.phantomjs._get_latest_version_phantomjs()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary not needed')
     def test07_check_download_driver_specific_version(self):
-        self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
+        self.phantomjs._delete_current_driver_for_current_os()
         self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
-        file_name = self.phantomjs._PhantomJS__download_driver(version=self.specific_version)
+        file_name = self.phantomjs._download_driver(version=self.specific_version)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
         self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
-        self.phantomjs._PhantomJS__chmod_driver()
+        self.phantomjs._chmod_driver()
 
-        current_version = self.phantomjs._PhantomJS__get_current_version_phantomjs()
+        current_version = self.phantomjs._get_current_version_driver()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
         self.assertEqual(current_version, self.specific_version)
 
     #@unittest.skip('Temporary not needed')
     def test08_check_download_driver_latest_previous_version(self):
-        self.phantomjs._PhantomJS__delete_current_phantomjs_for_current_os()
+        self.phantomjs._delete_current_driver_for_current_os()
         self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
-        file_name = self.phantomjs._PhantomJS__download_driver(previous_version=True)
+        file_name = self.phantomjs._download_driver(previous_version=True)
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
         self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
-        self.phantomjs._PhantomJS__chmod_driver()
+        self.phantomjs._chmod_driver()
 
-        current_version = self.phantomjs._PhantomJS__get_current_version_phantomjs()
+        current_version = self.phantomjs._get_current_version_driver()
         self.assertIsNotNone(current_version, current_version)
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
 
 
     #@unittest.skip('Temporary not needed')
     def test09_check_download_driver(self):
-        latest_version = self.phantomjs._PhantomJS__get_latest_version_phantomjs()
+        latest_version = self.phantomjs._get_latest_version_phantomjs()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
-        file_name = self.phantomjs._PhantomJS__download_driver()
+        file_name = self.phantomjs._download_driver()
         self.assertIsNotNone(file_name,file_name)
         self.assertGreater(len(file_name), 0, len(file_name))
         self.assertTrue(Path(self.phantomjs_path).exists(), self.phantomjs_path)
 
-        self.phantomjs._PhantomJS__chmod_driver()
+        self.phantomjs._chmod_driver()
 
     #@unittest.skip('Temporary not needed')
     def test10_check_phantomjs_is_up_to_date(self):
@@ -175,8 +176,8 @@ class testPhantomJS(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test11_check_if_version_is_valid(self):
-        url = self.setting["PhantomJS"]["LinkLastReleaseFile"].format(self.specific_version)
-        self.phantomjs._PhantomJS__check_if_version_is_valid(url=url)
+        url = str(self.setting["PhantomJS"]["LinkLastReleaseFile"]).format(self.specific_version)
+        self.phantomjs._check_if_version_is_valid(url=url)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
