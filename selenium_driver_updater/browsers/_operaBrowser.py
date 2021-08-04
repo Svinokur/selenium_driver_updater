@@ -162,7 +162,7 @@ class OperaBrowser():
                 driver = webdriver.Opera(executable_path = self.operadriver_path)
                 browser_version = driver.execute_script("return navigator.userAgent")
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version)
+                find_string = re.findall('OPR/' + self.setting["Program"]["wedriverVersionPattern"], browser_version)
                 browser_version = find_string[0] if len(find_string) > 0 else ''
 
                 driver.close()
