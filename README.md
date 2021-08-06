@@ -24,14 +24,14 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install seleniu
 pip install selenium-driver-updater
 ```
 
-## Usage
+## Usage in code
 This example shows how you can use this library to download chromedriver binary.
 ```python
 from selenium_driver_updater import DriverUpdater
 import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-result, message, filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True)
+filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True)
 print(filename)
 
 ```
@@ -43,10 +43,17 @@ import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 list_drivers = [DriverUpdater.chromedriver, DriverUpdater.geckodriver]
 
-result, message, filename = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
+filename = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
 print(filename)
 
 ```
+
+## Usage with help of command line
+Use 
+```bash
+selenium-driver-updater --help
+```
+To see all available arguments and commands
 
 # Supported Selenium Binaries
 

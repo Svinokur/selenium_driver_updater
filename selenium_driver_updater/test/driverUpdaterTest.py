@@ -1,3 +1,4 @@
+#pylint: disable=broad-except,wrong-import-position,protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -5,15 +6,15 @@ import time
 import logging
 
 import sys
-import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 # Local imports
-from driverUpdater import DriverUpdater
-from driverUpdater import info
+from selenium_driver_updater.driverUpdater import DriverUpdater
+from selenium_driver_updater.driverUpdater import _info
 
-from _setting import setting
-from util.requests_getter import RequestsGetter
+from selenium_driver_updater._setting import setting
+from selenium_driver_updater.util.requests_getter import RequestsGetter
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,7 +34,7 @@ class testDriverUpdater(unittest.TestCase):
 
         cls.driver_updater = DriverUpdater
         cls.requests_getter = RequestsGetter
-        cls.info = info
+        cls.info = _info
 
     def setUp(self):
         self.start_time : float = time.time()
@@ -51,80 +52,76 @@ class testDriverUpdater(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_all_input_parameteres_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres()
-        self.assertFalse(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        try:
+            self.driver_updater._DriverUpdater__check_all_input_parameteres()
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_enviroment_and_variables_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables()
-        self.assertFalse(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        try:
+            self.driver_updater._DriverUpdater__check_enviroment_and_variables()
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test03_check_driver_name_is_valid_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name_failure)
-        self.assertFalse(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        try:
+            self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name_failure)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test04_check_system_name_is_valid_failure(self):
-        result, message = self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name_failure)
-        self.assertFalse(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        try:
+            self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name_failure)
+        except Exception as error:
+            self.assertTrue(error.__class__ == ValueError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test05_check_parameter_type_is_valid(self):
-        result, message = self.driver_updater._DriverUpdater__check_parameter_type_is_valid(parameter='aboba', needed_type=list, parameter_name='driver_name')
-        self.assertFalse(result, message)
-        self.assertGreater(len(message), 0, len(message))
+        try:
+            self.driver_updater._DriverUpdater__check_parameter_type_is_valid(parameter='aboba', needed_type=list, parameter_name='driver_name')
+        except Exception as error:
+            self.assertTrue(error.__class__ == TypeError, error.__class__)
 
     #@unittest.skip('Temporary not needed')
     def test06_check_get_result_by_request(self):
         url = str(self.setting["PyPi"]["urlProjectJson"])
-        result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
-        self.assertTrue(result, message)
-        self.assertEqual(status_code, 200, status_code)
+        json_data = self.requests_getter.get_result_by_request(url=url)
         self.assertGreaterEqual(len(json_data), 0, len(json_data))
 
     #@unittest.skip('Temporary not needed')
     def test07_check_library_is_up_to_date(self):
-        info._path = base_dir
-        info._driver_name = 'chromedriver'
-        info._system_name = 'mac64'
+        self.info.path = base_dir
+        self.info.driver_name = 'chromedriver'
+        self.info.system_name = 'mac64'
 
-        result, message = self.driver_updater._DriverUpdater__check_library_is_up_to_date()
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_library_is_up_to_date()
 
     #@unittest.skip('Temporary not needed')
     def test08_check_is_python_version_compatible_for_library(self):
-        result, message = self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_is_python_version_compatible_for_library()
 
     #@unittest.skip('Temporary not needed')
     def test09_check_all_input_parameteres(self):
-        result, message = self.driver_updater._DriverUpdater__check_all_input_parameteres()
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_all_input_parameteres()
 
     #@unittest.skip('Temporary not needed')
     def test10_check_enviroment_and_variables(self):
-        result, message = self.driver_updater._DriverUpdater__check_enviroment_and_variables()
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_enviroment_and_variables()
 
     #@unittest.skip('Temporary not needed')
     def test11_check_driver_name_is_valid(self):
-        result, message = self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name)
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_driver_name_is_valid(driver_name=self.driver_name)
 
     #@unittest.skip('Temporary not needed')
     def test12_check_system_name_is_valid(self):
-        result, message = self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name)
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_system_name_is_valid(system_name=self.system_name)
 
     #@unittest.skip('Temporary not needed')
     def test13_check_parameter_type_is_valid(self):
-        result, message = self.driver_updater._DriverUpdater__check_parameter_type_is_valid(parameter=self.driver_name, needed_type=str, parameter_name='driver_name')
-        self.assertTrue(result, message)
+        self.driver_updater._DriverUpdater__check_parameter_type_is_valid(parameter=self.driver_name, needed_type=str, parameter_name='driver_name')
 
 
 if __name__ == '__main__':

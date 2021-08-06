@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position,wrong-import-order
 import unittest
 import os
 import sys
@@ -7,29 +8,33 @@ import logging
 
 import traceback
 
-from test import settingTest
-from test import driverUpdaterTest
+from selenium_driver_updater.test import settingTest
+from selenium_driver_updater.test import driverUpdaterTest
 
-from test import chromeDriverTest
-from test import chromeBrowserTest
+from selenium_driver_updater.test import chromeDriverTest
+from selenium_driver_updater.test import chromeBrowserTest
 
-from test import geckoDriverTest
-from test import firefoxBrowserTest
+from selenium_driver_updater.test import geckoDriverTest
+from selenium_driver_updater.test import firefoxBrowserTest
 
-from test import operaDriverTest
-from test import operaBrowserTest
+from selenium_driver_updater.test import operaDriverTest
+from selenium_driver_updater.test import operaBrowserTest
 
-from test import edgeDriverTest
-from test import edgeBrowserTest
+from selenium_driver_updater.test import edgeDriverTest
+from selenium_driver_updater.test import edgeBrowserTest
 
-from test import githubViewerTest
-from test import extractorTest
-from test import requestsGetterTest
+from selenium_driver_updater.test import githubViewerTest
+from selenium_driver_updater.test import extractorTest
+from selenium_driver_updater.test import requestsGetterTest
 
-from test import chromiumChromeDriverTest
-from test import chromiumChromeBrowserTest
+from selenium_driver_updater.test import chromiumChromeDriverTest
+from selenium_driver_updater.test import chromiumChromeBrowserTest
 
-from test import phantomJSTest
+from selenium_driver_updater.test import phantomJSTest
+
+from selenium_driver_updater.test import exceptionsTest
+
+from selenium_driver_updater.test import safariDriverTest
 
 import platform
 
@@ -39,13 +44,10 @@ for handler in logging.root.handlers[:]:
 
 base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
-level=logging.DEBUG
-format='%(asctime)s %(name)s %(levelname)s [%(module)s %(funcName)s %(lineno)d] %(message)s '
-filename=f'{base_dir}log_test.log' 
-filemode='w'
-encoding='utf-8'
+LEVEL=logging.INFO
+FORMAT='%(asctime)s %(name)s %(levelname)s [%(module)s %(funcName)s %(lineno)d] %(message)s '
 
-logging.basicConfig(level=level, format=format, filename=filename, filemode=filemode, encoding=encoding)
+logging.basicConfig(level=LEVEL, format=FORMAT)
 
 #define a Handler which writes INFO messages or higher to the sys.stderr
 console = logging.StreamHandler()
@@ -66,22 +68,28 @@ try:
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
-    #testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver)) #Temporary could not test it in Github Workflow
-    #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser)) #Temporary could not test it in Github Workflow
+    #if platform.system() == 'Darwin':
+    #    testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver))
+    #    testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser))
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
         testSuite.addTest(unittest.makeSuite(edgeBrowserTest.testEdgeBrowser))
 
 
-    #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver)) Temporary could not test it in Github Workflow
-    #testSuite.addTest(unittest.makeSuite(chromiumChromeBrowserTest.testChromiumChromeBrowser)) Temporary could not test it in Github Workflow
+    #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver))
+    #testSuite.addTest(unittest.makeSuite(chromiumChromeBrowserTest.testChromiumChromeBrowser))
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
+
+    if platform.system() == 'Darwin':
+        testSuite.addTest(unittest.makeSuite(safariDriverTest.testSafariDriver))
 
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))
     testSuite.addTest(unittest.makeSuite(requestsGetterTest.testRequestsGetter))
+
+    testSuite.addTest(unittest.makeSuite(exceptionsTest.testExceptions))
 
 
     runner = unittest.TextTestRunner(verbosity=2, failfast=True)

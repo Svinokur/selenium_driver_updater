@@ -1,7 +1,6 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
-import traceback
-import logging
 import time
 import os
 import re
@@ -21,6 +20,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium_driver_updater._setting import setting
 
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.logger import logger
 
 class OperaBrowser():
     """Class for working with Opera browser"""
@@ -33,107 +33,51 @@ class OperaBrowser():
 
         self.requests_getter = RequestsGetter
 
-    def main(self):
-        """Main function, checks for the latest version, downloads or updates opera browser
+    def main(self) -> None:
+        """Main function, checks for the latest version, downloads or updates opera browser"""
 
-        Returns:
-            Tuple of bool, str and str
+        if self.check_browser_is_up_to_date:
+            try:
+                self._check_if_opera_browser_is_up_to_date()
+            except (ValueError, FileNotFoundError):
+                pass
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-            driver_path (str)       : Path where phantomjs was downloaded or updated.
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
-        result_run : bool = False
-        message_run : str = ''
-
-        try:
-
-            if self.check_browser_is_up_to_date:
-                result, message = self.__check_if_opera_browser_is_up_to_date()
-                if not result:
-                    logging.error(message)
-                    return result, message
-
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run
-
-    def __check_if_opera_browser_is_up_to_date(self) -> Tuple[bool, str]:
+    def _check_if_opera_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of opera browser
 
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
-
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
 
-        try:
+        operabrowser_updater_path = str(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"])
+        if not operabrowser_updater_path:
+            message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+            raise ValueError(message)
 
-            operabrowser_updater_path = str(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"])
-            if not operabrowser_updater_path:
-                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                logging.info(message)
-                return True, message
+        if not Path(operabrowser_updater_path).exists():
+            message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
+            raise FileNotFoundError(message)
 
-            if not Path(operabrowser_updater_path).exists():
-                message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
-                logging.info(message)
-                return True, message
+        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
 
-            result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_opera_browser()
-            if not result:
-                logging.error(message)
-                return result, message
+        if not is_browser_up_to_date:
+
+            self._get_latest_opera_browser_for_current_os()
+
+            is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
 
             if not is_browser_up_to_date:
+                message = f'Problem with updating opera browser current_version: {current_version} latest_version: {latest_version}'
+                logger.info(message)
 
-                result, message = self.__get_latest_opera_browser_for_current_os()
-                if not result:
-                    logging.error(message)
-                    return result, message
-
-                result, message, is_browser_up_to_date, current_version, latest_version = self.__compare_current_version_and_latest_version_opera_browser()
-                if not result:
-                    logging.error(message)
-                    return result, message
-
-                if not is_browser_up_to_date:
-                    message = f'Problem with updating opera browser current_version: {current_version} latest_version: {latest_version}'
-                    logging.info(message)
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run
-
-    def __get_current_version_opera_browser_selenium(self) -> Tuple[bool, str, str]:
+    def _get_current_version_opera_browser_selenium(self) -> str:
         """Gets current opera browser version
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             browser_version (str)   : Current opera browser version.
 
         Raises:
@@ -141,62 +85,39 @@ class OperaBrowser():
 
             WebDriverException: Occurs when current operadriver could not start or critical error occured.
 
-            Except: If unexpected error raised.
-
         """
 
-        result_run : bool = False
-        message_run : str = ''
         browser_version : str = ''
 
         try:
 
-            result, message, browser_version = self.__get_current_version_opera_browser_selenium_via_terminal()
-            if not result:
-                logging.error(message)
+            browser_version = self._get_current_version_opera_browser_selenium_via_terminal()
+            if not browser_version:
                 message = 'Trying to get current version of opera browser via operadriver'
-                logging.info(message)
-            
-            if Path(self.operadriver_path).exists() and (not result or not browser_version):
+                logger.info(message)
 
-                driver = webdriver.Opera(executable_path = self.operadriver_path)
-                browser_version = driver.execute_script("return navigator.userAgent")
+            if Path(self.operadriver_path).exists() and not browser_version:
+
+                with webdriver.Opera(executable_path = self.operadriver_path) as driver:
+                    browser_version = driver.execute_script("return navigator.userAgent")
 
                 find_string = re.findall('OPR/' + self.setting["Program"]["wedriverVersionPattern"], browser_version)
                 browser_version = find_string[0] if len(find_string) > 0 else ''
 
-                driver.close()
-                driver.quit()
+            logger.info(f'Current version of opera browser: {browser_version}')
 
-            logging.info(f'Current version of opera browser: {browser_version}')
+        except (WebDriverException, SessionNotCreatedException, OSError):
+            pass #[Errno 86] Bad CPU type in executable:
 
-            result_run = True
+        return browser_version
 
-        except SessionNotCreatedException:
-            message_run = f'SessionNotCreatedException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, browser_version
-
-        except WebDriverException:
-            message_run = f'WebDriverException error: {traceback.format_exc()}'
-            logging.error(message_run)
-            return True, message_run, browser_version
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, browser_version
-
-    def __get_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
+    def _get_latest_version_opera_browser(self) -> str:
         """Gets latest opera browser version
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             latest_version (str)    : Latest version of opera browser.
 
         Raises:
@@ -204,63 +125,41 @@ class OperaBrowser():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         latest_version : str = ''
         latest_version_element : str = ''
 
-        try:
+        url = self.setting["OperaBrowser"]["LinkAllReleases"]
+        json_data = self.requests_getter.get_result_by_request(url=url)
 
-            url = self.setting["OperaBrowser"]["LinkAllReleases"]
-            result, message, status_code, json_data = self.requests_getter.get_result_by_request(url=url)
-            if not result:
-                logging.error(message)
-                return result, message, latest_version
+        soup = BeautifulSoup(json_data, 'html.parser')
+        changelogs = soup.findAll('h1', attrs={'class' : 'entry-title'})
 
-            soup = BeautifulSoup(json_data, 'html.parser')
-            changelogs = soup.findAll('h1', attrs={'class' : 'entry-title'})
+        for changelog in changelogs:
+            latest_version_element = changelog.text.replace('\n', '')
 
-            for changelog in changelogs:
-                latest_version_element = changelog.text.replace('\n', '')
+            if 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
+                continue
 
-                if 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
-                    continue
+            else:
+                break
 
-                else:
-                    break
+        if not latest_version_element:
+            message = f'Latest main version of opera browser could not be determinated. Maybe the element is changed.'
+            logger.error(message)
 
-            if not latest_version_element:
-                message = f'Latest main version of opera browser could not be determinated. Maybe the element is changed.'
-                logging.error(message)
-                return result_run, message, latest_version
+        latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
+        
+        logger.info(f'Latest version of opera browser: {latest_version}')
 
-            latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
-            
-            logging.info(f'Latest version of opera browser: {latest_version}')
+        return latest_version
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run , latest_version
-
-    def __get_latest_opera_browser_for_current_os(self) -> Tuple[bool, str]:
+    def _get_latest_opera_browser_for_current_os(self) -> None:
         """Trying to update opera browser to its latest version
-
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
 
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
         try:
             is_admin : bool = bool(os.getuid() == 0)
         except Exception:
@@ -268,94 +167,66 @@ class OperaBrowser():
 
         update_command : str = self.setting["OperaBrowser"]["OperaBrowserUpdater"]
 
-        try:
+        message = 'Trying to update opera browser to the latest version.'
+        logger.info(message)
 
-            message = 'Trying to update opera browser to the latest version.'
-            logging.info(message)
+        if platform.system() == 'Linux':
 
-            if platform.system() == 'Linux':
-
-                if is_admin:
-                    os.system(update_command)
-
-                elif not is_admin:
-                    message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
-                    logging.error(message)
-                    return True, message_run
-
-            else:
-
+            if is_admin:
                 os.system(update_command)
-                time.sleep(60) #wait for the updating
 
-            message = 'Opera browser was successfully updated to the latest version.'
-            logging.info(message)
+            elif not is_admin:
+                message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
+                raise ValueError(message)
 
-            result_run = True
+        else:
 
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
+            os.system(update_command)
+            time.sleep(60) #wait for the updating
 
-        return result_run, message_run
+        message = 'Opera browser was successfully updated to the latest version.'
+        logger.info(message)
 
-    def __compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, bool, str, str]:
+    def _compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of opera browser to latest version
 
         Returns:
-            Tuple of bool, str and bool
+            Tuple of bool, str and str
 
-            result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
-            is_browser_up_to_date (bool)    : If true current version of opera browser is up to date. Defaults to False.
+            is_browser_up_to_date (bool)    : It true the browser is up to date. Defaults to False.
+            current_version (str)           : Current version of the browser.
+            latest_version (str)            : Latest version of the browser.
 
         Raises:
             Except: If unexpected error raised.
 
         """
-        result_run : bool = False
-        message_run : str = ''
+
         is_browser_up_to_date : bool = False
         current_version : str = ''
         latest_version : str = ''
 
-        try:
+        current_version = self._get_current_version_opera_browser_selenium()
 
-            result, message, current_version = self.__get_current_version_opera_browser_selenium()
-            if not result:
-                logging.error(message)
-                return result, message, is_browser_up_to_date, current_version, latest_version
+        if not current_version:
+            return True, current_version, latest_version
 
-            if not current_version:
-                return True, message, True, current_version, latest_version
+        latest_version = self._get_latest_version_opera_browser()
 
-            result, message, latest_version = self.__get_latest_version_opera_browser()
-            if not result:
-                logging.error(message)
-                return result, message, is_browser_up_to_date, current_version, latest_version
+        if current_version == latest_version:
+            is_browser_up_to_date = True
+            message = f"Your existing opera browser is up to date. current_version: {current_version} latest_version: {latest_version}"
+            logger.info(message)
 
-            if current_version == latest_version:
-                is_browser_up_to_date = True
-                message = f"Your existing opera browser is up to date. current_version: {current_version} latest_version: {latest_version}"
-                logging.info(message)
+        return is_browser_up_to_date, current_version, latest_version
 
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, is_browser_up_to_date, current_version, latest_version
-
-    def __get_current_version_opera_browser_selenium_via_terminal(self) -> Tuple[bool, str, str]:
+    def _get_current_version_opera_browser_selenium_via_terminal(self) -> str:
         """Gets current opera browser version via command in terminal
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             browser_version (str)   : Current opera browser version.
 
         Raises:
@@ -364,39 +235,29 @@ class OperaBrowser():
 
         """
 
-        result_run : bool = False
-        message_run : str = ''
         browser_version : str = ''
         browser_version_terminal : str = ''
 
-        try:
+        operabrowser_path = self.setting["OperaBrowser"]["Path"]
+        if operabrowser_path:
 
-            operabrowser_path = self.setting["OperaBrowser"]["Path"]
-            if operabrowser_path:
+            logger.info('Trying to get current version of opera browser via terminal')
 
-                logging.info('Trying to get current version of opera browser via terminal')
+            if platform.system() == 'Windows':
 
-                if platform.system() == 'Windows':
+                with subprocess.Popen(operabrowser_path, stdout=subprocess.PIPE) as process:
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                    with subprocess.Popen(operabrowser_path, stdout=subprocess.PIPE) as process:
-                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
+                find_string_terminal = re.findall("Opera.*", browser_version_terminal)
 
-                    find_string_terminal = re.findall("Opera.*", browser_version_terminal)
+                browser_version_terminal = find_string_terminal[0] if len(find_string_terminal) > 0 else ''
 
-                    browser_version_terminal = find_string_terminal[0] if len(find_string_terminal) > 0 else ''
+            elif platform.system() == 'Darwin':
 
-                elif platform.system() == 'Darwin':
+                with subprocess.Popen([operabrowser_path, '--version'], stdout=subprocess.PIPE) as process:
+                    browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
-                    with subprocess.Popen([operabrowser_path, '--version'], stdout=subprocess.PIPE) as process:
-                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
+            find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
+            browser_version = find_string[0] if len(find_string) > 0 else ''
 
-                find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
-                browser_version = find_string[0] if len(find_string) > 0 else ''
-
-            result_run = True
-
-        except Exception:
-            message_run = f'Unexcepted error: {traceback.format_exc()}'
-            logging.error(message_run)
-
-        return result_run, message_run, browser_version
+        return browser_version

@@ -10,13 +10,16 @@ import logging
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 # Local imports
-from util.github_viewer import GithubViewer
+from selenium_driver_updater.util.github_viewer import GithubViewer
 
-from _setting import setting
+from selenium_driver_updater._setting import setting
 
 logging.basicConfig(level=logging.INFO)
+
+from selenium_driver_updater.util.exceptions import StatusCodeNotEqualException
 
 # pylint: disable=missing-function-docstring
 class testGithubViewer(unittest.TestCase): 
@@ -47,61 +50,32 @@ class testGithubViewer(unittest.TestCase):
         print("%.3f" % end_time)
 
     #@unittest.skip('Temporary not needed')
-    def test01_check_get_latest_release_data_by_repo_name_failure(self):
-        result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = 'mazilla/geckadruver')
-        self.assertFalse(result, json_data)
-        self.assertGreater(len(message), 0, len(message))
-        self.assertGreaterEqual(len(json_data),0, (len(json_data)))
+    def test01_check_get_all_releases_data_by_repo_name_failure(self):
+        try:
+            releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = 'mazilla/geckadruver')
+            self.assertGreaterEqual(len(releases),0, (len(releases)))
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
-    def test02_check_get_latest_release_data_by_repo_name_failure(self):
-        result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = 'mazilla/geckadruver')
-        self.assertFalse(result, json_data)
-        self.assertGreater(len(message), 0, len(message))
-        self.assertGreaterEqual(len(json_data),0, (len(json_data)))
+    def test02_check_get_latest_release_tag_by_repo_name_failure(self):
+        try:
+            tag = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name = 'mazilla/geckadruver')
+            self.assertGreaterEqual(len(tag), 0, len(tag))
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
-    def test03_check_get_all_releases_data_by_repo_name_failure(self):
-        result, message, releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = 'mazilla/geckadruver')
-        self.assertFalse(result, releases)
-        self.assertGreater(len(message), 0, len(message))
-        self.assertGreaterEqual(len(releases),0, (len(releases)))
+    def test03_check_get_release_version_by_repo_name_failure(self):
+        try:
+            version = self.github_viewer.get_release_version_by_repo_name(repo_name = 'mazilla/geckadruver')
+            self.assertGreaterEqual(len(version), 0, len(version))
+        except Exception as error:
+            self.assertTrue(error.__class__ == StatusCodeNotEqualException, error.__class__)
 
     #@unittest.skip('Temporary not needed')
-    def test04_check_get_latest_release_data_by_repo_name_and_validate_json_schema(self):
-        result, message, json_data = self.github_viewer.get_latest_release_data_by_repo_name(repo_name = self.repo_name)
-        self.assertTrue(result, message)
-        self.assertIsNotNone(json_data,json_data)
-        self.assertGreater(len(json_data), 0, len(json_data))
-
-        schema_asset = json.loads(Path(self.setting["JsonSchema"]["githubAssetSchema"]).read_text(encoding='utf-8'))
-
-        for asset in json_data.get('assets'):
-            self.assertIsNone(jsonschema.validate(instance=asset, schema=schema_asset))
-
-        del json_data['assets']
-
-        self.assertIsNone(json_data.get('assets'), json_data)
-
-        schema_release = json.loads(Path(self.setting["JsonSchema"]["githubReleaseSchema"]).read_text(encoding='utf-8'))
-
-        self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema_release))
-
-    #@unittest.skip('Temporary not needed')
-    def test05_check_get_latest_release_tag_by_repo_name(self):
-        result, message, json_data = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name = self.repo_name)
-        self.assertTrue(result, message)
-        self.assertIsNotNone(json_data,json_data)
-        self.assertGreater(len(json_data), 0, len(json_data))
-
-        schema = json.loads(Path(self.setting["JsonSchema"]["githubReleaseTagSchema"]).read_text(encoding='utf-8'))
-
-        self.assertIsNone(jsonschema.validate(instance=json_data, schema=schema))
-
-    #@unittest.skip('Temporary not needed')
-    def test06_check_get_all_releases_data_by_repo_name_and_validate_json_schema(self):
-        result, message, releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = self.repo_name)
-        self.assertTrue(result, message)
+    def test04_check_get_all_releases_data_by_repo_name_and_validate_json_schema(self):
+        releases = self.github_viewer.get_all_releases_data_by_repo_name(repo_name = self.repo_name)
         self.assertIsNotNone(releases,releases)
         self.assertGreater(len(releases), 0, len(releases))
 
@@ -109,6 +83,28 @@ class testGithubViewer(unittest.TestCase):
 
         for release in releases:
             self.assertIsNone(jsonschema.validate(instance=release, schema=schema))
+
+    #@unittest.skip('Temporary not needed')
+    def test05_check_get_latest_release_tag_by_repo_name(self):
+        tag_api = self.github_viewer.get_latest_release_tag_by_repo_name(repo_name = 'ariya/phantomjs')
+        self.assertIsNotNone(tag_api,tag_api)
+        self.assertGreater(len(tag_api), 0, len(tag_api))
+
+        tag_site = self.github_viewer.get_release_version_by_repo_name_via_site(repo_name = 'ariya/phantomjs')
+        self.assertIsNotNone(tag_site,tag_site)
+        self.assertGreater(len(tag_site), 0, len(tag_site))
+
+        self.assertEqual(tag_api, tag_site, f'tag_api: {tag_api} is not equal to tag_api: {tag_api}')
+
+    #@unittest.skip('Temporary not needed')
+    def test06_check_get_release_version_by_repo_name(self):
+        version_api = self.github_viewer.get_release_version_by_repo_name(repo_name = self.repo_name)
+        self.assertGreaterEqual(len(version_api), 0, len(version_api))
+
+        version_site = self.github_viewer.get_release_version_by_repo_name_via_site(repo_name = self.repo_name)
+        self.assertGreaterEqual(len(version_site), 0, len(version_site))
+
+        self.assertEqual(version_api, version_site, f'version_api: {version_api} is not equal to version_site: {version_site}')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)

@@ -7,3 +7,4 @@ selenium_driver_updater/*.log
 selenium_driver_updater/util/__pycache__/*.pyc
 *.log
 selenium_driver_updater/browsers/__pycache__/*.pyc
+build/*

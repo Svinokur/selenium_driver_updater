@@ -5,9 +5,10 @@ import platform
 import os.path
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
-from _setting import setting
-from _setting import info
+from selenium_driver_updater._setting import setting
+from selenium_driver_updater._setting import info
 
 #pylint: disable=invalid-name
 base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
@@ -58,12 +59,13 @@ phantomjs_latest_release = url_release_phantomjs + phantomjs_latest_release
 # BROWSERS AND THEIR UPDATERS
 #   
 
-chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
+chrome_browser_path = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+"/Applications/Chromium.app/Contents/MacOS/Chromium"] if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
 r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
-chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
+chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" /ua /installsource scheduler' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
 "sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
@@ -138,17 +140,18 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_count_main_param(self):
-        self.assertEqual(len(self.setting), 15)
+        self.assertEqual(len(self.setting), 16)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
         self.assertEqual(len(self.setting["Program"]), 4)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
-        self.assertEqual(len(self.setting["GeckoDriver"]), 3)
-        self.assertEqual(len(self.setting["OperaDriver"]), 3)
+        self.assertEqual(len(self.setting["GeckoDriver"]), 2)
+        self.assertEqual(len(self.setting["OperaDriver"]), 2)
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
         self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
+        self.assertEqual(len(self.setting["SafariDriver"]), 2)
 
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
@@ -159,7 +162,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
         self.assertEqual(len(self.setting["Github"]), 3)
         self.assertEqual(len(self.setting["PyPi"]), 1)
-    
+
     #@unittest.skip('Temporary not needed')
     def test03_check_values_params(self):
 
@@ -174,11 +177,9 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
         self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/")
 
-        self.assertEqual(self.setting["GeckoDriver"]["LinkLastRelease"], 'https://api.github.com/repos/mozilla/geckodriver/releases/latest')
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], 'geckodriver')
 
-        self.assertEqual(self.setting["OperaDriver"]["LinkLastRelease"], 'https://api.github.com/repos/operasoftware/operachromiumdriver/releases/latest')
         self.assertEqual(self.setting["OperaDriver"]["LinkLastReleasePlatform"], operadriver_latest_release)
         self.assertEqual(self.setting["OperaDriver"]["LastReleasePlatform"], 'operadriver')  
 
@@ -193,6 +194,9 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], 'phantomjs')
         self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], url_release_phantomjs)
+
+        self.assertEqual(self.setting["SafariDriver"]["LinkLastRelease"], 'https://support.apple.com/en-us/HT201222')
+        self.assertEqual(self.setting["SafariDriver"]["LastReleasePlatform"], 'safaridriver')
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')

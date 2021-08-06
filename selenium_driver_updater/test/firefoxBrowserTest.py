@@ -1,3 +1,4 @@
+#pylint: disable=wrong-import-position, protected-access
 #Standart library imports
 import unittest
 import os.path
@@ -7,10 +8,11 @@ import platform
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 # Local imports
-from _setting import setting
-from browsers._firefoxBrowser import FirefoxBrowser
+from selenium_driver_updater._setting import setting
+from selenium_driver_updater.browsers._firefoxBrowser import FirefoxBrowser
 
 logging.basicConfig(level=logging.INFO)
 
@@ -51,20 +53,17 @@ class testFirefoxBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_get_latest_version_firefox_browser(self):
-        result, message, latest_version = self.firefoxbrowser._FirefoxBrowser__get_latest_version_firefox_browser()
-        self.assertTrue(result, message)
+        latest_version = self.firefoxbrowser._get_latest_version_firefox_browser()
         self.assertIsNotNone(latest_version, latest_version)
         self.assertGreater(len(latest_version), 0, len(latest_version))
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test02_check_get_latest_firefox_browser_for_current_os(self):
-        result, message = self.firefoxbrowser._FirefoxBrowser__get_latest_firefox_browser_for_current_os()
-        self.assertTrue(result, message)
+        self.firefoxbrowser._get_latest_firefox_browser_for_current_os()
 
     #@unittest.skip('Temporary could not test it on Github Workflow')
     def test03_check_compare_current_version_and_latest_version_firefox_browser(self):
-        result, message, is_browser_is_up_to_date, current_version, latest_version = self.firefoxbrowser._FirefoxBrowser__compare_current_version_and_latest_version_firefox_browser()
-        self.assertTrue(result, message)
+        is_browser_is_up_to_date, current_version, latest_version = self.firefoxbrowser._compare_current_version_and_latest_version_firefox_browser()
         self.assertIsNotNone(is_browser_is_up_to_date, is_browser_is_up_to_date)
         self.assertIsNotNone(current_version, current_version)
         self.assertIsNotNone(latest_version, latest_version)
@@ -76,8 +75,7 @@ class testFirefoxBrowser(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test04_check_geckodriver_is_up_to_date(self):
-        result, message = self.firefoxbrowser.main()
-        self.assertTrue(result, message)
+        self.firefoxbrowser.main()
 
 
 if __name__ == '__main__':
