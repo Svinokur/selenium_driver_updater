@@ -70,11 +70,11 @@ class PhantomJS(DriverBase):
         """Compares current version of phantomjs to latest version
 
         Returns:
-            Tuple of bool, str and bool
+            Tuple of bool, str and str
 
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Empty string if function passed correctly, non-empty string if error.
-            is_driver_up_to_date (bool) : If true current version of phantomjs is up to date. Defaults to False.
+            is_driver_up_to_date (bool) : It true the driver is up to date. Defaults to False.
+            current_version (str)       : Current version of the driver.
+            latest_version (str)        : Latest version of the driver.
 
         """
         is_driver_up_to_date : bool = False

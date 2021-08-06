@@ -1,7 +1,6 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import time
-import re
 from pathlib import Path
 from typing import Tuple
 
@@ -12,8 +11,6 @@ import wget
 from selenium_driver_updater.browsers._chromeBrowser import ChromeBrowser
 
 from selenium_driver_updater.util.logger import logger
-from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
-
 from selenium_driver_updater.driver_base import DriverBase
 
 class ChromeDriver(DriverBase):
@@ -55,11 +52,11 @@ class ChromeDriver(DriverBase):
         if not self.version:
 
             #additional checking for main versions to equal - for example, chromedriver version main is 90 and chrome browser is still 89
-            is_equal, latest_version_driver, latest_version_browser = self.__compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
+            is_equal, latest_version_driver, latest_version_browser = self._compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser()
 
             if is_equal:
 
-                driver_path = self.__check_if_chromedriver_is_up_to_date()
+                driver_path = self._check_if_chromedriver_is_up_to_date()
 
             if not is_equal:
 
@@ -77,7 +74,7 @@ class ChromeDriver(DriverBase):
 
         return driver_path
 
-    def __compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser(self) -> Tuple[bool, str, str]:
+    def _compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser(self) -> Tuple[bool, str, str]:
         """Compares latest main version of chromedriver and latest main version of chrome browser"""
         is_equal : bool = False
         latest_version_chromedriver_main : str = ''
@@ -95,7 +92,7 @@ class ChromeDriver(DriverBase):
 
         return is_equal, latest_version_chromedriver_main, latest_version_browser_main
 
-    def __check_if_chromedriver_is_up_to_date(self) -> str:
+    def _check_if_chromedriver_is_up_to_date(self) -> str:
         """Сhecks for the latest version, downloads or updates chromedriver binary
 
         Returns:
@@ -160,28 +157,6 @@ class ChromeDriver(DriverBase):
         logger.info(f'Latest previous version of chromedriver: {latest_version_previous}')
 
         return latest_version_previous
-
-    def _check_if_version_is_valid(self, url : str) -> None:
-        """Checks the specified version for existence.
-
-        Args:
-            url (str)           : Full download url of chromedriver.
-
-        """
-
-        archive_name : str = url.split("/")[len(url.split("/"))-1]
-
-        find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], url)
-        driver_version = find_string[0] if len(find_string) > 0 else ''
-
-        url_test_valid = self.setting["ChromeDriver"]["LinkCheckVersionIsValid"].format(driver_version)
-        version_valid : str = f"{driver_version}/{archive_name}"
-
-        json_data = self.requests_getter.get_result_by_request(url=url_test_valid)
-
-        if not version_valid in json_data:
-            message = f'Wrong version or system_name was specified. version_valid: {version_valid} driver_version: {driver_version} url: {url}'
-            raise DriverVersionInvalidException(message)
 
     def _download_driver(self, version : str = '', previous_version : bool = False) -> str:
         """Function to download, delete or upgrade current chromedriver

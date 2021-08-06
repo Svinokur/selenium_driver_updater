@@ -1,7 +1,6 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
-import traceback
 import time
 import os
 import re
@@ -74,11 +73,11 @@ class ChromeBrowser():
         """Compares current version of chrome browser to latest version
 
         Returns:
-            Tuple of bool, str and bool
+            Tuple of bool, str and str
 
-            result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Returns an error message if an error occurs in the function.
-            is_browser_up_to_date (bool)    : If true current version of chrome browser is up to date. Defaults to False.
+            is_browser_up_to_date (bool)    : It true the browser is up to date. Defaults to False.
+            current_version (str)           : Current version of the browser.
+            latest_version (str)            : Latest version of the browser.
 
         """
         is_browser_up_to_date : bool = False
@@ -138,9 +137,7 @@ class ChromeBrowser():
             logger.info(f'Current version of chrome browser: {browser_version}')
 
         except (WebDriverException, SessionNotCreatedException, OSError):
-            message_run = f'Known error: {traceback.format_exc()}'
-            logger.error(message_run)
-            return browser_version
+            pass #[Errno 86] Bad CPU type in executable:
 
         return browser_version
 
@@ -173,10 +170,20 @@ class ChromeBrowser():
                     if 'invalid' not in browser_version_terminal.lower():
                         break
 
-            elif platform.system() in ['Linux', 'Darwin']:
+            elif platform.system() == 'Linux':
 
                 with subprocess.Popen([chromebrowser_path, '--version'], stdout=subprocess.PIPE) as process:
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+            elif platform.system() == 'Darwin':
+                
+                for path in chromebrowser_path:
+
+                    with subprocess.Popen([path, '--version'], stdout=subprocess.PIPE) as process:
+                        browser_version_terminal = process.communicate()[0].decode('UTF-8')
+
+                    if 'no such file or directory' not in browser_version_terminal.lower():
+                        break
 
 
             find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], browser_version_terminal)
@@ -189,10 +196,8 @@ class ChromeBrowser():
 
 
         Returns:
-            Tuple of bool, str and str
+            str
 
-            result_run (bool)       : True if function passed correctly, False otherwise.
-            message_run (str)       : Empty string if function passed correctly, non-empty string if error.
             latest_version (str)    : Latest version of chrome browser.
 
         Raises:

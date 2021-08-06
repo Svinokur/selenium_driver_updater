@@ -51,7 +51,7 @@ print(filename)
 ## Usage with help of command line
 Use 
 ```bash
-selenium_driver_updater --help
+selenium-driver-updater --help
 ```
 To see all available arguments and commands
 

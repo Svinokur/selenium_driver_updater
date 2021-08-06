@@ -1,3 +1,19 @@
+[5.0.0b5] 06/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added alternative usage in command line (now supports selenium-driver-updater reference)
+
+# Improvements
+
+- Improved updating command of chrome browser
+
+# Other
+
+- Removed unused imports
+- Removed unnecessary return after except statement
+
 [5.0.0b4] 03/08/2021
 This code was written and tested on Python 3.9.6
 

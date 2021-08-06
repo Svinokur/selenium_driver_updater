@@ -50,12 +50,13 @@ phantomjs_latest_release = url_release_phantomjs + phantomjs_latest_release
 # BROWSERS AND THEIR UPDATERS
 #                                 
 
-chrome_browser_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if platform.system() == 'Darwin' else \
+chrome_browser_path = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+"/Applications/Chromium.app/Contents/MacOS/Chromium"] if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
 r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
-chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe"' if platform.system() == 'Windows' else \
+chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" /ua /installsource scheduler' if platform.system() == 'Windows' else \
 'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
 "sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
@@ -109,7 +110,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.0b4"
+    version = "5.0.0b5"
 
 setting = dict(
     {

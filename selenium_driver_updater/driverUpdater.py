@@ -80,7 +80,7 @@ class DriverUpdater():
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
 
-            old_return (bool) : If false, it will not return old variables like "result and message". Defaults to True.
+            old_return (bool) : If false, it will not return old variables such as "result and message". Defaults to True.
 
         Returns:
             str
@@ -92,7 +92,7 @@ class DriverUpdater():
         #Initialize all variables
         driver_path = ''
 
-        old_return = kwargs.get('old_return', True)
+        old_return = bool(kwargs.get('old_return', True))
 
         _info.driver_name = driver_name
 

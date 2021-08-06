@@ -2,7 +2,6 @@
 #Standart library imports
 import shutil
 import time
-import re
 from pathlib import Path
 
 # Third party imports
@@ -13,7 +12,6 @@ import wget
 from selenium_driver_updater.browsers._edgeBrowser import EdgeBrowser
 
 from selenium_driver_updater.util.logger import logger
-from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
 
 from selenium_driver_updater.driver_base import DriverBase
 
@@ -123,28 +121,6 @@ class EdgeDriver(DriverBase):
         logger.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 
         return latest_previous_version
-
-    def _check_if_version_is_valid(self, url : str) -> None:
-        """Checks the specified version for existence.
-
-        Args:
-            url (str)           : Full download url of edgedriver.
-
-        """
-
-        archive_name : str = url.split("/")[len(url.split("/"))-1]
-        find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], url)
-        driver_version = find_string[0] if len(find_string) > 0 else ''
-
-        url_test_valid = str(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"]).format(driver_version)
-        version_valid : str = f"{driver_version}/{archive_name}"
-
-        json_data = self.requests_getter.get_result_by_request(url=url_test_valid)
-
-        if not version_valid in json_data:
-            message = ('Wrong version or system_name was specified.'
-            f'version_valid: {version_valid} driver_version: {driver_version} url: {url}')
-            raise DriverVersionInvalidException(message)
 
     def _download_driver(self, version : str = '', previous_version : bool = False) -> str:
         """Function to download, delete or upgrade current chromedriver

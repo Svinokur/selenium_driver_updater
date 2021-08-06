@@ -1,7 +1,6 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
-import traceback
 import time
 import os
 import re
@@ -108,9 +107,7 @@ class OperaBrowser():
             logger.info(f'Current version of opera browser: {browser_version}')
 
         except (WebDriverException, SessionNotCreatedException, OSError):
-            message_run = f'Known error: {traceback.format_exc()}'
-            logger.error(message_run)
-            return browser_version
+            pass #[Errno 86] Bad CPU type in executable:
 
         return browser_version
 
@@ -194,11 +191,11 @@ class OperaBrowser():
         """Compares current version of opera browser to latest version
 
         Returns:
-            Tuple of bool, str and bool
+            Tuple of bool, str and str
 
-            result_run (bool)               : True if function passed correctly, False otherwise.
-            message_run (str)               : Empty string if function passed correctly, non-empty string if error.
-            is_browser_up_to_date (bool)    : If true current version of opera browser is up to date. Defaults to False.
+            is_browser_up_to_date (bool)    : It true the browser is up to date. Defaults to False.
+            current_version (str)           : Current version of the browser.
+            latest_version (str)            : Latest version of the browser.
 
         Raises:
             Except: If unexpected error raised.

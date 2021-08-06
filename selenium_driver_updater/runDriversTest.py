@@ -82,7 +82,8 @@ try:
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 
-    testSuite.addTest(unittest.makeSuite(safariDriverTest.testSafariDriver))
+    if platform.system() == 'Darwin':
+        testSuite.addTest(unittest.makeSuite(safariDriverTest.testSafariDriver))
 
     testSuite.addTest(unittest.makeSuite(githubViewerTest.testGithubViewer))
     testSuite.addTest(unittest.makeSuite(extractorTest.testExtractor))

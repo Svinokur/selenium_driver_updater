@@ -120,11 +120,6 @@ class Extractor():
             out_path (str)          : Out path, where all members of archive will be gathered.
             delete_archive (bool)   : Delete archive after unzip or not. Defaults to True.
 
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool) : True if function passed correctly, False otherwise.
-            message_run (str) : Returns an error message if an error occurs in the function.
         """
 
         with tarfile.open(archive_path, "r:bz2") as tar_ref:
@@ -145,11 +140,6 @@ class Extractor():
             out_path (str)          : Out path, where all members of archive will be gathered.
             delete_archive (bool)   : Delete archive after unzip or not. Defaults to True.
 
-        Returns:
-            Tuple of bool and str
-
-            result_run (bool) : True if function passed correctly, False otherwise.
-            message_run (str) : Returns an error message if an error occurs in the function.
         """
 
         parameters = dict(

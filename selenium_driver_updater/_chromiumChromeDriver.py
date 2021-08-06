@@ -2,7 +2,6 @@
 #Standart library imports
 import subprocess
 import os
-import traceback
 import re
 from typing import Tuple, Any
 
@@ -64,7 +63,7 @@ class ChromiumChromeDriver():
 
         self.chromium_chromebrowser.main()
 
-        driver_path = self.__check_if_chromedriver_is_up_to_date()
+        driver_path = self._check_if_chromedriver_is_up_to_date()
 
         return driver_path
 
@@ -131,9 +130,7 @@ class ChromiumChromeDriver():
             logger.info(f'Current version of chromium_chromedriver: {driver_version}')
 
         except (OSError, WebDriverException, SessionNotCreatedException):
-            message_run = f'Known error: {traceback.format_exc()}' #probably [Errno 86] Bad CPU type in executable:
-            logger.error(message_run)
-            return driver_version
+            pass #[Errno 86] Bad CPU type in executable:
 
         return driver_version
 
@@ -165,11 +162,11 @@ class ChromiumChromeDriver():
         """Compares current version of chromium_chromedriver to latest version
 
         Returns:
-            Tuple of bool, str and bool
+            Tuple of bool, str and str
 
-            result_run (bool)           : True if function passed correctly, False otherwise.
-            message_run (str)           : Returns an error message if an error occurs in the function.
-            is_driver_up_to_date (bool) : If true current version of chromium_chromedriver is up to date. Defaults to False.
+            is_driver_up_to_date (bool) : It true the driver is up to date. Defaults to False.
+            current_version (str)       : Current version of the driver.
+            latest_version (str)        : Latest version of the driver.
 
         """
 
