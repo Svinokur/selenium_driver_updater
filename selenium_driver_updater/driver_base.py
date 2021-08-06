@@ -181,7 +181,7 @@ class DriverBase():
 
         if current_version == latest_version:
             is_driver_up_to_date = True
-            message = (f'Your existing {self.driver_name} is up to date.'
+            message = (f'Your existing {self.driver_name} is up to date. '
                         f'current_version: {current_version} latest_version: {latest_version}')
             logger.info(message)
 

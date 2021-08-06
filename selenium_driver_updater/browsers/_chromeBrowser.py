@@ -38,36 +38,38 @@ class ChromeBrowser():
         """Main function, checks for the latest version, downloads or updates chrome browser"""
 
         if self.check_browser_is_up_to_date:
-            try:
-                self._check_if_chrome_browser_is_up_to_date()
-            except (ValueError, FileNotFoundError):
-                pass
+            self._check_if_chrome_browser_is_up_to_date()
 
     def _check_if_chrome_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of chrome browser"""
 
-        if platform.system() != 'Linux':
+        try:
 
-            chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
-            if not chromebrowser_updater_path:
-                message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                raise ValueError(message)
+            if platform.system() != 'Linux':
 
-            if not Path(chromebrowser_updater_path).exists():
-                message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
-                raise FileNotFoundError(message)
+                chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
+                if not chromebrowser_updater_path:
+                    message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                    raise ValueError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
-
-        if not is_browser_up_to_date:
-
-            self._get_latest_chrome_browser_for_current_os()
+                if not Path(chromebrowser_updater_path).exists():
+                    message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
+                    raise FileNotFoundError(message)
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
 
             if not is_browser_up_to_date:
-                message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
-                logger.info(message)
+
+                self._get_latest_chrome_browser_for_current_os()
+
+                is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
+
+                if not is_browser_up_to_date:
+                    message = f'Problem with updating chrome browser current_version: {current_version} latest_version: {latest_version}'
+                    logger.info(message)
+
+        except (ValueError, FileNotFoundError):
+            pass
 
     def _compare_current_version_and_latest_version_chrome_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of chrome browser to latest version

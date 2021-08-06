@@ -42,10 +42,7 @@ class EdgeBrowser():
         """
 
         if self.check_browser_is_up_to_date:
-            try:
-                self._check_if_edge_browser_is_up_to_date()
-            except (ValueError, FileNotFoundError):
-                pass
+            self._check_if_edge_browser_is_up_to_date()
 
     def _check_if_edge_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of edge browser
@@ -55,26 +52,31 @@ class EdgeBrowser():
 
         """
 
-        edgebrowser_updater_path = str(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"])
-        if not edgebrowser_updater_path:
-            message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-            raise ValueError(message)
+        try:
 
-        if not Path(edgebrowser_updater_path).exists():
-            message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
-            raise FileNotFoundError(message)
+            edgebrowser_updater_path = str(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"])
+            if not edgebrowser_updater_path:
+                message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                raise ValueError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
-
-        if not is_browser_up_to_date:
-
-            self._get_latest_edge_browser_for_current_os()
+            if not Path(edgebrowser_updater_path).exists():
+                message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
+                raise FileNotFoundError(message)
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
 
             if not is_browser_up_to_date:
-                message = f'Problem with updating edge browser current_version: {current_version} latest_version: {latest_version}'
-                logger.info(message)
+
+                self._get_latest_edge_browser_for_current_os()
+
+                is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
+
+                if not is_browser_up_to_date:
+                    message = f'Problem with updating edge browser current_version: {current_version} latest_version: {latest_version}'
+                    logger.info(message)
+
+        except (ValueError, FileNotFoundError):
+            pass
 
     def _get_current_version_edge_browser_selenium(self) -> str:
         """Gets current edge browser version

@@ -37,10 +37,7 @@ class OperaBrowser():
         """Main function, checks for the latest version, downloads or updates opera browser"""
 
         if self.check_browser_is_up_to_date:
-            try:
-                self._check_if_opera_browser_is_up_to_date()
-            except (ValueError, FileNotFoundError):
-                pass
+            self._check_if_opera_browser_is_up_to_date()
 
     def _check_if_opera_browser_is_up_to_date(self) -> None:
         """Сhecks for the latest version of opera browser
@@ -50,26 +47,31 @@ class OperaBrowser():
 
         """
 
-        operabrowser_updater_path = str(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"])
-        if not operabrowser_updater_path:
-            message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-            raise ValueError(message)
+        try:
 
-        if not Path(operabrowser_updater_path).exists():
-            message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
-            raise FileNotFoundError(message)
+            operabrowser_updater_path = str(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"])
+            if not operabrowser_updater_path:
+                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
+                raise ValueError(message)
 
-        is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
-
-        if not is_browser_up_to_date:
-
-            self._get_latest_opera_browser_for_current_os()
+            if not Path(operabrowser_updater_path).exists():
+                message = f'operabrowser_updater_path: {operabrowser_updater_path} is not exists. Please report your OS information and path to {operabrowser_updater_path} file in repository.'
+                raise FileNotFoundError(message)
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
 
             if not is_browser_up_to_date:
-                message = f'Problem with updating opera browser current_version: {current_version} latest_version: {latest_version}'
-                logger.info(message)
+
+                self._get_latest_opera_browser_for_current_os()
+
+                is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_opera_browser()
+
+                if not is_browser_up_to_date:
+                    message = f'Problem with updating opera browser current_version: {current_version} latest_version: {latest_version}'
+                    logger.info(message)
+
+        except (ValueError, FileNotFoundError):
+            pass
 
     def _get_current_version_opera_browser_selenium(self) -> str:
         """Gets current opera browser version
