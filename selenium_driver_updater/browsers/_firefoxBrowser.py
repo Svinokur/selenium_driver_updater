@@ -158,27 +158,32 @@ class FirefoxBrowser():
         except Exception:
             is_admin : bool = False
 
-        update_command : str = self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"]
+        try:
 
-        message = f'Trying to update firefox browser to the latest version.'
-        logger.info(message)
+            update_command : str = self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"]
 
-        if platform.system() == 'Linux':
+            message = f'Trying to update firefox browser to the latest version.'
+            logger.info(message)
 
-            if is_admin:
+            if platform.system() == 'Linux':
+
+                if is_admin:
+                    os.system(update_command)
+
+                elif not is_admin:
+                    message = 'You have not ran library with sudo privileges to update firefox browser - so updating is impossible.'
+                    raise ValueError(message)
+
+            else:
+
                 os.system(update_command)
+                time.sleep(60) #wait for the updating - too long
 
-            elif not is_admin:
-                message = 'You have not ran library with sudo privileges to update firefox browser - so updating is impossible.'
-                raise ValueError(message)
-
-        else:
-
-            os.system(update_command)
-            time.sleep(60) #wait for the updating - too long
-
-        message = 'Firefox browser was successfully updated to the latest version.'
-        logger.info(message)
+            message = 'Firefox browser was successfully updated to the latest version.'
+            logger.info(message)
+        
+        except ValueError:
+            pass
 
     def _compare_current_version_and_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of firefox browser to latest version

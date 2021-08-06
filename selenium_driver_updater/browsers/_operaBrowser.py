@@ -167,27 +167,32 @@ class OperaBrowser():
         except Exception:
             is_admin : bool = False
 
-        update_command : str = self.setting["OperaBrowser"]["OperaBrowserUpdater"]
+        try:
 
-        message = 'Trying to update opera browser to the latest version.'
-        logger.info(message)
+            update_command : str = self.setting["OperaBrowser"]["OperaBrowserUpdater"]
 
-        if platform.system() == 'Linux':
+            message = 'Trying to update opera browser to the latest version.'
+            logger.info(message)
 
-            if is_admin:
+            if platform.system() == 'Linux':
+
+                if is_admin:
+                    os.system(update_command)
+
+                elif not is_admin:
+                    message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
+                    raise ValueError(message)
+
+            else:
+
                 os.system(update_command)
+                time.sleep(60) #wait for the updating
 
-            elif not is_admin:
-                message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
-                raise ValueError(message)
+            message = 'Opera browser was successfully updated to the latest version.'
+            logger.info(message)
 
-        else:
-
-            os.system(update_command)
-            time.sleep(60) #wait for the updating
-
-        message = 'Opera browser was successfully updated to the latest version.'
-        logger.info(message)
+        except ValueError:
+            pass
 
     def _compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of opera browser to latest version

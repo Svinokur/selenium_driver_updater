@@ -254,24 +254,29 @@ class ChromeBrowser():
         except Exception:
             is_admin : bool = False
 
-        update_command : str = self.setting["ChromeBrowser"]["ChromeBrowserUpdater"]
+        try:
 
-        message = 'Trying to update chrome browser to the latest version.'
-        logger.info(message)
+            update_command : str = self.setting["ChromeBrowser"]["ChromeBrowserUpdater"]
 
-        if platform.system() == 'Linux':
+            message = 'Trying to update chrome browser to the latest version.'
+            logger.info(message)
 
-            if is_admin:
+            if platform.system() == 'Linux':
+
+                if is_admin:
+                    os.system(update_command)
+
+                elif not is_admin:
+                    message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
+                    raise ValueError(message)
+
+            else:
+
                 os.system(update_command)
+                time.sleep(60) #wait for the updating
 
-            elif not is_admin:
-                message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
-                raise ValueError(message)
+            message = 'Chrome browser was successfully updated to the latest version.'
+            logger.info(message)
 
-        else:
-
-            os.system(update_command)
-            time.sleep(60) #wait for the updating
-
-        message = 'Chrome browser was successfully updated to the latest version.'
-        logger.info(message)
+        except ValueError:
+            pass
