@@ -110,7 +110,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.0"
+    version = "5.0.1"
 
 setting = dict(
     {
@@ -186,8 +186,7 @@ setting = dict(
         "OperaBrowser":
         {
             "Path"                          : opera_browser_path,
-            'LinkAllReleases'               : 'https://blogs.opera.com/desktop/?s=Stable+update',
-            "LinkSpecificReleaseChangelog"  : 'https://blogs.opera.com/desktop/changelog-for-{}/',
+            "LinkAllLatestRelease"          : 'https://get.geo.opera.com/pub/opera/desktop/',
             "OperaBrowserUpdater"           : opera_browser_updater,
             'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
         },

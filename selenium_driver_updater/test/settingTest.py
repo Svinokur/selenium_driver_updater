@@ -156,7 +156,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
-        self.assertEqual(len(self.setting["OperaBrowser"]), 5)
+        self.assertEqual(len(self.setting["OperaBrowser"]), 4)
         self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
@@ -214,8 +214,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"], edge_browser_updater_path)
 
         self.assertEqual(self.setting["OperaBrowser"]["Path"], opera_browser_path)
-        self.assertEqual(self.setting["OperaBrowser"]["LinkAllReleases"], 'https://blogs.opera.com/desktop/?s=Stable+update')
-        self.assertEqual(self.setting["OperaBrowser"]["LinkSpecificReleaseChangelog"], 'https://blogs.opera.com/desktop/changelog-for-{}/')
+        self.assertEqual(self.setting["OperaBrowser"]["LinkAllLatestRelease"], 'https://get.geo.opera.com/pub/opera/desktop/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
 

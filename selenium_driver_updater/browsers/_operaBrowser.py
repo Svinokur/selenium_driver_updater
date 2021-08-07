@@ -128,28 +128,32 @@ class OperaBrowser():
         """
 
         latest_version : str = ''
-        latest_version_element : str = ''
+        version : str = ''
 
-        url = self.setting["OperaBrowser"]["LinkAllReleases"]
+        url = self.setting["OperaBrowser"]["LinkAllLatestRelease"]
         json_data = self.requests_getter.get_result_by_request(url=url)
 
         soup = BeautifulSoup(json_data, 'html.parser')
-        changelogs = soup.findAll('h1', attrs={'class' : 'entry-title'})
 
-        for changelog in changelogs:
-            latest_version_element = changelog.text.replace('\n', '')
+        system_name = platform.system()
+        system_name = system_name.replace('Darwin', 'mac')
+        system_name = system_name.replace('Windows', 'win')
+        system_name = system_name.lower() + '/' #mac -> mac/ or Linux -> linux/
 
-            if 'macos' in changelog.text.lower() and platform.system() != 'Darwin':
+        elements = soup.findAll('a')
+        for i,_ in enumerate(elements, 1):
+            version = elements[-i].attrs.get('href')
+            url_release = url + version
+
+            json_data = self.requests_getter.get_result_by_request(url=url_release)
+
+            if not system_name in json_data:
                 continue
 
             else:
                 break
-
-        if not latest_version_element:
-            message = f'Latest main version of opera browser could not be determinated. Maybe the element is changed.'
-            logger.error(message)
-
-        latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
+        
+        latest_version = version.replace('/', '')
         
         logger.info(f'Latest version of opera browser: {latest_version}')
 

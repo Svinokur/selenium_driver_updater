@@ -139,7 +139,7 @@ class testPhantomJS(unittest.TestCase):
         self.assertGreaterEqual(len(current_version), 0, len(current_version))
         self.assertEqual(current_version, self.specific_version)
 
-    #@unittest.skip('Temporary not needed')
+    @unittest.skip('Temporary not needed')
     def test08_check_download_driver_latest_previous_version(self):
         self.phantomjs._delete_current_driver_for_current_os()
         self.assertFalse(Path(self.phantomjs_path).exists(), self.phantomjs_path)
