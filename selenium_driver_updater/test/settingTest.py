@@ -109,12 +109,6 @@ opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Pr
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
-chromiumbrowser_path = "chromium-browser"
-
-chromiumbrowser_updater = "sudo apt-get install chromium-browser"
-
-chromiumchromedriver_updater = "sudo apt-get install chromedriver"
-
 # pylint: disable=missing-function-docstring
 class testSetting(unittest.TestCase): 
     """Class for unit-testing settings
@@ -140,7 +134,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test01_check_count_main_param(self):
-        self.assertEqual(len(self.setting), 16)
+        self.assertEqual(len(self.setting), 14)
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
@@ -149,7 +143,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["GeckoDriver"]), 2)
         self.assertEqual(len(self.setting["OperaDriver"]), 2)
         self.assertEqual(len(self.setting["EdgeDriver"]), 5)
-        self.assertEqual(len(self.setting["ChromiumChromeDriver"]), 1)
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
         self.assertEqual(len(self.setting["SafariDriver"]), 2)
 
@@ -157,7 +150,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
         self.assertEqual(len(self.setting["OperaBrowser"]), 4)
-        self.assertEqual(len(self.setting["ChromiumBrowser"]), 2)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
         self.assertEqual(len(self.setting["Github"]), 3)
@@ -189,8 +181,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000")
         self.assertEqual(self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}")
 
-        self.assertEqual(self.setting["ChromiumChromeDriver"]["ChromiumChromeDriverUpdater"], chromiumchromedriver_updater)
-
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], 'phantomjs')
         self.assertEqual(self.setting["PhantomJS"]["LinkAllReleases"], url_release_phantomjs)
@@ -217,10 +207,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaBrowser"]["LinkAllLatestRelease"], 'https://get.geo.opera.com/pub/opera/desktop/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
-
-        self.assertEqual(self.setting["ChromiumBrowser"]["Path"], chromiumbrowser_path)
-        self.assertEqual(self.setting["ChromiumBrowser"]["ChromiumBrowserUpdater"], chromiumbrowser_updater)
-
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')

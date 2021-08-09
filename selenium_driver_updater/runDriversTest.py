@@ -27,9 +27,6 @@ from selenium_driver_updater.test import githubViewerTest
 from selenium_driver_updater.test import extractorTest
 from selenium_driver_updater.test import requestsGetterTest
 
-from selenium_driver_updater.test import chromiumChromeDriverTest
-from selenium_driver_updater.test import chromiumChromeBrowserTest
-
 from selenium_driver_updater.test import phantomJSTest
 
 from selenium_driver_updater.test import exceptionsTest
@@ -68,17 +65,13 @@ try:
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
     testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
-    #if platform.system() == 'Darwin':
-    #    testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver))
-    #    testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser))
+    if platform.system() == 'Darwin':
+        testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver))
+        testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser))
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
         testSuite.addTest(unittest.makeSuite(edgeBrowserTest.testEdgeBrowser))
-
-
-    #testSuite.addTest(unittest.makeSuite(chromiumChromeDriverTest.testChromiumChromeDriver))
-    #testSuite.addTest(unittest.makeSuite(chromiumChromeBrowserTest.testChromiumChromeBrowser))
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 

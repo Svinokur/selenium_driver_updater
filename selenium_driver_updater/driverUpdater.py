@@ -45,7 +45,6 @@ class DriverUpdater():
     geckodriver = 'geckodriver'
     operadriver = 'operadriver'
     edgedriver = 'edgedriver'
-    chromium_chromedriver = 'chromium_chromedriver'
     phantomjs = 'phantomjs'
     safaridriver = 'safaridriver'
 
@@ -193,35 +192,21 @@ class DriverUpdater():
                 DriverUpdater.__check_parameter_type_is_valid(_info.system_name, type(_info.driver_name), 'system_name')
 
             if _info.version:
-                pass
-                #DriverUpdater.__check_parameter_type_is_valid(_info.version, type(_info.driver_name), 'version')
+                DriverUpdater.__check_parameter_type_is_valid(_info.version, type(_info.driver_name), 'version')
 
             if isinstance(_info.driver_name, str):
-
-                DriverUpdater.__check_driver_name_is_valid(driver_name=_info.driver_name)
 
                 if _info.system_name:
 
                     DriverUpdater.__check_system_name_is_valid(system_name=_info.system_name)
 
             elif isinstance(_info.driver_name, list):
-                for driver in _info.driver_name:
-
-                    DriverUpdater.__check_driver_name_is_valid(driver_name=driver)
-                    # if not result:
-                    #     message = message + f' at index: {_info.driver_name.index(driver)}'
-                    #     logger.error(message)
-                    #     return result, message
 
                 if _info.system_name:
 
                     for os_system in _info.system_name:
 
                         DriverUpdater.__check_system_name_is_valid(system_name=os_system)
-                        # if not result:
-                        #     message = message + f' at index: {_info.system_name.index(os_system)}'
-                        #     logger.error(message)
-                        #     return result, message
 
         else:
 
@@ -314,7 +299,8 @@ class DriverUpdater():
 
         """
 
-        driver_path : str = ''
+        driver_path: str = ''
+        index:str = ''
 
         driver_name = kwargs.get('driver_name', _info.driver_name)
         filename = kwargs.get('filename', _info.filename)
@@ -334,21 +320,19 @@ class DriverUpdater():
                 setting['Program']['DriversFileFormat'] = '.exe' if 'win' in _info.system_name[index] or 'arm' in _info.system_name[index] else ''
             else:
                 setting['Program']['DriversFileFormat'] = '.exe' if 'win' in _info.system_name or 'arm' in _info.system_name else ''
+        try:
+            driver = ALL_DRIVERS[driver_name](**parametres)
+        except KeyError:
+            index = kwargs.get('index', None)
+            if index:
+                message = f'Unknown driver name at index: {index} was specified current driver_name is: {driver_name}'
+            else:
+                message = f'Unknown driver name was specified current driver_name is: {driver_name}'
+            raise NameError(message)
 
-        driver = ALL_DRIVERS.get(driver_name)(**parametres)
         driver_path = driver.main()
 
         return driver_path
-
-    @staticmethod
-    def __check_driver_name_is_valid(driver_name) -> None:
-        """Private function for checking if specified driver_name is exists and valid"""
-
-        driver_name_check = ALL_DRIVERS.get(driver_name)
-
-        if not driver_name_check:
-            message = f'Unknown driver name was specified current driver_name is: {driver_name}'
-            raise ValueError(message)
 
     @staticmethod
     def __check_system_name_is_valid(system_name) -> None:

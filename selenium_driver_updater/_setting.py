@@ -100,17 +100,11 @@ opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Pr
 opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
-chromiumbrowser_path = "chromium-browser"
-
-chromiumbrowser_updater = "sudo apt-get install chromium-browser"
-
-chromiumchromedriver_updater = "sudo apt-get install chromedriver"
-
 from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.1"
+    version = "5.0.2"
 
 setting = dict(
     {
@@ -146,10 +140,6 @@ setting = dict(
             "LastReleasePlatform"               : 'msedgedriver',
             "LinkCheckVersionIsValid"           : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000",
             "LinkLatestReleaseSpecificVersion"  : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}",
-        },
-        "ChromiumChromeDriver":
-        {
-            'ChromiumChromeDriverUpdater'    : chromiumchromedriver_updater,
         },
         "PhantomJS":
         {
@@ -189,11 +179,6 @@ setting = dict(
             "LinkAllLatestRelease"          : 'https://get.geo.opera.com/pub/opera/desktop/',
             "OperaBrowserUpdater"           : opera_browser_updater,
             'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
-        },
-        "ChromiumBrowser":
-        {
-            "Path"                      : chromiumbrowser_path,
-            'ChromiumBrowserUpdater'    : chromiumbrowser_updater,
         },
         "JsonSchema":
         {

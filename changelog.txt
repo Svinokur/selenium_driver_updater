@@ -1,3 +1,14 @@
+[5.0.2] 09/08/2021
+This code was written and tested on Python 3.9.6
+
+# Improvements
+
+- Simplified checking for correct driver_name
+
+# Other
+
+- Dropped support for chromium chromedriver and chromiumbrowser (due to incorrect concept)
+
 [5.0.1] 07/08/2021
 This code was written and tested on Python 3.9.6
 
