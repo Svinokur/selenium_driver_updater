@@ -98,12 +98,12 @@ try:
         errors = ''
 
         for failures in result.failures:
-            failures = str(failures) + "\r\n"
+            failures = str(failures) + "\n"
 
         logging.error(failures)
 
         for errors in result.errors:
-            errors = str(errors) + "\r\n"
+            errors = str(errors) + "\n"
 
         logging.error(errors)
 
