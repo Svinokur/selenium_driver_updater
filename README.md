@@ -69,15 +69,6 @@ All supported OS for this driver are:
 - MacOS
 - MacOS with M1
 
-### ``Chromium ChromeDriver`` 
-#### ``DriverUpdater.chromium_chromedriver``
-
-For installing or updating [chromium_chromedriver binary](https://chromedriver.chromium.org)
-
-All supported OS's for this driver are:
-
-- Linux
-
 ### ``Geckodriver`` 
 #### ``DriverUpdater.geckodriver``
 
@@ -134,14 +125,6 @@ All supported OS's for this browser are:
 
 - Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
-
-### ``Chromium Browser``
-
-For updating [chromium browser](https://www.chromium.org/getting-involved/download-chromium)
-
-All supported OS's for this browser are:
-
 - Linux (Tested on Ubuntu 20.04)
 
 ### ``Firefox Browser``
