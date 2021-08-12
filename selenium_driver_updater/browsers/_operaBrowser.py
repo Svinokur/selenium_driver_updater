@@ -166,37 +166,6 @@ class OperaBrowser():
             Except: If unexpected error raised.
 
         """
-        # try:
-        #     is_admin : bool = bool(os.getuid() == 0)
-        # except Exception:
-        #     is_admin : bool = False
-
-        # try:
-
-        #     update_command : str = self.setting["OperaBrowser"]["OperaBrowserUpdater"]
-
-        #     message = 'Trying to update opera browser to the latest version.'
-        #     logger.info(message)
-
-        #     if platform.system() == 'Linux':
-
-        #         if is_admin:
-        #             os.system(update_command)
-
-        #         elif not is_admin:
-        #             message = 'You have not ran library with sudo privileges to update opera browser - so updating is impossible.'
-        #             raise ValueError(message)
-
-        #     else:
-
-        #         os.system(update_command)
-        #         time.sleep(60) #wait for the updating
-
-        #     message = 'Opera browser was successfully updated to the latest version.'
-        #     logger.info(message)
-
-        # except ValueError:
-        #     pass
 
         latest_version = self._get_latest_version_opera_browser()
 
