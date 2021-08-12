@@ -93,18 +93,14 @@ opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\C
 '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
 "opera" if platform.system() == 'Linux' else ''
 
-opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
-'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else\
+opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else\
 "sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
-
-opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
 from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.2"
+    version = "5.1.0b1"
 
 setting = dict(
     {
@@ -178,7 +174,6 @@ setting = dict(
             "Path"                          : opera_browser_path,
             "LinkAllLatestRelease"          : 'https://get.geo.opera.com/pub/opera/desktop/',
             "OperaBrowserUpdater"           : opera_browser_updater,
-            'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
         },
         "JsonSchema":
         {

@@ -102,12 +102,8 @@ opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\C
 '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
 "opera" if platform.system() == 'Linux' else ''
 
-opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
-'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else\
+opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else\
 "sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
-
-opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
 
 # pylint: disable=missing-function-docstring
 class testSetting(unittest.TestCase): 
@@ -149,7 +145,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["ChromeBrowser"]), 4)
         self.assertEqual(len(self.setting["FirefoxBrowser"]), 4)
         self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
-        self.assertEqual(len(self.setting["OperaBrowser"]), 4)
+        self.assertEqual(len(self.setting["OperaBrowser"]), 3)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
         self.assertEqual(len(self.setting["Github"]), 3)
@@ -206,7 +202,6 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["OperaBrowser"]["Path"], opera_browser_path)
         self.assertEqual(self.setting["OperaBrowser"]["LinkAllLatestRelease"], 'https://get.geo.opera.com/pub/opera/desktop/')
         self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
-        self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdaterPath"], opera_browser_updater_path)
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')

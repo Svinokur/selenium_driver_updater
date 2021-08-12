@@ -39,6 +39,7 @@ class testExtractor(unittest.TestCase):
         self.zip_archive_path : str = self.out_path + 'geckodriver-v0.29.0-win64.zip'
         self.tar_archive_path : str = self.out_path + 'geckodriver-v0.29.1-macos-aarch64.tar.gz'
         self.tar_bz2_archive_path : str = self.out_path + 'phantomjs-2.1.1-linux-x86_64.tar.bz2'
+        self.tar_xz_archive_path : str = self.out_path + 'Opera_78.0.4093.112_Autoupdate_arm64.tar.xz'
 
         self.start_time : float = time.time()
 
@@ -77,7 +78,14 @@ class testExtractor(unittest.TestCase):
             pass
 
     #@unittest.skip('Temporary not needed')
-    def test05_check_extract_all_zip_archive(self):
+    def test05_check_extract_all_tar_archive_with_specific_name_failure(self):
+        try:
+            Extractor.extract_all_tar_xz_archive(archive_path= self.out_path,out_path=self.out_path)
+        except Exception:
+            pass
+
+    #@unittest.skip('Temporary not needed')
+    def test06_check_extract_all_zip_archive(self):
         self.extractor.extract_all_zip_archive(archive_path=self.zip_archive_path,out_path=self.out_path, delete_archive = False)
 
         geckodriver_path = self.out_path + 'geckodriver.exe'
@@ -86,7 +94,7 @@ class testExtractor(unittest.TestCase):
         self.assertFalse(Path(geckodriver_path).exists())
 
     #@unittest.skip('Temporary not needed')
-    def test06_check_extract_all_tar_gz_archive(self):
+    def test07_check_extract_all_tar_gz_archive(self):
         self.extractor.extract_all_tar_gz_archive(archive_path=self.tar_archive_path,out_path=self.out_path, delete_archive = False)
 
         geckodriver_path = self.out_path + 'geckodriver'
@@ -95,7 +103,7 @@ class testExtractor(unittest.TestCase):
         self.assertFalse(Path(geckodriver_path).exists())
 
     #@unittest.skip('Temporary not needed')
-    def test07_check_extract_all_zip_archive_with_specific_name(self):
+    def test08_check_extract_all_zip_archive_with_specific_name(self):
         self.extractor.extract_all_zip_archive_with_specific_name(archive_path=self.zip_archive_path,out_path=self.out_path, delete_archive = False,
         filename = 'geckodriver.exe', filename_replace = 'geckodriverzip')
 
@@ -105,7 +113,7 @@ class testExtractor(unittest.TestCase):
         self.assertFalse(Path(geckodriver_path).exists())
 
     #@unittest.skip('Temporary not needed')
-    def test08_check_extract_all_tar_archive_with_specific_name(self):
+    def test09_check_extract_all_tar_archive_with_specific_name(self):
         Extractor.extract_all_zip_archive_with_specific_name(archive_path=self.tar_archive_path,out_path=self.out_path, delete_archive = False,
         filename = 'geckodriver', filename_replace = 'geckodrivertar')
 
@@ -115,13 +123,22 @@ class testExtractor(unittest.TestCase):
         self.assertFalse(Path(geckodriver_path).exists())
 
     #@unittest.skip('Temporary not needed')
-    def test09_check_extract_all_tar_bz2_archive(self):
+    def test10_check_extract_all_tar_bz2_archive(self):
         Extractor.extract_all_tar_bz2_archive(archive_path=self.tar_bz2_archive_path,out_path=self.out_path, delete_archive = False)
 
         phantom_path = self.out_path + 'phantomjs-2.1.1-linux-x86_64'
         self.assertTrue(Path(phantom_path).exists())
         shutil.rmtree(phantom_path)
         self.assertFalse(Path(phantom_path).exists())
+
+    #@unittest.skip('Temporary not needed')
+    def test11_check_extract_all_tar_xz_archive(self):
+        Extractor.extract_all_tar_xz_archive(archive_path=self.tar_xz_archive_path,out_path=self.out_path, delete_archive = False)
+
+        opera_path = self.out_path + 'Opera.app'
+        self.assertTrue(Path(opera_path).exists())
+        shutil.rmtree(opera_path)
+        self.assertFalse(Path(opera_path).exists())
 
 
 if __name__ == '__main__':
