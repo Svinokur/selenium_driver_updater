@@ -57,11 +57,9 @@ r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVe
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
 chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" /ua /installsource scheduler' if platform.system() == 'Windows' else \
-'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
 "sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
 
-chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
-'/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
+chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else ''
 
 
 firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
@@ -71,11 +69,9 @@ r"Powershell (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\Curre
 "firefox" if platform.system() == 'Linux' else ''
 
 firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
-'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else\
 "sudo apt-get install firefox" if platform.system() == 'Linux' else ''
 
-firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else \
-'/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
+firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else ''
 
 
 
@@ -100,7 +96,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.1.0b1"
+    version = "5.1.0b2"
 
 setting = dict(
     {
@@ -154,6 +150,7 @@ setting = dict(
             "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com/search/label/Stable%20updates',
             'ChromeBrowserUpdater'      : chrome_browser_updater,
             'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
+            "LinkAllLatestReleaseFile"  : 'https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg',
         },
         "FirefoxBrowser":
         {
@@ -161,6 +158,7 @@ setting = dict(
             "LinkAllLatestReleases"         : 'https://www.mozilla.org/en-US/firefox/releases/',
             'FirefoxBrowserUpdater'         : firefox_browser_updater,
             'FirefoxBrowserUpdaterPath'     : firefox_browser_updater_path,
+            "LinkAllLatestRelease"          : 'https://download-installer.cdn.mozilla.net/pub/firefox/releases/{}/{}/{}/Firefox {}.{}',
         },
         "EdgeBrowser":
         {

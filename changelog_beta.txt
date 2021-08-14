@@ -1,3 +1,18 @@
+[5.1.0b2] 12/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added full updating of firefox and chrome browser on MacOS (full installation instead of browser update command)
+
+# Fixes
+
+- Partial fixed of getting latest version of edge browser
+
+# Other
+
+- Removed parameter "old_return" for returning old variables like "result and message"
+
 [5.1.0b1] 12/08/2021
 This code was written and tested on Python 3.9.6
 

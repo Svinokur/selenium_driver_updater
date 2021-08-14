@@ -8,9 +8,6 @@ from typing import Tuple, Any
 from pathlib import Path
 import platform
 
-# Third party imports
-from bs4 import BeautifulSoup
-
 # Selenium imports
 from selenium import webdriver
 from selenium.common.exceptions import SessionNotCreatedException
@@ -34,34 +31,20 @@ class EdgeBrowser():
         self.requests_getter = RequestsGetter
 
     def main(self):
-        """Main function, checks for the latest version, downloads or updates edge browser
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Main function, checks for the latest version, downloads or updates edge browser"""
 
         if self.check_browser_is_up_to_date:
             self._check_if_edge_browser_is_up_to_date()
 
     def _check_if_edge_browser_is_up_to_date(self) -> None:
-        """Сhecks for the latest version of edge browser
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Сhecks for the latest version of edge browser"""
 
         try:
 
-            edgebrowser_updater_path = str(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"])
-            if not edgebrowser_updater_path:
-                message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                raise ValueError(message)
-
-            if not Path(edgebrowser_updater_path).exists():
-                message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
-                raise FileNotFoundError(message)
+            if platform.system() not in ['Darwin']:
+                message = 'Edge browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+                logger.error(message)
+                return
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
 
@@ -120,38 +103,26 @@ class EdgeBrowser():
     def _get_latest_version_edge_browser(self) -> str:
         """Gets latest edge browser version
 
-
         Returns:
             str
 
             latest_version (str)    : Latest version of edge browser.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
 
-        url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
+        url = self.setting['EdgeDriver']["LinkLastRelease"]
         json_data = self.requests_getter.get_result_by_request(url=url)
 
-        soup = BeautifulSoup(json_data, 'html.parser')
-        latest_version_element = soup.findAll('h2')[0].text
-
-        latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
+        latest_version = str(json_data).strip()
 
         logger.info(f'Latest version of edge browser: {latest_version}')
 
         return latest_version
 
     def _get_latest_edge_browser_for_current_os(self) -> None:
-        """Trying to update edge browser to its latest version
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Trying to update edge browser to its latest version"""
 
         message = 'Trying to update edge browser to the latest version.'
         logger.info(message)
@@ -171,9 +142,6 @@ class EdgeBrowser():
             is_browser_up_to_date (bool)    : It true the browser is up to date. Defaults to False.
             current_version (str)           : Current version of the browser.
             latest_version (str)            : Latest version of the browser.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -198,15 +166,10 @@ class EdgeBrowser():
     def _get_current_version_edge_browser_selenium_via_terminal(self) -> str:
         """Gets current edge browser version via command in terminal
 
-
         Returns:
             str
 
             browser_version (str)   : Current edge browser version.
-
-        Raises:
-
-            Except: If unexpected error raised.
 
         """
 
