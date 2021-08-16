@@ -208,8 +208,6 @@ class FirefoxBrowser():
                     shutil.rmtree(firefox_browser_path_application)
                 
                 logger.info(f'Trying to move firefox browser from: {firefox_browser_path} to: {firefox_browser_path_application} ')
-                # with subprocess.Popen(f'rsync -a {volume_path}*.app /Applications/', stdout=subprocess.PIPE, shell=True) as process:
-                #     info = process.communicate()[0].decode('UTF-8')
 
                 os.system(f'rsync -a {volume_path}Firefox.app /Applications/')
                     

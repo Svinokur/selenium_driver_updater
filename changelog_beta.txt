@@ -1,3 +1,10 @@
+[5.1.0b3] 17/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added full updating of edge browser on MacOS (full installation instead of browser update command)
+
 [5.1.0b2] 14/08/2021
 This code was written and tested on Python 3.9.6
 

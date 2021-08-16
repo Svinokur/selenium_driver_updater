@@ -7,6 +7,10 @@ import re
 from typing import Tuple, Any
 from pathlib import Path
 import platform
+import shutil
+
+#Third party imports
+import wget
 
 # Selenium imports
 from selenium import webdriver
@@ -124,14 +128,61 @@ class EdgeBrowser():
     def _get_latest_edge_browser_for_current_os(self) -> None:
         """Trying to update edge browser to its latest version"""
 
-        message = 'Trying to update edge browser to the latest version.'
-        logger.info(message)
+        if platform.system() not in ['Darwin']:
+            message = 'Edge browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+            logger.error(message)
+            return
 
-        os.system(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"])
-        time.sleep(60) #wait for the updating
+        url_release = self.setting["EdgeBrowser"]["LinkAllLatestReleaseFile"]
+        latest_version = self._get_latest_version_edge_browser()
 
-        message = 'Edge browser was successfully updated to the latest version.'
-        logger.info(message)
+        path = self.edgedriver_path.replace(self.edgedriver_path.split(os.path.sep)[-1], '') + 'selenium-driver-updater' + os.path.sep
+        archive_name = f'MicrosoftEdge-{latest_version}.pkg'
+
+        if not Path(path).exists():
+            Path(path).mkdir()
+
+        if Path(path + archive_name).exists():
+            Path(path + archive_name).unlink()
+
+        logger.info(f'Started to download edge browser by url: {url_release}')
+        package_path = wget.download(url=url_release, out=path + archive_name)
+
+        logger.info(f'Edge browser was downloaded to path: {package_path}')
+
+        if platform.system() == 'Darwin':
+            
+            package_expanded_path = f'{path}expanded{os.path.sep}'
+
+            if Path(package_expanded_path).exists():
+                shutil.rmtree(package_expanded_path)
+            
+            logger.info(f'Trying to expand package: {package_path}')
+            os.system(f'pkgutil --expand {package_path} {package_expanded_path}')
+            logger.info(f'Successfully expanded package at path: {package_expanded_path}')
+            
+            package_expanded_payload_path = package_expanded_path + 'expanded_payload'
+
+            if not Path(package_expanded_payload_path).exists():
+                Path(package_expanded_payload_path).mkdir()
+
+            with subprocess.Popen(f'tar -xvf {package_expanded_path + archive_name}/Payload -C {package_expanded_payload_path}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+                pass
+
+            edge_browser_path = package_expanded_payload_path + os.path.sep + 'Microsoft Edge.app'
+
+            edge_browser_path_application = '/Applications/Microsoft Edge.app'
+
+            shutil.rmtree(edge_browser_path_application)
+            shutil.move(edge_browser_path, edge_browser_path_application)
+                   
+            logger.info(f'Successfully moved edge browser from: {edge_browser_path} to: {edge_browser_path_application}')
+
+            if Path(package_path).exists():
+                Path(package_path).unlink()
+
+            if Path(package_expanded_path).exists():
+               shutil.rmtree(package_expanded_path) 
 
     def _compare_current_version_and_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of edge browser to latest version

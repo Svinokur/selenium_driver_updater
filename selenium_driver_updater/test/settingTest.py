@@ -57,18 +57,13 @@ phantomjs_latest_release = url_release_phantomjs + phantomjs_latest_release
 
 #
 # BROWSERS AND THEIR UPDATERS
-#   
+#                                 
 
 chrome_browser_path = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 "/Applications/Chromium.app/Contents/MacOS/Chromium"] if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
 r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
-
-chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" /ua /installsource scheduler' if platform.system() == 'Windows' else \
-"sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
-
-chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else ''
 
 
 firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
@@ -77,29 +72,18 @@ firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if pla
 r"Powershell (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion"] if platform.system() == 'Windows' else\
 "firefox" if platform.system() == 'Linux' else ''
 
-firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
-"sudo apt-get install firefox" if platform.system() == 'Linux' else ''
-
-firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else ''
-
 
 
 edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
 'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
-edge_browser_updater = r'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
-'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
-
-edge_browser_updater_path = r"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else \
-'/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
+edge_browser_release = 'https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and not 'arm' in str(os.uname().machine) else \
+                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else ''
 
 
 opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera' if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
 "opera" if platform.system() == 'Linux' else ''
-
-opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else\
-"sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
 
 # pylint: disable=missing-function-docstring
 class testSetting(unittest.TestCase): 
@@ -138,10 +122,10 @@ class testSetting(unittest.TestCase):
         self.assertEqual(len(self.setting["PhantomJS"]), 3)
         self.assertEqual(len(self.setting["SafariDriver"]), 2)
 
-        self.assertEqual(len(self.setting["ChromeBrowser"]), 5)
-        self.assertEqual(len(self.setting["FirefoxBrowser"]), 5)
-        self.assertEqual(len(self.setting["EdgeBrowser"]), 4)
-        self.assertEqual(len(self.setting["OperaBrowser"]), 3)
+        self.assertEqual(len(self.setting["ChromeBrowser"]), 3)
+        self.assertEqual(len(self.setting["FirefoxBrowser"]), 3)
+        self.assertEqual(len(self.setting["EdgeBrowser"]), 3)
+        self.assertEqual(len(self.setting["OperaBrowser"]), 2)
 
         self.assertEqual(len(self.setting["JsonSchema"]), 3)
         self.assertEqual(len(self.setting["Github"]), 3)
@@ -182,24 +166,18 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["ChromeBrowser"]["Path"], chrome_browser_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestRelease"], 'https://chromereleases.googleblog.com/search/label/Stable%20updates')
-        self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdater"], chrome_browser_updater)
-        self.assertEqual(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"], chrome_browser_updater_path)
         self.assertEqual(self.setting["ChromeBrowser"]["LinkAllLatestReleaseFile"], 'https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg')
 
         self.assertEqual(self.setting["FirefoxBrowser"]["Path"], firefox_browser_path)
         self.assertEqual(self.setting["FirefoxBrowser"]["LinkAllLatestReleases"], 'https://www.mozilla.org/en-US/firefox/releases/')
-        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"], firefox_browser_updater)
-        self.assertEqual(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"], firefox_browser_updater_path)
         self.assertEqual(self.setting["FirefoxBrowser"]["LinkAllLatestRelease"], 'https://download-installer.cdn.mozilla.net/pub/firefox/releases/{}/{}/{}/Firefox {}.{}')
 
         self.assertEqual(self.setting["EdgeBrowser"]["Path"], edge_browser_path)
         self.assertEqual(self.setting["EdgeBrowser"]["LinkAllLatestRelease"], 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel')
-        self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"], edge_browser_updater)
-        self.assertEqual(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"], edge_browser_updater_path)
+        self.assertEqual(self.setting["EdgeBrowser"]["LinkAllLatestReleaseFile"], edge_browser_release)
 
         self.assertEqual(self.setting["OperaBrowser"]["Path"], opera_browser_path)
         self.assertEqual(self.setting["OperaBrowser"]["LinkAllLatestRelease"], 'https://get.geo.opera.com/pub/opera/desktop/')
-        self.assertEqual(self.setting["OperaBrowser"]["OperaBrowserUpdater"], opera_browser_updater)
 
         self.assertEqual(self.setting["JsonSchema"]["githubAssetSchema"], base_dir + 'schemas' + os.path.sep + 'github_asset_schema.json')
         self.assertEqual(self.setting["JsonSchema"]["githubReleaseSchema"], base_dir + 'schemas' + os.path.sep + 'github_release_schema.json')
