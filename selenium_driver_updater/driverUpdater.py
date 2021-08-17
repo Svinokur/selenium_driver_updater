@@ -104,7 +104,7 @@ class DriverUpdater():
 
         path = kwargs.get('path')
         if not path:
-            path = sys.path[0]
+            path = os.getcwd()
             logger.info('You have not specified the path - so used default folder path instead')
 
         _info.path = str(os.path.abspath(path) + os.path.sep)

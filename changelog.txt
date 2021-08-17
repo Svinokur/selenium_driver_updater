@@ -1,3 +1,10 @@
+[5.0.3] 17/08/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Fixed an issue with incorrect default path detecting if library was ran in console mode
+
 [5.0.2] 09/08/2021
 This code was written and tested on Python 3.9.6
 
