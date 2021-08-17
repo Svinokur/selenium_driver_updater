@@ -114,7 +114,7 @@ class testSetting(unittest.TestCase):
 
     #@unittest.skip('Temporary not needed')
     def test02_check_count_params(self):
-        self.assertEqual(len(self.setting["Program"]), 4)
+        self.assertEqual(len(self.setting["Program"]), 5)
         self.assertEqual(len(self.setting["ChromeDriver"]), 5)
         self.assertEqual(len(self.setting["GeckoDriver"]), 2)
         self.assertEqual(len(self.setting["OperaDriver"]), 2)
@@ -138,6 +138,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["Program"]["wedriverVersionPattern"], r'([0-9.]*\.[0-9]+)')
         self.assertEqual(self.setting["Program"]["driversPath"], base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep)
         self.assertEqual(self.setting["Program"]["DriversFileFormat"], ".exe" if platform.system() == 'Windows' else '')
+        self.assertEqual(self.setting["Program"]["OSBitness"], os_bit)
 
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)

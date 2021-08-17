@@ -191,6 +191,10 @@ class FirefoxBrowser():
 
             try:
                 
+                logger.info('Trying to kill all firefox processes')
+                subprocess.Popen('killall firefox', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                logger.info('Successfully killed all firefox processes')
+                
                 logger.info(f'Trying to attach image: {archive_path}')
                 with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
                     info = process.communicate()[0].decode('UTF-8')

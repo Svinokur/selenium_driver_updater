@@ -102,8 +102,6 @@ class ConsoleUpdater():
     def install():
         "Main function that initializes all variables and pass it to main module (driver Updater)"
 
-        #Initialize all variables
-
         args = ConsoleUpdater.parse_command_line()
         kwargs = vars(args)
 

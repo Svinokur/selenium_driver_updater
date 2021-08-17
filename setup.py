@@ -32,7 +32,7 @@ packages = ['selenium_driver_updater',
 
 setup(
   name='selenium_driver_updater',
-  version='5.1.0b3',
+  version='5.1.0b4',
   description='Download or update your Selenium driver binaries and their browsers automatically with this package',
   long_description=long_description,
   long_description_content_type='text/markdown',

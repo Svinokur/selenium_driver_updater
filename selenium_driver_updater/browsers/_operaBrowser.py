@@ -4,9 +4,9 @@ import subprocess
 import os
 import re
 import platform
-from typing import Tuple, Any
+from typing import Tuple,Any
 from pathlib import Path
-import tarfile
+import time
 import shutil
 
 # Third party imports
@@ -53,7 +53,7 @@ class OperaBrowser():
 
         try:
 
-            if platform.system() not in ['Darwin']:
+            if platform.system() not in ['Darwin', 'Windows']:
                 message = 'Opera browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
                 logger.error(message)
                 return
@@ -162,7 +162,7 @@ class OperaBrowser():
     def _get_latest_opera_browser_for_current_os(self) -> None:
         """Trying to update opera browser to its latest version"""
         
-        if platform.system() not in ['Darwin']:
+        if platform.system() not in ['Darwin', 'Windows']:
             message = 'Opera browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
             logger.error(message)
             return
@@ -177,6 +177,15 @@ class OperaBrowser():
 
             else:
                 url_full_release = url_full_release + f'Opera_{latest_version}_Autoupdate.tar.xz'
+
+        elif platform.system() == 'Windows':
+            if self.setting['Program']['OSBitness'] == '64':
+
+                url_full_release = url_full_release + f'Opera_{latest_version}_Setup_x64.exe'
+
+            else:
+
+                url_full_release = url_full_release + f'Opera_{latest_version}_Setup.exe'
 
         logger.info(f'Started download operabrowser by url: {url_full_release}')
 
@@ -195,6 +204,11 @@ class OperaBrowser():
         logger.info(f'Opera browser was downloaded to path: {archive_path}')
 
         if platform.system() == 'Darwin':
+            
+            logger.info('Trying to kill all opera processes')
+            os.system('killall Opera')
+            os.system('killall Opera')
+            logger.info('Successfully killed all opera.exe processes')
 
             self.extractor.extract_all_tar_xz_archive(archive_path=archive_path, delete_archive=True, out_path=path)
 
@@ -208,6 +222,16 @@ class OperaBrowser():
 
             if Path(archive_path).exists():
                 Path(archive_path).unlink()
+
+        elif platform.system() == 'Windows':
+            
+            logger.info('Trying to kill all opera.exe processes')
+            subprocess.Popen('taskkill /F /IM "opera.exe" /T', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            logger.info('Successfully killed all opera.exe processes')
+
+            os.system(f'{archive_path + archive_name} /install /silent /launchopera=no /desktopshortcut=no /pintotaskbar=no /setdefaultbrowser=0')
+
+            time.sleep(60)
 
     def _compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of opera browser to latest version

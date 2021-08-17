@@ -1,7 +1,8 @@
+#pylint: disable=invalid-name
+#Standart library imports
 import os
 import platform
 
-#pylint: disable=invalid-name
 base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
 os_bit = platform.architecture()[0][:-3]
@@ -80,7 +81,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.1.0b3"
+    version = "5.1.0b4"
 
 setting = dict(
     {
@@ -90,6 +91,7 @@ setting = dict(
             'wedriverVersionPattern'    : r'([0-9.]*\.[0-9]+)',
             'driversPath'               : base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep,
             'DriversFileFormat'         : ".exe" if platform.system() == 'Windows' else '',
+            'OSBitness'                 : os_bit,
         },
         "ChromeDriver":
         {

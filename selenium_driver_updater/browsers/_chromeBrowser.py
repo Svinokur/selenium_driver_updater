@@ -267,6 +267,8 @@ class ChromeBrowser():
 
             try:
 
+                subprocess.Popen(r'killall Google\ Chrome', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
                 logger.info(f'Trying to attach image: {archive_path}')
                 with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
                     info = process.communicate()[0].decode('UTF-8')

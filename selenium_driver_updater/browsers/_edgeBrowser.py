@@ -152,6 +152,10 @@ class EdgeBrowser():
 
         if platform.system() == 'Darwin':
             
+            logger.info('Trying to kill all edgebrowser processes')
+            subprocess.Popen(r'killall Microsoft\ Edge', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            logger.info('Successfully killed all edgebrowser processes')
+            
             package_expanded_path = f'{path}expanded{os.path.sep}'
 
             if Path(package_expanded_path).exists():
@@ -166,8 +170,9 @@ class EdgeBrowser():
             if not Path(package_expanded_payload_path).exists():
                 Path(package_expanded_payload_path).mkdir()
 
-            with subprocess.Popen(f'tar -xvf {package_expanded_path + archive_name}/Payload -C {package_expanded_payload_path}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
-                pass
+            subprocess.Popen(f'tar -xvf {package_expanded_path + archive_name}/Payload -C {package_expanded_payload_path}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+            time.sleep(5)
 
             edge_browser_path = package_expanded_payload_path + os.path.sep + 'Microsoft Edge.app'
 

@@ -1,4 +1,16 @@
-[5.1.0b3] 17/08/2021
+[5.1.0b4] 17/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added killing of browser if its getting updated
+- Added full updating of opera browser on Windows (full installation instead of browser update command)
+
+# Fixes
+
+- Fixed an issue with incorrect default path detecting if library was ran in console mode
+
+[5.1.0b3] 16/08/2021
 This code was written and tested on Python 3.9.6
 
 # Added

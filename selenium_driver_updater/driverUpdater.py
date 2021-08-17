@@ -73,7 +73,7 @@ class DriverUpdater():
             chmod (bool)                        : If true, it will make driver binary executable. Defaults to True.
             check_driver_is_up_to_date (bool)   : If true, it will check driver version before and after upgrade. Defaults to True.
             info_messages (bool)                : If false, it will disable all info messages. Defaults to True.
-            filename (str)                      : Specific name for driver. If given, it will replace name for driver. Defaults to empty string.
+            filename (str)                      : Specific name for driver. If given, it will replace current name for driver. Defaults to empty string.
             version (str)                       : Specific version for driver. If given, it will downloads given version. Defaults to empty string.
             check_browser_is_up_to_date (bool)  : If true, it will check browser version before specific driver update or upgrade. Defaults to False.
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
@@ -100,7 +100,7 @@ class DriverUpdater():
 
         path = kwargs.get('path')
         if not path:
-            path = sys.path[0]
+            path = os.getcwd()
             logger.info('You have not specified the path - so used default folder path instead')
 
         _info.path = str(os.path.abspath(path) + os.path.sep)
@@ -166,13 +166,15 @@ class DriverUpdater():
         """Private function for checking all input parameters"""
 
 
-        if not Path(_info.path).exists():
-            message = f"The specified path does not exist current path is: {_info.path}"
-            raise ValueError(message)
+        if not Path(_info.path).exists() and _info.path.endswith(os.path.sep):
+            message = f"The specified path does not exist current path is: {_info.path}, trying to create this directory"
+            logger.error(message)
+            Path(_info.path).mkdir()
+            logger.info(f'Successfully created new directory at path: {_info.path}')
 
         if not Path(_info.path).is_dir():
-            message = f"The specified path is not a folder current path is: {_info.path}"
-            raise ValueError(message)
+            message = f"The specified path is not a directory current path is: {_info.path}"
+            raise NotADirectoryError(message)
 
         if isinstance(_info.driver_name,(list, str)):
 
