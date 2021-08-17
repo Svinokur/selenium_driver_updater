@@ -229,9 +229,9 @@ class OperaBrowser():
             subprocess.Popen('taskkill /F /IM "opera.exe" /T', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             logger.info('Successfully killed all opera.exe processes')
 
-            os.system(f'{archive_path + archive_name} /install /silent /launchopera=no /desktopshortcut=no /pintotaskbar=no /setdefaultbrowser=0')
-
-            time.sleep(60)
+            logger.info('Trying to install new opera browser')
+            os.system(f'{archive_path} /install /silent /launchopera=no /desktopshortcut=no /pintotaskbar=no /setdefaultbrowser=0')
+            logger.info('Successfully updated current opera browser')
 
     def _compare_current_version_and_latest_version_opera_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of opera browser to latest version
@@ -255,7 +255,7 @@ class OperaBrowser():
         current_version = self._get_current_version_opera_browser_selenium()
 
         if not current_version:
-            return True, current_version, latest_version
+            return is_browser_up_to_date, current_version, latest_version
 
         latest_version = self._get_latest_version_opera_browser()
 
