@@ -120,6 +120,15 @@ All supported OS's for this driver are:
 - MacOS
 - Linux
 
+### ``SafariDriver`` 
+#### ``DriverUpdater.safaridriver``
+
+For installing or updating [safaridriver binary](https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari)
+
+All supported OS's for this driver are:
+
+- MacOS
+
 # Supported browsers for updates
 
 ### ``Chrome Browser``
@@ -128,9 +137,7 @@ For updating [chrome browser](https://www.google.com/chrome/)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Firefox Browser``
 
@@ -138,9 +145,7 @@ For updating [firefox browser](https://www.mozilla.org/en-US/firefox/)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Opera Browser``
 
@@ -150,7 +155,6 @@ All supported OS's for this browser are:
 
 - Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Edge Browser``
 
@@ -158,5 +162,4 @@ For updating [edge browser](https://www.microsoft.com/en-us/edge)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS

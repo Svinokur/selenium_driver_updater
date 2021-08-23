@@ -151,27 +151,27 @@ class EdgeBrowser():
         logger.info(f'Edge browser was downloaded to path: {package_path}')
 
         if platform.system() == 'Darwin':
-            
+
             logger.info('Trying to kill all edgebrowser processes')
             subprocess.Popen(r'killall Microsoft\ Edge', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             logger.info('Successfully killed all edgebrowser processes')
-            
+
             package_expanded_path = f'{path}expanded{os.path.sep}'
 
             if Path(package_expanded_path).exists():
                 shutil.rmtree(package_expanded_path)
-            
+
             logger.info(f'Trying to expand package: {package_path}')
             os.system(f'pkgutil --expand {package_path} {package_expanded_path}')
             logger.info(f'Successfully expanded package at path: {package_expanded_path}')
-            
+
             package_expanded_payload_path = package_expanded_path + 'expanded_payload'
 
             if not Path(package_expanded_payload_path).exists():
                 Path(package_expanded_payload_path).mkdir()
 
             subprocess.Popen(f'tar -xvf {package_expanded_path + archive_name}/Payload -C {package_expanded_payload_path}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            
+
             time.sleep(5)
 
             edge_browser_path = package_expanded_payload_path + os.path.sep + 'Microsoft Edge.app'
@@ -180,14 +180,14 @@ class EdgeBrowser():
 
             shutil.rmtree(edge_browser_path_application)
             shutil.move(edge_browser_path, edge_browser_path_application)
-                   
+
             logger.info(f'Successfully moved edge browser from: {edge_browser_path} to: {edge_browser_path_application}')
 
             if Path(package_path).exists():
                 Path(package_path).unlink()
 
             if Path(package_expanded_path).exists():
-               shutil.rmtree(package_expanded_path) 
+                shutil.rmtree(package_expanded_path)
 
     def _compare_current_version_and_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of edge browser to latest version

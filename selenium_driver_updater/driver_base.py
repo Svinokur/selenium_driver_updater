@@ -232,5 +232,6 @@ class DriverBase():
         json_data = self.requests_getter.get_result_by_request(url=url_test_valid)
 
         if not version_valid in json_data:
-            message = f'Wrong version or system_name was specified. version_valid: {version_valid} driver_version: {driver_version} url: {url}'
+            message = ('Wrong version or system_name was specified.'
+                        f'version_valid: {version_valid} driver_version: {driver_version} url: {url}')
             raise DriverVersionInvalidException(message)

@@ -75,7 +75,7 @@ class FirefoxBrowser():
                 if not is_browser_up_to_date:
                     message = f'Problem with updating firefox browser current_version: {current_version} latest_version: {latest_version}'
                     logger.info(message)
-        
+
         except (ValueError, FileNotFoundError):
             pass
 
@@ -162,11 +162,11 @@ class FirefoxBrowser():
         file_format = 'dmg' if system_name == 'mac' else 'exe'
         locale_name = locale.getlocale()[0].replace('_', '-')
         url_release = self.setting["FirefoxBrowser"]["LinkAllLatestRelease"].format(latest_version, system_name, locale_name, latest_version, file_format)
-        
+
         try:
             url = url_release.replace(url_release.split('/')[-1], '')
             self.requests_getter.get_result_by_request(url)
-            
+
         except Exception:
             message = f'Unknown locale name was specified locale_name: {locale_name}'
             raise OSError(message)
@@ -179,7 +179,7 @@ class FirefoxBrowser():
 
         if Path(path + archive_name).exists():
             Path(path + archive_name).unlink()
-        
+
         logger.info(f'Started to download firefox browser by url: {url_release}')
         archive_path = wget.download(url=url_release, out=path + archive_name)
 
@@ -190,18 +190,18 @@ class FirefoxBrowser():
             volume_path:str = ''
 
             try:
-                
+
                 logger.info('Trying to kill all firefox processes')
                 subprocess.Popen('killall firefox', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 logger.info('Successfully killed all firefox processes')
-                
+
                 logger.info(f'Trying to attach image: {archive_path}')
                 with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
                     info = process.communicate()[0].decode('UTF-8')
 
                 volume_path = re.findall('Volumes.*', info)[0]
                 volume_path = f"/{volume_path}/"
-                
+
                 firefox_browser_path = volume_path + 'Firefox.app'
 
                 logger.info(f'Successfully attached {archive_name} at path: {volume_path}')
@@ -210,11 +210,11 @@ class FirefoxBrowser():
 
                 if Path(firefox_browser_path_application).exists():
                     shutil.rmtree(firefox_browser_path_application)
-                
+
                 logger.info(f'Trying to move firefox browser from: {firefox_browser_path} to: {firefox_browser_path_application} ')
 
                 os.system(f'rsync -a {volume_path}Firefox.app /Applications/')
-                    
+
                 logger.info(f'Successfully moved firefox browser from: {firefox_browser_path} to: {firefox_browser_path_application}')
 
             finally:

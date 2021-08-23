@@ -6,7 +6,6 @@ import re
 import platform
 from typing import Tuple,Any
 from pathlib import Path
-import time
 import shutil
 
 # Third party imports
@@ -35,7 +34,9 @@ class OperaBrowser():
         self.operadriver_path = str(kwargs.get('path'))
 
         self.requests_getter = RequestsGetter
-        self.extractor = Extractor 
+        self.extractor = Extractor
+        self.system_name = ''
+        self.url_release = ''
 
     def main(self) -> None:
         """Main function, checks for the latest version, downloads or updates opera browser"""
@@ -152,16 +153,16 @@ class OperaBrowser():
 
             else:
                 break
-        
+
         latest_version = version.replace('/', '')
-        
+
         logger.info(f'Latest version of opera browser: {latest_version}')
 
         return latest_version
 
     def _get_latest_opera_browser_for_current_os(self) -> None:
         """Trying to update opera browser to its latest version"""
-        
+
         if platform.system() not in ['Darwin', 'Windows']:
             message = 'Opera browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
             logger.error(message)
@@ -191,7 +192,7 @@ class OperaBrowser():
 
         path = self.operadriver_path.replace(self.operadriver_path.split(os.path.sep)[-1], '') + 'selenium-driver-updater' + os.path.sep
         archive_name = url_full_release.split('/')[-1]
-        
+
         if not Path(path).exists():
             Path(path).mkdir()
 
@@ -204,7 +205,7 @@ class OperaBrowser():
         logger.info(f'Opera browser was downloaded to path: {archive_path}')
 
         if platform.system() == 'Darwin':
-            
+
             logger.info('Trying to kill all opera processes')
             os.system('killall Opera')
             os.system('killall Opera')
@@ -217,14 +218,14 @@ class OperaBrowser():
 
             shutil.rmtree(opera_browser_path_application)
             shutil.move(opera_browser_path, opera_browser_path_application)
-                   
+
             logger.info(f'Successfully moved opera browser from: {opera_browser_path} to: {opera_browser_path_application}')
 
             if Path(archive_path).exists():
                 Path(archive_path).unlink()
 
         elif platform.system() == 'Windows':
-            
+
             logger.info('Trying to kill all opera.exe processes')
             subprocess.Popen('taskkill /F /IM "opera.exe" /T', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             logger.info('Successfully killed all opera.exe processes')

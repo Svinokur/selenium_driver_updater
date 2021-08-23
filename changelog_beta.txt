@@ -1,3 +1,10 @@
+[5.1.0b5] 23/08/2021
+This code was written and tested on Python 3.9.6
+
+# Improvements
+
+- Speeded up getting latest version of safaridriver
+
 [5.1.0b4] 17/08/2021
 This code was written and tested on Python 3.9.6
 

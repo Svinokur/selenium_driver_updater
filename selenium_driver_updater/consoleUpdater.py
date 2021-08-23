@@ -13,7 +13,7 @@ class ConsoleUpdater():
     def parse_command_line():
         "Function for parsing arguments that were specified in command line"
         parser = argparse.ArgumentParser(
-            description=f'Download or update your Selenium driver binaries and their browsers automatically with this package. Current version is {str(setting["Program"]["version"])}',
+            description='Download or update your selenium driver binaries and their browsers automatically with this package.',
         )
         parser.add_argument(
         "--driver_name",

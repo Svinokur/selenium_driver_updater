@@ -93,7 +93,8 @@ class GeckoDriver(DriverBase):
             is_driver_up_to_date, current_version, latest_version = super()._compare_current_version_and_latest_version_github()
 
             if not is_driver_up_to_date:
-                message = f'Problem with updating geckodriver current_version: {current_version} latest_version: {latest_version}'
+                message = ('Problem with updating geckodriver'
+                        f'current_version: {current_version} latest_version: {latest_version}')
                 logger.error(message)
                 message = 'Trying to download previous latest version of geckodriver'
                 logger.info(message)
@@ -173,7 +174,7 @@ class GeckoDriver(DriverBase):
             super()._delete_current_driver_for_current_os()
 
         if version:
-            
+
             url = self.setting["GeckoDriver"]["LinkLastReleasePlatform"].format(version, version)
             logger.info(f'Started download geckodriver specific_version: {version}')
 
