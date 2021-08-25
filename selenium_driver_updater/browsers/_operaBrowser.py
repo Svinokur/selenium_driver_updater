@@ -207,8 +207,8 @@ class OperaBrowser():
         if platform.system() == 'Darwin':
 
             logger.info('Trying to kill all opera processes')
-            os.system('killall Opera')
-            os.system('killall Opera')
+            subprocess.Popen('killall Opera', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen('killall Opera', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             logger.info('Successfully killed all opera.exe processes')
 
             self.extractor.extract_all_tar_xz_archive(archive_path=archive_path, delete_archive=True, out_path=path)

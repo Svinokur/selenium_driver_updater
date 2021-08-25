@@ -266,8 +266,10 @@ class ChromeBrowser():
             volume_path:str = ''
 
             try:
-
+                
+                logger.info('Trying to kill all chrome processes')
                 subprocess.Popen(r'killall Google\ Chrome', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                logger.info('Successfully killed all chrome processes')
 
                 logger.info(f'Trying to attach image: {archive_path}')
                 with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
