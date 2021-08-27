@@ -105,9 +105,9 @@ For installing or updating [edgedriver binary](https://developer.microsoft.com/r
 All supported OS's for this driver are:
 
 - Windows
+- Windows ARM
 - MacOS
 - Linux
-- ARM
 
 ### ``PhantomJS`` 
 #### ``DriverUpdater.phantomjs``
@@ -153,7 +153,7 @@ For updating [opera browser](https://www.opera.com)
 
 All supported OS's for this browser are:
 
-- Windows
+- Windows 32 / 64 / ARM
 - MacOS
 
 ### ``Edge Browser``

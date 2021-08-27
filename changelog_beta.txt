@@ -1,6 +1,9 @@
 [5.1.0b5] 23/08/2021
 This code was written and tested on Python 3.9.6
 
+# Added
+- Added support for edgedriver ARM version on Windows
+
 # Improvements
 
 - Speeded up getting latest version of safaridriver

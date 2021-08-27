@@ -33,9 +33,9 @@ operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.syste
 operadriver_latest_release = latest_release_operadriver + operadriver_latest_release
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
-edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' and not 'arm' in platform.processor().lower() else\
                                 "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
-                                "edgedriver_linux64" if platform.system() == 'Linux' else\
+                                "edgedriver_linux64.zip" if platform.system() == 'Linux' else\
                                 "edgedriver_arm64.zip"
 edgedriver_latest_release = latest_release_edgedriver + edgedriver_latest_release
 
@@ -70,7 +70,7 @@ edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft E
 'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
 edge_browser_release = 'https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and not 'arm' in str(os.uname().machine) else \
-                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else ''
+                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else ''  
 
 
 opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera' if platform.system() == 'Windows' else \
