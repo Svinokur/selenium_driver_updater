@@ -120,26 +120,19 @@ class EdgeBrowser():
     def _get_latest_version_edge_browser(self) -> str:
         """Gets latest edge browser version
 
-
         Returns:
             str
 
             latest_version (str)    : Latest version of edge browser.
 
-        Raises:
-            Except: If unexpected error raised.
-
         """
 
         latest_version : str = ''
 
-        url = self.setting["EdgeBrowser"]["LinkAllLatestRelease"]
+        url = self.setting['EdgeDriver']["LinkLastRelease"]
         json_data = self.requests_getter.get_result_by_request(url=url)
 
-        soup = BeautifulSoup(json_data, 'html.parser')
-        latest_version_element = soup.findAll('h2')[0].text
-
-        latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], latest_version_element)[0]
+        latest_version = str(json_data).strip()
 
         logger.info(f'Latest version of edge browser: {latest_version}')
 

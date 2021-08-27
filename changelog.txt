@@ -1,3 +1,10 @@
+[5.0.4] 27/08/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Partial fixed of getting latest version of edge browser 
+
 [5.0.3] 17/08/2021
 This code was written and tested on Python 3.9.6
 
