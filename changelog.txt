@@ -1,3 +1,41 @@
+[5.1.0] 27/08/2021
+This code was written and tested on Python 3.9.6
+
+# Added
+
+- Added full updating of edge, opera, firefox and chrome browsers on MacOS (full installation instead of browser update command)
+- Added full updating of opera browser on Windows (full installation instead of browser update command)
+
+- Added killing of browser if its getting updated
+- Added support for edgedriver ARM version on Windows
+
+# Improvements
+
+- Speeded up getting latest version of safaridriver
+
+# Fixes
+
+- Partial fixed of getting latest version of edge browser (already fixed in version 5.0.4)
+- Fixed an issue with incorrect default path detecting if library was ran in console mode (already fixed in version 5.0.3)
+
+# Other
+
+- Removed parameter "old_return" for returning old variables such as "result" and "message"
+
+[5.0.4] 27/08/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Partial fixed of getting latest version of edge browser 
+
+[5.0.3] 17/08/2021
+This code was written and tested on Python 3.9.6
+
+# Fixes
+
+- Fixed an issue with incorrect default path detecting if library was ran in console mode
+
 [5.0.2] 09/08/2021
 This code was written and tested on Python 3.9.6
 
