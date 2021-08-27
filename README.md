@@ -34,7 +34,6 @@ import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True)
-print(filename)
 
 driver = webdriver.Chrome(filename)
 driver.get('https://google.com')
@@ -44,12 +43,20 @@ driver.get('https://google.com')
 Or you can use library to download and update chromedriver and geckodriver binaries at the same time.
 ```python
 from selenium_driver_updater import DriverUpdater
+from selenium import webdriver
 import os
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 list_drivers = [DriverUpdater.chromedriver, DriverUpdater.geckodriver]
 
-filename = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
-print(filename)
+filenames = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
+print(filenames)
+
+driver_chrome = webdriver.Chrome(filename[0])
+driver_chrome.get('https://google.com')
+
+driver_firefox = webdriver.Firefox(filename[1])
+driver_firefox.get('https://google.com')
 
 ```
 
