@@ -12,7 +12,7 @@ This version was written and tested on Python 3.9.6
 ### Improvements
 
 - Speeded up getting latest version of safaridriver
-- Returned parameter "old_return" with improved back-compability
+- Improved parameter "old_return" with improved back-compatibility
 
 ### Fixes
 
@@ -21,7 +21,6 @@ This version was written and tested on Python 3.9.6
 
 ### Other
 
-- Removed parameter "old_return" for returning old variables such as "result" and "message"
 - Setted default value "False" for parameter "old_return"
 
 ## [5.0.4] - 27/08/2021
