@@ -3,7 +3,7 @@ This version was written and tested on Python 3.9.6
 
 ### Improvements
 
-- Returned parameter "old_return" with improved back-compability
+- Returned parameter "old_return" with improved back-compatibility
 
 ### Other
 
