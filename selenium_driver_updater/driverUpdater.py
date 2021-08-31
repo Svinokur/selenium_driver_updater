@@ -79,6 +79,8 @@ class DriverUpdater():
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
 
+            old_return (bool) : If true, it will return additional variables "result" and "message" in returning Tuple.
+
         Returns:
             str
 
@@ -87,6 +89,10 @@ class DriverUpdater():
         """
 
         #Initialize all variables
+        result_run:bool = True
+        message_run:str = ''
+        old_return = bool(kwargs.get('old_return', False))
+
         driver_path = ''
 
         _info.driver_name = driver_name
@@ -156,8 +162,13 @@ class DriverUpdater():
                     driver_path = list_of_paths
 
         except Exception:
+            result_run:bool = False
+
             message_run = f'error: {str(traceback.format_exc())}'
             logger.error(message_run)
+
+        if old_return:
+            return result_run, message_run, driver_path
 
         return driver_path
 
