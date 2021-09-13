@@ -25,26 +25,38 @@ pip install selenium-driver-updater
 ```
 
 ## Usage in code
-This example shows how you can use this library to download chromedriver binary.
+This example shows how you can use this library to download chromedriver binary and use it immediately.
 ```python
 from selenium_driver_updater import DriverUpdater
+from selenium import webdriver
 import os
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True, old_return=False)
-print(filename)
+
+driver = webdriver.Chrome(filename)
+driver.get('https://google.com')
 
 ```
 
 Or you can use library to download and update chromedriver and geckodriver binaries at the same time.
 ```python
 from selenium_driver_updater import DriverUpdater
+from selenium import webdriver
 import os
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 list_drivers = [DriverUpdater.chromedriver, DriverUpdater.geckodriver]
 
-filename = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True, old_return=False)
-print(filename)
+filenames = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True, old_return=False)
+print(filenames)
+
+driver_chrome = webdriver.Chrome(filename[0])
+driver_chrome.get('https://google.com')
+
+driver_firefox = webdriver.Firefox(filename[1])
+driver_firefox.get('https://google.com')
 
 ```
 
@@ -100,9 +112,9 @@ For installing or updating [edgedriver binary](https://developer.microsoft.com/r
 All supported OS's for this driver are:
 
 - Windows
+- Windows ARM
 - MacOS
 - Linux
-- ARM
 
 ### ``PhantomJS`` 
 #### ``DriverUpdater.phantomjs``
@@ -115,6 +127,15 @@ All supported OS's for this driver are:
 - MacOS
 - Linux
 
+### ``SafariDriver`` 
+#### ``DriverUpdater.safaridriver``
+
+For installing or updating [safaridriver binary](https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari)
+
+All supported OS's for this driver are:
+
+- MacOS
+
 # Supported browsers for updates
 
 ### ``Chrome Browser``
@@ -123,9 +144,7 @@ For updating [chrome browser](https://www.google.com/chrome/)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Firefox Browser``
 
@@ -133,9 +152,7 @@ For updating [firefox browser](https://www.mozilla.org/en-US/firefox/)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Opera Browser``
 
@@ -143,9 +160,8 @@ For updating [opera browser](https://www.opera.com)
 
 All supported OS's for this browser are:
 
-- Windows
+- Windows 32 / 64 / ARM
 - MacOS
-- Linux (Tested on Ubuntu 20.04)
 
 ### ``Edge Browser``
 
@@ -153,5 +169,4 @@ For updating [edge browser](https://www.microsoft.com/en-us/edge)
 
 All supported OS's for this browser are:
 
-- Windows
 - MacOS

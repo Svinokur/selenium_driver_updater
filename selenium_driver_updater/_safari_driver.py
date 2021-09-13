@@ -1,3 +1,4 @@
+#pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import platform
 import re
@@ -11,6 +12,8 @@ from selenium_driver_updater.util.logger import logger
 from selenium_driver_updater.driver_base import DriverBase
 
 class SafariDriver(DriverBase):
+    "Class for working with Selenium safaridriver binary"
+
     def __init__(self, **kwargs):
 
         kwargs.update(path='/usr/bin/')
@@ -41,7 +44,8 @@ class SafariDriver(DriverBase):
         latest_version = self._get_latest_version_safaridriver()
 
         if current_version == latest_version:
-            message = f'Your existing safaridriver is up to date. current_version: {current_version} latest_version: {latest_version}' 
+            message = ('Your existing safaridriver is up to date.'
+                        f'current_version: {current_version} latest_version: {latest_version}')
             logger.info(message)
 
         else:
@@ -66,8 +70,14 @@ class SafariDriver(DriverBase):
         json_data = self.requests_getter.get_result_by_request(url=url)
         soup = BeautifulSoup(json_data, 'html.parser')
 
-        all_releases = [re.findall(self.setting["Program"]["wedriverVersionPattern"], element.text) for element in soup.findAll('td') if 'safari' in element.text.lower()]
-        latest_version = all_releases[0][0]
+        for release in soup.findAll('td'):
+            if 'safari' in release.text.lower():
+                latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], str(release.text))[0]
+                break
+
+        if not latest_version:
+            message = 'Could not determine latest version of safaridriver, maybe the site was changed'
+            raise ValueError(message)
 
         logger.info(f'Latest version of safaridriver: {latest_version}')
 

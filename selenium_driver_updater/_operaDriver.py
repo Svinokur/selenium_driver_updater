@@ -252,7 +252,7 @@ class OperaDriver(DriverBase):
         archive_operadriver_path = archive_folder_path + platform
 
         if not self.filename:
-            
+
             copyfile(archive_operadriver_path, self.path + platform)
 
         else:

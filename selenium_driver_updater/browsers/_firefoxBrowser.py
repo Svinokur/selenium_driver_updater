@@ -1,15 +1,17 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
-import time
-import os
 import re
+import os
 import platform
 from typing import Tuple, Any
 from pathlib import Path
+import shutil
+import locale
 
 # Third party imports
 from bs4 import BeautifulSoup
+import wget
 
 # Selenium imports
 from selenium import webdriver
@@ -21,6 +23,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium_driver_updater._setting import setting
 
 from selenium_driver_updater.util.requests_getter import RequestsGetter
+from selenium_driver_updater.util.extractor import Extractor
 from selenium_driver_updater.util.logger import logger
 
 class FirefoxBrowser():
@@ -33,6 +36,7 @@ class FirefoxBrowser():
         self.geckodriver_path = str(kwargs.get('path'))
 
         self.requests_getter = RequestsGetter
+        self.extractor = Extractor
 
     def main(self) -> None:
         """Main function, checks for the latest version, downloads or updates firefox browser
@@ -55,14 +59,10 @@ class FirefoxBrowser():
 
         try:
 
-            firefoxbrowser_updater_path = str(self.setting["FirefoxBrowser"]["FirefoxBrowserUpdaterPath"])
-            if not firefoxbrowser_updater_path:
-                message = f'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                raise ValueError(message)
-
-            if not Path(firefoxbrowser_updater_path).exists():
-                message = f'firefoxbrowser_updater_path: {firefoxbrowser_updater_path} is not exists. Please report your OS information and path to {firefoxbrowser_updater_path} file in repository.'
-                raise FileNotFoundError(message)
+            if platform.system() not in ['Darwin']:
+                message = 'Firefox browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+                logger.error(message)
+                return
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_firefox_browser()
 
@@ -75,7 +75,7 @@ class FirefoxBrowser():
                 if not is_browser_up_to_date:
                     message = f'Problem with updating firefox browser current_version: {current_version} latest_version: {latest_version}'
                     logger.info(message)
-        
+
         except (ValueError, FileNotFoundError):
             pass
 
@@ -146,44 +146,87 @@ class FirefoxBrowser():
         return latest_version
 
     def _get_latest_firefox_browser_for_current_os(self) -> None:
-        """Trying to update firefox browser to its latest version
+        """Trying to update firefox browser to its latest version"""
 
-        Raises:
-            Except: If unexpected error raised.
+        if platform.system() not in ['Darwin']:
+            message = 'Firefox browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+            logger.error(message)
+            return
 
-        """
+        latest_version = self._get_latest_version_firefox_browser()
+
+        system_name = platform.system()
+        system_name = system_name.replace('Darwin', 'mac')
+        system_name = system_name.replace('Windows', 'win')
+
+        file_format = 'dmg' if system_name == 'mac' else 'exe'
+        locale_name = locale.getlocale()[0].replace('_', '-')
+        url_release = self.setting["FirefoxBrowser"]["LinkAllLatestRelease"].format(latest_version, system_name, locale_name, latest_version, file_format)
 
         try:
-            is_admin : bool = bool(os.getuid() == 0)
+            url = url_release.replace(url_release.split('/')[-1], '')
+            self.requests_getter.get_result_by_request(url)
+
         except Exception:
-            is_admin : bool = False
+            message = f'Unknown locale name was specified locale_name: {locale_name}'
+            raise OSError(message)
 
-        try:
+        path = self.geckodriver_path.replace(self.geckodriver_path.split(os.path.sep)[-1], '') + 'selenium-driver-updater' + os.path.sep
+        archive_name = url_release.split('/')[-1]
 
-            update_command : str = self.setting["FirefoxBrowser"]["FirefoxBrowserUpdater"]
+        if not Path(path).exists():
+            Path(path).mkdir()
 
-            message = f'Trying to update firefox browser to the latest version.'
-            logger.info(message)
+        if Path(path + archive_name).exists():
+            Path(path + archive_name).unlink()
 
-            if platform.system() == 'Linux':
+        logger.info(f'Started to download firefox browser by url: {url_release}')
+        archive_path = wget.download(url=url_release, out=path + archive_name)
 
-                if is_admin:
-                    os.system(update_command)
+        logger.info(f'Firefox browser was downloaded to path: {archive_path}')
 
-                elif not is_admin:
-                    message = 'You have not ran library with sudo privileges to update firefox browser - so updating is impossible.'
-                    raise ValueError(message)
+        if platform.system() == 'Darwin':
 
-            else:
+            volume_path:str = ''
 
-                os.system(update_command)
-                time.sleep(60) #wait for the updating - too long
+            try:
 
-            message = 'Firefox browser was successfully updated to the latest version.'
-            logger.info(message)
-        
-        except ValueError:
-            pass
+                logger.info('Trying to kill all firefox processes')
+                subprocess.Popen('killall firefox', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                logger.info('Successfully killed all firefox processes')
+
+                logger.info(f'Trying to attach image: {archive_path}')
+                with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
+                    info = process.communicate()[0].decode('UTF-8')
+
+                volume_path = re.findall('Volumes.*', info)[0]
+                volume_path = f"/{volume_path}/"
+
+                firefox_browser_path = volume_path + 'Firefox.app'
+
+                logger.info(f'Successfully attached {archive_name} at path: {volume_path}')
+
+                firefox_browser_path_application = '/Applications/Firefox.app'
+
+                if Path(firefox_browser_path_application).exists():
+                    shutil.rmtree(firefox_browser_path_application)
+
+                logger.info(f'Trying to move firefox browser from: {firefox_browser_path} to: {firefox_browser_path_application} ')
+
+                os.system(f'rsync -a {volume_path}Firefox.app /Applications/')
+
+                logger.info(f'Successfully moved firefox browser from: {firefox_browser_path} to: {firefox_browser_path_application}')
+
+            finally:
+
+                with subprocess.Popen(['hdiutil', 'eject', volume_path], stdout=subprocess.PIPE) as process:
+                    info = process.communicate()[0].decode('UTF-8')
+
+                logger.info(f'Successfully ejected {archive_name} at path: {volume_path}')
+
+                if Path(archive_path).exists():
+                    Path(archive_path).unlink()
+
 
     def _compare_current_version_and_latest_version_firefox_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of firefox browser to latest version
@@ -206,7 +249,7 @@ class FirefoxBrowser():
         current_version = self._get_current_version_firefox_browser_selenium()
 
         if not current_version:
-            return True, current_version, latest_version
+            return is_browser_up_to_date, current_version, latest_version
 
         latest_version = self._get_latest_version_firefox_browser()
 

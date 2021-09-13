@@ -90,7 +90,8 @@ class PhantomJS(DriverBase):
 
         if current_version == latest_version:
             is_driver_up_to_date = True
-            message = f'Your existing phantomjs is up to date. current_version: {current_version} latest_version: {latest_version}' 
+            message = ('Your existing phantomjs is up to date.'
+                    f'current_version: {current_version} latest_version: {latest_version}')
             logger.info(message)
 
         return is_driver_up_to_date, current_version, latest_version
@@ -120,7 +121,8 @@ class PhantomJS(DriverBase):
             is_driver_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_phantomjs()
 
             if not is_driver_up_to_date:
-                message = f'Problem with updating phantomjs current_version: {current_version} latest_version: {latest_version}'
+                message = ('Problem with updating phantomjs'
+                            f'current_version: {current_version} latest_version: {latest_version}')
                 logger.error(message)
                 message = 'Trying to download previous latest version of phantomjs'
                 logger.info(message)
@@ -220,7 +222,7 @@ class PhantomJS(DriverBase):
         url_releases : str = self.setting["PhantomJS"]["LinkAllReleases"]
         is_found : bool = False
 
-        while is_found == False:
+        while is_found is False:
 
             json_data = self.requests_getter.get_result_by_request(url=url_releases, is_json=True)
 
@@ -332,7 +334,7 @@ class PhantomJS(DriverBase):
 
         if Path(archive_path_folder).exists():
             shutil.rmtree(archive_path_folder)
-        
+
         driver_path = self.phantomjs_path
 
         logger.info(f'PhantomJS was successfully unpacked by path: {driver_path}')

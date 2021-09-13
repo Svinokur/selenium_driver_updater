@@ -7,9 +7,10 @@ import re
 from typing import Tuple, Any
 from pathlib import Path
 import platform
+import shutil
 
-# Third party imports
-from bs4 import BeautifulSoup
+#Third party imports
+import wget
 
 # Selenium imports
 from selenium import webdriver
@@ -34,34 +35,20 @@ class EdgeBrowser():
         self.requests_getter = RequestsGetter
 
     def main(self):
-        """Main function, checks for the latest version, downloads or updates edge browser
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Main function, checks for the latest version, downloads or updates edge browser"""
 
         if self.check_browser_is_up_to_date:
             self._check_if_edge_browser_is_up_to_date()
 
     def _check_if_edge_browser_is_up_to_date(self) -> None:
-        """Сhecks for the latest version of edge browser
-
-        Raises:
-            Except: If unexpected error raised.
-
-        """
+        """Сhecks for the latest version of edge browser"""
 
         try:
 
-            edgebrowser_updater_path = str(self.setting["EdgeBrowser"]["EdgeBrowserUpdaterPath"])
-            if not edgebrowser_updater_path:
-                message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                raise ValueError(message)
-
-            if not Path(edgebrowser_updater_path).exists():
-                message = f'edgebrowser_updater_path: {edgebrowser_updater_path} is not exists. Please report your OS information and path to {edgebrowser_updater_path} file in repository.'
-                raise FileNotFoundError(message)
+            if platform.system() not in ['Darwin']:
+                message = 'Edge browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+                logger.error(message)
+                return
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_edge_browser()
 
@@ -139,21 +126,68 @@ class EdgeBrowser():
         return latest_version
 
     def _get_latest_edge_browser_for_current_os(self) -> None:
-        """Trying to update edge browser to its latest version
+        """Trying to update edge browser to its latest version"""
 
-        Raises:
-            Except: If unexpected error raised.
+        if platform.system() not in ['Darwin']:
+            message = 'Edge browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+            logger.error(message)
+            return
 
-        """
+        url_release = self.setting["EdgeBrowser"]["LinkAllLatestReleaseFile"]
+        latest_version = self._get_latest_version_edge_browser()
 
-        message = 'Trying to update edge browser to the latest version.'
-        logger.info(message)
+        path = self.edgedriver_path.replace(self.edgedriver_path.split(os.path.sep)[-1], '') + 'selenium-driver-updater' + os.path.sep
+        archive_name = f'MicrosoftEdge-{latest_version}.pkg'
 
-        os.system(self.setting["EdgeBrowser"]["EdgeBrowserUpdater"])
-        time.sleep(60) #wait for the updating
+        if not Path(path).exists():
+            Path(path).mkdir()
 
-        message = 'Edge browser was successfully updated to the latest version.'
-        logger.info(message)
+        if Path(path + archive_name).exists():
+            Path(path + archive_name).unlink()
+
+        logger.info(f'Started to download edge browser by url: {url_release}')
+        package_path = wget.download(url=url_release, out=path + archive_name)
+
+        logger.info(f'Edge browser was downloaded to path: {package_path}')
+
+        if platform.system() == 'Darwin':
+
+            logger.info('Trying to kill all edgebrowser processes')
+            subprocess.Popen(r'killall Microsoft\ Edge', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            logger.info('Successfully killed all edgebrowser processes')
+
+            package_expanded_path = f'{path}expanded{os.path.sep}'
+
+            if Path(package_expanded_path).exists():
+                shutil.rmtree(package_expanded_path)
+
+            logger.info(f'Trying to expand package: {package_path}')
+            os.system(f'pkgutil --expand {package_path} {package_expanded_path}')
+            logger.info(f'Successfully expanded package at path: {package_expanded_path}')
+
+            package_expanded_payload_path = package_expanded_path + 'expanded_payload'
+
+            if not Path(package_expanded_payload_path).exists():
+                Path(package_expanded_payload_path).mkdir()
+
+            subprocess.Popen(f'tar -xvf {package_expanded_path + archive_name}/Payload -C {package_expanded_payload_path}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+            time.sleep(5)
+
+            edge_browser_path = package_expanded_payload_path + os.path.sep + 'Microsoft Edge.app'
+
+            edge_browser_path_application = '/Applications/Microsoft Edge.app'
+
+            shutil.rmtree(edge_browser_path_application)
+            shutil.move(edge_browser_path, edge_browser_path_application)
+
+            logger.info(f'Successfully moved edge browser from: {edge_browser_path} to: {edge_browser_path_application}')
+
+            if Path(package_path).exists():
+                Path(package_path).unlink()
+
+            if Path(package_expanded_path).exists():
+                shutil.rmtree(package_expanded_path)
 
     def _compare_current_version_and_latest_version_edge_browser(self) -> Tuple[bool, str, str]:
         """Compares current version of edge browser to latest version
@@ -164,9 +198,6 @@ class EdgeBrowser():
             is_browser_up_to_date (bool)    : It true the browser is up to date. Defaults to False.
             current_version (str)           : Current version of the browser.
             latest_version (str)            : Latest version of the browser.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -191,15 +222,10 @@ class EdgeBrowser():
     def _get_current_version_edge_browser_selenium_via_terminal(self) -> str:
         """Gets current edge browser version via command in terminal
 
-
         Returns:
             str
 
             browser_version (str)   : Current edge browser version.
-
-        Raises:
-
-            Except: If unexpected error raised.
 
         """
 

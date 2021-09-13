@@ -1,15 +1,16 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import subprocess
-import time
 import os
 import re
 import platform
 from typing import Tuple, Any
 from pathlib import Path
+import shutil
 
 # Third party imports
 from bs4 import BeautifulSoup
+import wget
 
 # Selenium imports
 from selenium import webdriver
@@ -45,16 +46,10 @@ class ChromeBrowser():
 
         try:
 
-            if platform.system() != 'Linux':
-
-                chromebrowser_updater_path = str(self.setting["ChromeBrowser"]["ChromeBrowserUpdaterPath"])
-                if not chromebrowser_updater_path:
-                    message = 'Parameter "check_browser_is_up_to_date" has not been optimized for your OS yet. Please wait for the new releases.'
-                    raise ValueError(message)
-
-                if not Path(chromebrowser_updater_path).exists():
-                    message = f'chromebrowser_updater_path: {chromebrowser_updater_path} is not exists. Please report your OS information and path to {chromebrowser_updater_path} file in repository.'
-                    raise FileNotFoundError(message)
+            if platform.system() not in ['Darwin']:
+                message = 'Chrome browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+                logger.error(message)
+                return
 
             is_browser_up_to_date, current_version, latest_version = self._compare_current_version_and_latest_version_chrome_browser()
 
@@ -89,7 +84,7 @@ class ChromeBrowser():
         current_version = self._get_current_version_chrome_browser_selenium()
 
         if not current_version:
-            return True, current_version, latest_version
+            return is_browser_up_to_date, current_version, latest_version
 
         latest_version = self._get_latest_version_chrome_browser()
 
@@ -178,7 +173,7 @@ class ChromeBrowser():
                     browser_version_terminal = process.communicate()[0].decode('UTF-8')
 
             elif platform.system() == 'Darwin':
-                
+
                 for path in chromebrowser_path:
 
                     with subprocess.Popen([path, '--version'], stdout=subprocess.PIPE) as process:
@@ -201,9 +196,6 @@ class ChromeBrowser():
             str
 
             latest_version (str)    : Latest version of chrome browser.
-
-        Raises:
-            Except: If unexpected error raised.
 
         """
 
@@ -249,34 +241,64 @@ class ChromeBrowser():
     def _get_latest_chrome_browser_for_current_os(self) -> None:
         """Trying to update chrome browser to its latest version"""
 
-        try:
-            is_admin : bool = bool(os.getuid() == 0)
-        except Exception:
-            is_admin : bool = False
+        if platform.system() not in ['Darwin']:
+            message = 'Chrome browser checking/updating is currently disabled for your OS. Please wait for the new releases.'
+            logger.error(message)
+            return
 
-        try:
+        url_release = self.setting["ChromeBrowser"]["LinkAllLatestReleaseFile"]
+        path = self.chromedriver_path.replace(self.chromedriver_path.split(os.path.sep)[-1], '') + 'selenium-driver-updater' + os.path.sep
+        archive_name = url_release.split('/')[-1]
 
-            update_command : str = self.setting["ChromeBrowser"]["ChromeBrowserUpdater"]
+        if not Path(path).exists():
+            Path(path).mkdir()
 
-            message = 'Trying to update chrome browser to the latest version.'
-            logger.info(message)
+        if Path(path + archive_name).exists():
+            Path(path + archive_name).unlink()
 
-            if platform.system() == 'Linux':
+        logger.info(f'Started to download chrome browser by url: {url_release}')
+        archive_path = wget.download(url=url_release, out=path + archive_name)
 
-                if is_admin:
-                    os.system(update_command)
+        logger.info(f'Chrome browser was downloaded to path: {archive_path}')
 
-                elif not is_admin:
-                    message = 'You have not ran library with sudo privileges to update chrome browser - so updating is impossible.'
-                    raise ValueError(message)
+        if platform.system() == 'Darwin':
 
-            else:
+            volume_path:str = ''
 
-                os.system(update_command)
-                time.sleep(60) #wait for the updating
+            try:
+                
+                logger.info('Trying to kill all chrome processes')
+                subprocess.Popen(r'killall Google\ Chrome', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                logger.info('Successfully killed all chrome processes')
 
-            message = 'Chrome browser was successfully updated to the latest version.'
-            logger.info(message)
+                logger.info(f'Trying to attach image: {archive_path}')
+                with subprocess.Popen(['hdiutil', 'attach', archive_path], stdout=subprocess.PIPE) as process:
+                    info = process.communicate()[0].decode('UTF-8')
 
-        except ValueError:
-            pass
+                volume_path = re.findall('Volumes.*', info)[0]
+                volume_path = f"/{volume_path}/"
+
+                chrome_browser_path = volume_path + 'Google Chrome.app'
+
+                logger.info(f'Successfully attached {archive_name} at path: {volume_path}')
+
+                chrome_browser_path_application = '/Applications/Google Chrome.app'
+
+                if Path(chrome_browser_path_application).exists():
+                    shutil.rmtree(chrome_browser_path_application)
+
+                logger.info(f'Trying to move chrome browser from: {chrome_browser_path} to: {chrome_browser_path_application}')
+
+                os.system(f'rsync -a "{volume_path}Google Chrome.app" /Applications/')
+
+                logger.info(f'Successfully moved chrome browser from: {chrome_browser_path} to: {chrome_browser_path_application}')
+
+            finally:
+
+                with subprocess.Popen(['hdiutil', 'eject', volume_path], stdout=subprocess.PIPE) as process:
+                    info = process.communicate()[0].decode('UTF-8')
+
+                logger.info(f'Successfully ejected {archive_name} at path: {volume_path}')
+
+                if Path(archive_path).exists():
+                    Path(archive_path).unlink()

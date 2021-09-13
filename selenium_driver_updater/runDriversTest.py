@@ -1,4 +1,4 @@
-#pylint: disable=wrong-import-position,wrong-import-order
+#pylint: disable=wrong-import-position,wrong-import-order, invalid-name
 import unittest
 import os
 import sys

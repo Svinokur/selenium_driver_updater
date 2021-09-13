@@ -1,7 +1,8 @@
+#pylint: disable=invalid-name
+#Standart library imports
 import os
 import platform
 
-#pylint: disable=invalid-name
 base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
 os_bit = platform.architecture()[0][:-3]
@@ -32,9 +33,9 @@ operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.syste
 operadriver_latest_release = latest_release_operadriver + operadriver_latest_release
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
-edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
+edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' and not 'arm' in platform.processor().lower() else\
                                 "edgedriver_mac64.zip" if platform.system() == 'Darwin' else\
-                                "edgedriver_linux64" if platform.system() == 'Linux' else\
+                                "edgedriver_linux64.zip" if platform.system() == 'Linux' else\
                                 "edgedriver_arm64.zip"
 edgedriver_latest_release = latest_release_edgedriver + edgedriver_latest_release
 
@@ -56,13 +57,6 @@ chrome_browser_path = ['/Applications/Google Chrome.app/Contents/MacOS/Google Ch
 r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
 "google-chrome-stable" if platform.system() == 'Linux' else ''
 
-chrome_browser_updater = r'"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" /ua /installsource scheduler' if platform.system() == 'Windows' else \
-'open "/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app"' if platform.system() == 'Darwin' else\
-"sudo apt-get install google-chrome-stable" if platform.system() == 'Linux' else ''
-
-chrome_browser_updater_path = r"C:\Program Files (x86)\Google\Update\GoogleUpdate.exe" if platform.system() == 'Windows' else \
-'/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Helpers/GoogleSoftwareUpdateAgent.app' if platform.system() == 'Darwin' else ''
-
 
 firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
 ['reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion',
@@ -70,41 +64,24 @@ firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if pla
 r"Powershell (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion"] if platform.system() == 'Windows' else\
 "firefox" if platform.system() == 'Linux' else ''
 
-firefox_browser_updater = r'"C:\Program Files\Mozilla Firefox\updater.exe"' if platform.system() == 'Windows' else \
-'open "/Applications/Firefox.app/Contents/MacOS/updater.app"' if platform.system() == 'Darwin' else\
-"sudo apt-get install firefox" if platform.system() == 'Linux' else ''
-
-firefox_browser_updater_path = r"C:\Program Files\Mozilla Firefox\updater.exe" if platform.system() == 'Windows' else \
-'/Applications/Firefox.app/Contents/MacOS/updater.app' if platform.system() == 'Darwin' else ''
-
 
 
 edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
 'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
 
-edge_browser_updater = r'"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"' if platform.system() == 'Windows' else \
-'open "/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app"' if platform.system() == 'Darwin' else ''
-
-edge_browser_updater_path = r"C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe" if platform.system() == 'Windows' else \
-'/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app' if platform.system() == 'Darwin' else ''
+edge_browser_release = 'https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and not 'arm' in str(os.uname().machine) else \
+                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else ''  
 
 
 opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera' if platform.system() == 'Windows' else \
 '/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
 "opera" if platform.system() == 'Linux' else ''
 
-opera_browser_updater = fr'"C:\\Users\\{os.getenv("username")}\\AppData\Local\Programs\Opera\launcher.exe" --scheduledautoupdate $(Arg0)' if platform.system() == 'Windows' else \
-'open -a "/Applications/Opera.app/Contents/MacOS/opera_autoupdate"' if platform.system() == 'Darwin' else\
-"sudo apt-get install opera-stable" if platform.system() == 'Linux' else ''
-
-opera_browser_updater_path = fr"C:\\Users\\{os.getenv('username')}\\AppData\Local\Programs\Opera\launcher.exe" if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/opera_autoupdate' if platform.system() == 'Darwin' else ''
-
 from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.0.4"
+    version = "5.1.0"
 
 setting = dict(
     {
@@ -114,6 +91,7 @@ setting = dict(
             'wedriverVersionPattern'    : r'([0-9.]*\.[0-9]+)',
             'driversPath'               : base_dir + 'test' + os.path.sep + 'drivers' + os.path.sep,
             'DriversFileFormat'         : ".exe" if platform.system() == 'Windows' else '',
+            'OSBitness'                 : os_bit,
         },
         "ChromeDriver":
         {
@@ -156,29 +134,24 @@ setting = dict(
         {
             "Path"                      : chrome_browser_path,
             "LinkAllLatestRelease"      : 'https://chromereleases.googleblog.com/search/label/Stable%20updates',
-            'ChromeBrowserUpdater'      : chrome_browser_updater,
-            'ChromeBrowserUpdaterPath'  : chrome_browser_updater_path,
+            "LinkAllLatestReleaseFile"  : 'https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg',
         },
         "FirefoxBrowser":
         {
             "Path"                          : firefox_browser_path,
             "LinkAllLatestReleases"         : 'https://www.mozilla.org/en-US/firefox/releases/',
-            'FirefoxBrowserUpdater'         : firefox_browser_updater,
-            'FirefoxBrowserUpdaterPath'     : firefox_browser_updater_path,
+            "LinkAllLatestRelease"          : 'https://download-installer.cdn.mozilla.net/pub/firefox/releases/{}/{}/{}/Firefox {}.{}',
         },
         "EdgeBrowser":
         {
             "Path"                          : edge_browser_path,
             "LinkAllLatestRelease"          : 'https://docs.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel',
-            'EdgeBrowserUpdater'            : edge_browser_updater,
-            'EdgeBrowserUpdaterPath'        : edge_browser_updater_path,
+            "LinkAllLatestReleaseFile"      : edge_browser_release,
         },
         "OperaBrowser":
         {
             "Path"                          : opera_browser_path,
             "LinkAllLatestRelease"          : 'https://get.geo.opera.com/pub/opera/desktop/',
-            "OperaBrowserUpdater"           : opera_browser_updater,
-            'OperaBrowserUpdaterPath'       : opera_browser_updater_path,
         },
         "JsonSchema":
         {

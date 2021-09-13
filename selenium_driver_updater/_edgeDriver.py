@@ -109,7 +109,7 @@ class EdgeDriver(DriverBase):
 
         latest_version = super()._get_latest_version_driver()
 
-        latest_version_main = int(latest_version.split('.')[0])
+        latest_version_main = int(latest_version.split('.', maxsplit=1)[0])
         latest_previous_version_main = str(latest_version_main-1)
 
         url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_previous_version_main)
