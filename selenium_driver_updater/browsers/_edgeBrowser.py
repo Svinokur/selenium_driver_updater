@@ -163,7 +163,7 @@ class EdgeBrowser():
 
             logger.info(f'Trying to expand package: {package_path}')
             os.system(f'pkgutil --expand {package_path} {package_expanded_path}')
-            logger.info(f'Successfully expanded package at path: {package_expanded_path}')
+            logger.info(f'Successfully unpacked package at path: {package_expanded_path}')
 
             package_expanded_payload_path = package_expanded_path + 'expanded_payload'
 

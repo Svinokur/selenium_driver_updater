@@ -209,7 +209,7 @@ class OperaBrowser():
             logger.info('Trying to kill all opera processes')
             subprocess.Popen('killall Opera', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.Popen('killall Opera', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            logger.info('Successfully killed all opera.exe processes')
+            logger.info('Successfully killed all opera processes')
 
             self.extractor.extract_all_tar_xz_archive(archive_path=archive_path, delete_archive=True, out_path=path)
 

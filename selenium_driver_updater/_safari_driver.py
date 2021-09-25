@@ -72,7 +72,10 @@ class SafariDriver(DriverBase):
 
         for release in soup.findAll('td'):
             if 'safari' in release.text.lower():
-                latest_version = re.findall(self.setting["Program"]["wedriverVersionPattern"], str(release.text))[0]
+                latest_version = release.text.lower().split('safari ')[1]
+
+                if not '.' in latest_version:
+                    latest_version = str(float(latest_version))
                 break
 
         if not latest_version:
