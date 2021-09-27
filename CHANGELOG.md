@@ -3,6 +3,7 @@ This version was written and tested on Python 3.9.6
 
 ### Fixes
 
+- Fixed an issue with incorrect getting of latest version of edge browser (returned old method of getting version)
 - Fixed an issue with incorrect getting of latest version of safaridriver
 
 ## [5.1.0] - 27/08/2021

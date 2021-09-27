@@ -284,8 +284,12 @@ class ChromeBrowser():
 
                 chrome_browser_path_application = '/Applications/Google Chrome.app'
 
-                if Path(chrome_browser_path_application).exists():
-                    shutil.rmtree(chrome_browser_path_application)
+                try:
+                    if Path(chrome_browser_path_application).exists():
+                        shutil.rmtree(chrome_browser_path_application)
+                except PermissionError:
+                    logger.error(f'Cannot delete chromebrowser at path: {chrome_browser_path_application} abort operation')
+                    return
 
                 logger.info(f'Trying to move chrome browser from: {chrome_browser_path} to: {chrome_browser_path_application}')
 
