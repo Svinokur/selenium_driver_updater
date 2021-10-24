@@ -47,7 +47,7 @@ class GithubViewer():
                 message = 'Github API rate limit exceeded for your IP, trying to get needed data via site.'
                 logger.warning(message)
 
-                version = GithubViewer.get_release_version_by_repo_name_via_site(repo_name=repo_name)
+                version = GithubViewer.get_release_version_by_repo_name_via_site(repo_name=repo_name, index=index)
 
             else:
                 raise StatusCodeNotEqualException from error

@@ -1,3 +1,10 @@
+## [5.1.2] - 24/10/2021
+This version was written and tested on Python 3.9.6
+
+### Fixes
+
+- Fixed an issue where the previous latest version was incorrectly received through the github site
+
 ## [5.1.1] - 25/09/2021
 This version was written and tested on Python 3.9.6
 
