@@ -6,6 +6,7 @@ from pathlib import Path
 
 # Third party imports
 import wget
+import re
 
 # Local imports
 
@@ -112,11 +113,10 @@ class EdgeDriver(DriverBase):
         latest_version_main = int(latest_version.split('.', maxsplit=1)[0])
         latest_previous_version_main = str(latest_version_main-1)
 
-        url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_previous_version_main)
-
+        url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"]
         json_data = self.requests_getter.get_result_by_request(url=url)
 
-        latest_previous_version = str(json_data.strip())
+        latest_previous_version = [version for version in re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data) if version.startswith(latest_previous_version_main)][-1]
 
         logger.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 

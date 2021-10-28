@@ -96,13 +96,25 @@ class GithubViewer():
             json_data         : All latest release data.
         """
 
-        url: str = f'https://github.com/{repo_name}/releases'
+        url: str = str(setting["Github"]["linkAllReleases"]).format(repo_name)
         version:str = ''
 
         json_data = RequestsGetter.get_result_by_request(url=url)
 
         soup = BeautifulSoup(json_data, 'html.parser')
-        version = soup.findAll('a', href=lambda href: href and 'releases/tag' in href)[index].text.strip()
+        try:
+            version = soup.findAll('a', href=lambda href: href and 'releases/tag' in href)[index].text.strip()
+        except IndexError:
+            logger.error('Could not retrieve version via releases, trying to retrieve version via tags')
+            url: str = 'https://github.com/{}/tags'.format(repo_name)
+
+            json_data = RequestsGetter.get_result_by_request(url=url)
+
+            soup = BeautifulSoup(json_data, 'html.parser')
+
+            version_tag = soup.findAll('a', href=lambda href: href and 'releases/tag' in href)[index].text.strip()
+
+            version = re.findall(setting["Program"]["wedriverVersionPattern"], str(version_tag))[0]
 
         return version
 

@@ -4,6 +4,9 @@ This version was written and tested on Python 3.9.6
 ### Fixes
 
 - Fixed an issue where the previous latest version was incorrectly received through the github site
+- Fixed an issue with incorrect getting of phantomjs versions via github releases
+- Fixed an issue if browser is not pre installed and could not be updated
+- Fixed an issue with incorrect getting of latest previous version of edgedriver
 
 ## [5.1.1] - 25/09/2021
 This version was written and tested on Python 3.9.6

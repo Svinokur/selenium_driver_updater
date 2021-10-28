@@ -178,7 +178,8 @@ class EdgeBrowser():
 
             edge_browser_path_application = '/Applications/Microsoft Edge.app'
 
-            shutil.rmtree(edge_browser_path_application)
+            if Path(edge_browser_path_application).exists():
+                shutil.rmtree(edge_browser_path_application)
             shutil.move(edge_browser_path, edge_browser_path_application)
 
             logger.info(f'Successfully moved edge browser from: {edge_browser_path} to: {edge_browser_path_application}')

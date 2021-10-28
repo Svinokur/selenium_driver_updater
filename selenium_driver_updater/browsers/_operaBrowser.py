@@ -216,7 +216,8 @@ class OperaBrowser():
             opera_browser_path = path + 'Opera.app'
             opera_browser_path_application = '/Applications/Opera.app'
 
-            shutil.rmtree(opera_browser_path_application)
+            if Path(opera_browser_path_application).exists():
+                shutil.rmtree(opera_browser_path_application)
             shutil.move(opera_browser_path, opera_browser_path_application)
 
             logger.info(f'Successfully moved opera browser from: {opera_browser_path} to: {opera_browser_path_application}')
