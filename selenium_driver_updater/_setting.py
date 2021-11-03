@@ -81,7 +81,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.1.2"
+    version = "5.1.3"
 
 setting = dict(
     {
@@ -113,7 +113,7 @@ setting = dict(
         },
         "EdgeDriver":
         {
-            "LinkLastRelease"                   : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_UNKNOWN',
+            "LinkLastRelease"                   : 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_STABLE',
             "LinkLastReleaseFile"               : edgedriver_latest_release,
             "LastReleasePlatform"               : 'msedgedriver',
             "LinkCheckVersionIsValid"           : "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000",

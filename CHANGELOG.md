@@ -1,3 +1,9 @@
+## [5.1.3] - 03/11/2021
+This version was written and tested on Python 3.9.6
+
+#### Fixes
+
+- Fixed an issue with incorrect getting of latest version of edgedriver (#1)
 ## [5.1.2] - 24/10/2021
 This version was written and tested on Python 3.9.6
 
