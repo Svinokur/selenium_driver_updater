@@ -207,7 +207,15 @@ class ChromeDriver(DriverBase):
             logger.info(f'Started downloading chromedriver for specific system: {self.system_name}')
 
         if any([version, self.system_name ,latest_previous_version]):
-            super()._check_if_version_is_valid(url=url)
+            if 'mac64_m1' in url:
+                try:
+                    super()._check_if_version_is_valid(url=url)
+                except:
+                    logger.warning('Could not find binary with mac64_m1 name, trying to check version using different name')
+                    url = url.replace('mac64_m1', 'mac_arm64')
+                    super()._check_if_version_is_valid(url=url)
+            else:
+                super()._check_if_version_is_valid(url=url)
 
         archive_name = url.split("/")[-1]
         out_path = self.path + archive_name
@@ -216,12 +224,16 @@ class ChromeDriver(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download chromedriver by url: {url}')
+        if 'mac64_m1' in url:
+            try:
+                archive_path = self._wget_download_driver(url, out_path)
+            except:
+                logger.warning('Could not find binary with mac64_m1 name, trying to download using different name')
+                url_new = url.replace('mac64_m1', 'mac_arm64')
 
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=out_path)
+                archive_path = self._wget_download_driver(url_new, out_path)
         else:
-            archive_path = wget.download(url=url, out=out_path, bar=None)
-
+            archive_path = self._wget_download_driver(url, out_path)
         time.sleep(2)
 
         logger.info(f'Chromedriver was downloaded to path: {archive_path}')
@@ -253,3 +265,10 @@ class ChromeDriver(DriverBase):
             super()._chmod_driver()
 
         return driver_path
+
+    def _wget_download_driver(self, url, path):
+        if self.info_messages:
+            archive_path = wget.download(url=url, out=path)
+        else:
+            archive_path = wget.download(url=url, out=path, bar=None)
+        return archive_path

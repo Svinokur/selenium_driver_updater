@@ -1,9 +1,17 @@
+## [5.1.4] - 08/11/2022
+This version was written and tested on Python 3.10.8
+This version fully supports Python 3.10!
+#### Fixes
+
+- Fixed an issue with incorrect downloading of Mac M1 binaries of chromedriver
+
 ## [5.1.3] - 03/11/2021
 This version was written and tested on Python 3.9.6
 
 #### Fixes
 
 - Fixed an issue with incorrect getting of latest version of edgedriver (#1)
+
 ## [5.1.2] - 24/10/2021
 This version was written and tested on Python 3.9.6
 
