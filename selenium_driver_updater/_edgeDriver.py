@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Third party imports
 import wget
-import re
+import xmltodict
 
 # Local imports
 
@@ -115,9 +115,12 @@ class EdgeDriver(DriverBase):
 
         url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"]
         json_data = self.requests_getter.get_result_by_request(url=url)
+        data = xmltodict.parse(json_data)
+        versions = data.get('EnumerationResults').get('Blobs').get('Blob')
+        latest_previous_versions = [version for version in versions if version.get('Name').startswith(latest_previous_version_main)]
+        previous_versions_suitable = [version for version in latest_previous_versions if version.get('Name').split('/')[-1] == self.setting['EdgeDriver']['LinkLastReleaseFile'].split('/')[-1]]
 
-        latest_previous_version = [version for version in re.findall(self.setting["Program"]["wedriverVersionPattern"], json_data) if version.startswith(latest_previous_version_main)][-1]
-
+        latest_previous_version = previous_versions_suitable[-1].get('Name').split('/')[0]
         logger.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 
         return latest_previous_version
@@ -173,7 +176,15 @@ class EdgeDriver(DriverBase):
             logger.info(f'Started downloading edgedriver for specific system: {self.system_name}')
 
         if any([version, self.system_name ,latest_previous_version]):
-            super()._check_if_version_is_valid(url=url)
+            if 'mac64_m1' in url:
+                try:
+                    super()._check_if_version_is_valid(url=url)
+                except:
+                    logger.warning('Could not find binary with mac64_m1 name, trying to download standart mac binary')
+                    url = url.replace('mac64_m1', 'mac64')
+                    super()._check_if_version_is_valid(url=url)
+            else:
+                super()._check_if_version_is_valid(url=url)
 
         archive_name = url.split("/")[-1]
         out_path = self.path + archive_name

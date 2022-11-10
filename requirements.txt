@@ -3,3 +3,4 @@ wget
 requests
 jsonschema
 beautifulsoup4
+xmltodict

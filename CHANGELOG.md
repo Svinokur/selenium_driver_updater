@@ -1,3 +1,15 @@
+## [5.1.5] - 09/11/2022
+This version was written and tested on Python 3.10.8
+
+#### Added
+
+- Added checking for Mac M1 binary if specific version of edgedriver specified
+- Added checking for suitable version if latest previous version parameter is on
+
+#### Fixes
+
+- Fixed an issue that caused Mac M1 users to install the default Mac EdgeDriver even though the Mac M1 binary was available.
+
 ## [5.1.4] - 08/11/2022
 This version was written and tested on Python 3.10.8
 This version fully supports Python 3.10!

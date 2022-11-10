@@ -205,7 +205,14 @@ class testEdgeDriver(unittest.TestCase):
     def test16_check_if_version_is_valid(self):
         url = str(self.setting["EdgeDriver"]["LinkLastReleaseFile"]).format(self.specific_version)
 
-        self.edgedriver._check_if_version_is_valid(url=url)
+        if 'mac64_m1' in url:
+                try:
+                    self.edgedriver._check_if_version_is_valid(url=url)
+                except:
+                    url = url.replace('mac64_m1', 'mac64')
+                    self.edgedriver._check_if_version_is_valid(url=url)
+        else:
+            self.edgedriver._check_if_version_is_valid(url=url)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, failfast=True, exit=False)
