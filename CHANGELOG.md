@@ -1,3 +1,10 @@
+## [5.1.6] - 14/11/2022
+This version was written and tested on Python 3.10.8
+
+#### Fixes
+
+- Minor fixes
+
 ## [5.1.5] - 09/11/2022
 This version was written and tested on Python 3.10.8
 

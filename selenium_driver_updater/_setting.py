@@ -82,7 +82,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "5.1.5"
+    version = "5.1.6"
 
 setting = dict(
     {
