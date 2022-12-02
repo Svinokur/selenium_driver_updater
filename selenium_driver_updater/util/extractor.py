@@ -51,7 +51,7 @@ class Extractor():
         """
 
         with tarfile.open(archive_path, "r:gz") as tar_ref:
-            tar_ref.extractall(out_path)
+            Extractor._safe_extract(tar_ref, out_path)
 
         if Path(archive_path).exists() and delete_archive:
             Path(archive_path).unlink()
@@ -123,7 +123,7 @@ class Extractor():
         """
 
         with tarfile.open(archive_path, "r:bz2") as tar_ref:
-            tar_ref.extractall(out_path)
+            Extractor._safe_extract(tar_ref, out_path)
 
         if Path(archive_path).exists() and delete_archive:
             Path(archive_path).unlink()
@@ -141,7 +141,7 @@ class Extractor():
         """
 
         with tarfile.open(archive_path, "r:xz") as tar_ref:
-            tar_ref.extractall(out_path)
+            Extractor._safe_extract(tar_ref, out_path)
 
         if Path(archive_path).exists() and delete_archive:
             Path(archive_path).unlink()
@@ -179,4 +179,44 @@ class Extractor():
         else:
             message = f'Unknown archive format was specified archive_path: {archive_path}'
             raise UnknownArchiveFormatException(message)
+
+    @staticmethod
+    def _is_within_directory(directory, target):
+        """Function that checks that target directory is equal to prefix directory 
+
+        Args:
+            directory (str) : Target directory.
+            target (str)    : Target directory with filename.
+
+        Returns:
+            If target directory is equal to prefix directory.
+
+        """
+                
+        abs_directory = os.path.abspath(directory)
+        abs_target = os.path.abspath(target)
+    
+        prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+        return prefix == abs_directory
+
+    @staticmethod      
+    def _safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        """Function that safely extract files to directory
+
+        Args:
+            tar (tarfile.Tarfile)   : Target archive.
+            path (str)              : Target directory.
+            members                 : Files that lies in archive.
+            numeric_owner           : If numeric_owner is True, the uid and gid numbers from the tarfile are used to set the owner/group for the extracted files. 
+                                      Otherwise, the named values from the tarfile are used.
+
+        """
+    
+        for member in tar.getmembers():
+            member_path = os.path.join(path, member.name)
+            if not Extractor._is_within_directory(path, member_path):
+                raise Exception("Attempted Path Traversal in Tar File")
+    
+        tar.extractall(path, members, numeric_owner=numeric_owner) 
         

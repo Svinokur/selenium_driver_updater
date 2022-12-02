@@ -1,3 +1,14 @@
+## [5.1.7] - 02/12/2022
+This version was written and tested on Python 3.10.8
+
+#### Fixes
+
+- Fixed CVE-2007-4559 patch (thanks to TrellixVulnTeam)
+
+#### Other
+
+- Added requirement for selenium to be lower than or equal to version 4.2.0
+
 ## [5.1.6] - 14/11/2022
 This version was written and tested on Python 3.10.8
 
