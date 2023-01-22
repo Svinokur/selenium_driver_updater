@@ -6,7 +6,6 @@ from pathlib import Path
 
 # Third party imports
 import wget
-import xmltodict
 
 # Local imports
 
@@ -113,14 +112,16 @@ class EdgeDriver(DriverBase):
         latest_version_main = int(latest_version.split('.', maxsplit=1)[0])
         latest_previous_version_main = str(latest_version_main-1)
 
-        url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"]
-        json_data = self.requests_getter.get_result_by_request(url=url)
-        data = xmltodict.parse(json_data)
-        versions = data.get('EnumerationResults').get('Blobs').get('Blob')
-        latest_previous_versions = [version for version in versions if version.get('Name').startswith(latest_previous_version_main)]
-        previous_versions_suitable = [version for version in latest_previous_versions if version.get('Name').split('/')[-1] == self.setting['EdgeDriver']['LinkLastReleaseFile'].split('/')[-1]]
+        if 'arm64' in self.setting["EdgeDriver"]["LinkLastReleaseFile"] or 'win' in  self.setting["EdgeDriver"]["LinkLastReleaseFile"]:
+            platform_url = 'WINDOWS'
+        elif 'mac64' in self.setting["EdgeDriver"]["LinkLastReleaseFile"]:
+            platform_url = 'MACOS'
+        else:
+            platform_url = 'LINUX'
 
-        latest_previous_version = previous_versions_suitable[-1].get('Name').split('/')[0]
+        url = self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"].format(latest_previous_version_main, platform_url)
+        json_data = self.requests_getter.get_result_by_request(url=url)
+        latest_previous_version = json_data.strip()
         logger.info(f'Latest previous version of edgedriver: {latest_previous_version}')
 
         return latest_previous_version

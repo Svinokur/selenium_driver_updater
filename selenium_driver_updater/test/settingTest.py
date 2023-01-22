@@ -19,7 +19,7 @@ latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
 
 chromedriver_latest_release =   "chromedriver_win32.zip" if platform.system() == 'Windows' else\
                                 "chromedriver_linux64.zip" if platform.system() == "Linux" else\
-                                "chromedriver_mac64_m1.zip" if 'arm' in str(os.uname().machine)\
+                                "chromedriver_mac_arm64.zip" if 'arm' in str(os.uname().machine)\
                                 and platform.system() == 'Darwin' else\
                                 "chromedriver_mac64.zip"
 chromedriver_latest_release = latest_release + chromedriver_latest_release
@@ -157,7 +157,7 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["EdgeDriver"]["LinkLastReleaseFile"], edgedriver_latest_release)
         self.assertEqual(self.setting["EdgeDriver"]["LastReleasePlatform"], 'msedgedriver')
         self.assertEqual(self.setting["EdgeDriver"]["LinkCheckVersionIsValid"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?prefix={}%2F&delimiter=%2F&maxresults=100&restype=container&comp=list&_=1622714933676&timeout=60000")
-        self.assertEqual(self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"], "https://msedgedriver.azureedge.net")
+        self.assertEqual(self.setting["EdgeDriver"]["LinkLatestReleaseSpecificVersion"], "https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/LATEST_RELEASE_{}_{}")
 
         self.assertEqual(self.setting["PhantomJS"]["LinkLastReleaseFile"], phantomjs_latest_release)
         self.assertEqual(self.setting["PhantomJS"]["LastReleasePlatform"], 'phantomjs')

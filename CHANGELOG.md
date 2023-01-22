@@ -1,3 +1,20 @@
+## [5.1.8] - 22/01/2023
+This version was written and tested on Python 3.11.1
+This version fully supports Python 3.11!
+
+#### Improvements
+
+- Improved detecting M1 binary of chromedriver without additional checks
+- Improved some unit-tests
+
+#### Fixes
+
+- Fixed an issue with incorrect getting of latest previous version of edgedriver
+
+#### Other
+
+- Removed requirement for selenium to be lower than or equal to version 4.2.0
+
 ## [5.1.7] - 02/12/2022
 This version was written and tested on Python 3.10.8
 

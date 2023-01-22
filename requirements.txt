@@ -1,6 +1,5 @@
-selenium<=4.2.0
+selenium
 wget
 requests
 jsonschema
 beautifulsoup4
-xmltodict
