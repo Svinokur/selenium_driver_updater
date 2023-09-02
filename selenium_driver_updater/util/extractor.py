@@ -29,8 +29,30 @@ class Extractor():
 
         """
 
+        member_extract = ''
+
         with zipfile.ZipFile(archive_path, 'r') as zip_ref:
-            zip_ref.extractall(out_path)
+            for member in zip_ref.namelist():
+                # Check if the member is a file and its name matches any of the driver names
+                member_name = member.split('/')[-1]
+                if ('driver' in member_name or 'phantomjs' in member_name) and not 'license' in member_name.lower():
+                    member_extract = member
+                    # Extract the member to the destination directory
+                    zip_ref.extract(member_extract, out_path)
+                    # Get the full extracted path and the desired new path
+                    extracted_path = os.path.join(out_path, member_extract)
+                    new_path = os.path.join(out_path, os.path.basename(member_extract))
+                    # Move the file to the desired location
+                    shutil.move(extracted_path, new_path)
+                    break
+
+        if not member_extract:
+            message = 'Cannot find any drivers inside archive, maybe the name of driver was changed'
+            raise FileNotFoundError(message)
+
+        # Delete the specific folder created during extraction
+        if '/' in member_extract:
+            shutil.rmtree(os.path.join(out_path, os.path.splitext(os.path.basename(archive_path))[0]))
 
         if Path(archive_path).exists() and delete_archive:
             Path(archive_path).unlink()
@@ -73,7 +95,7 @@ class Extractor():
         """
 
         driver_folder_path = out_path + 'tmp'
-        message = ('Created new safety directory for replacing'
+        message = ('Created new safety directory for replacing '
                     f'filename: {filename} filename_replace: {filename_replace}')
         logger.info(message)
 

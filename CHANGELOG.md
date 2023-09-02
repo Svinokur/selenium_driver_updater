@@ -1,3 +1,25 @@
+## [6.0.0] - 02/09/2023
+This version was written and tested on Python 3.11.1
+
+#### Complete overhaul of chromedriver
+- Added updated method to download chromedriver
+- Added support for Windows 64 bit chromedriver
+
+#### Added
+- Added support for Windows ARM, Linux ARM Geckodriver
+- Added proper comparison of versions
+- Added universal extraction of only drivers (before it was extracting all elements in archive)
+- Added support of multiple drivers in console updater - you need to separate drivers with comma, like this: chromedriver,geckodriver
+- Added support for one filename if multiple drivers are given
+
+#### Improved
+- Improved console line updater help function and added more additional information to become more understandable to user
+- Improved WGET bar to be more understandable, now file size is measuring in MB's
+- Overall code improvements
+
+#### Removed
+- Removed parameter "old_return"
+
 ## [5.1.8] - 22/01/2023
 This version was written and tested on Python 3.11.1
 This version fully supports Python 3.11!

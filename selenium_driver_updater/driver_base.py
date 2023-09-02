@@ -5,6 +5,7 @@ import os
 import stat
 import subprocess
 import re
+import wget
 
 #Local imports
 from selenium_driver_updater._setting import setting
@@ -226,12 +227,27 @@ class DriverBase():
         find_string = re.findall(self.setting["Program"]["wedriverVersionPattern"], url)
         driver_version = find_string[0] if len(find_string) > 0 else ''
 
-        url_test_valid = self.setting[self.driver_name_setting]["LinkCheckVersionIsValid"].format(driver_version)
-        version_valid : str = f"{driver_version}/{archive_name}"
+        if 'chromedriver' in archive_name:
+            url_test_valid = self.setting[self.driver_name_setting]["LinkCheckVersionIsValid"]
+            archive_platform = archive_name.split('-', maxsplit=1)[1].split('.')[0]
+
+            version_valid : str = f"{driver_version}/{archive_platform}/{archive_name}"
+        else:
+            url_test_valid = self.setting[self.driver_name_setting]["LinkCheckVersionIsValid"].format(driver_version)
+            version_valid : str = f"{driver_version}/{archive_name}"
 
         json_data = self.requests_getter.get_result_by_request(url=url_test_valid)
 
-        if not version_valid in json_data:
+        if not version_valid in json_data or not driver_version:
             message = ('Wrong version or system_name was specified.'
                         f'version_valid: {version_valid} driver_version: {driver_version} url: {url}')
             raise DriverVersionInvalidException(message)
+        
+    def _custom_bar(self, current, total, width=80):
+        return wget.bar_adaptive(round(current/1024/1024, 2), round(total/1024/1024, 2), width) + ' MB' + " "
+    
+    def _wget_download_driver(self, url, path):
+        bar = self._custom_bar if self.info_messages else None
+
+        archive_path = wget.download(url=url, out=path, bar=bar)
+        return archive_path

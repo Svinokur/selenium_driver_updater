@@ -15,19 +15,21 @@ base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
 
 os_bit = platform.architecture()[0][:-3]
 
-latest_release = 'https://chromedriver.storage.googleapis.com/{}/'
+latest_release = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/{}/"
 
-chromedriver_latest_release =   "chromedriver_win32.zip" if platform.system() == 'Windows' else\
-                                "chromedriver_linux64.zip" if platform.system() == "Linux" else\
-                                "chromedriver_mac_arm64.zip" if 'arm' in str(os.uname().machine)\
+chromedriver_latest_release =   f"win{os_bit}/" + f"chromedriver-win{os_bit}.zip" if platform.system() == 'Windows' else\
+                                "linux64/" + "chromedriver-linux64.zip" if platform.system() == "Linux" else\
+                                "mac-arm64/" + "chromedriver-mac-arm64.zip" if 'arm' in str(os.uname().machine)\
                                 and platform.system() == 'Darwin' else\
-                                "chromedriver_mac64.zip"
+                                "mac-x64/" + "chromedriver-mac-x64.zip"
 chromedriver_latest_release = latest_release + chromedriver_latest_release
 
 
 latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
-geckodriver_platform_release =  "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" else\
+geckodriver_platform_release =  "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' and not 'arm' in platform.processor().lower() else\
+                                "geckodriver-v{}-" + "win-aarch64.zip" if platform.system() == 'Windows' and 'arm' in platform.processor().lower() else\
+                                "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" and not 'arm' in platform.processor().lower() else\
+                                "geckodriver-v{}-" + f"linux-aarch64.tar.gz" if platform.system() == "Linux" and 'arm' in platform.processor().lower() else\
                                 "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine)\
                                 and platform.system() == 'Darwin' else\
                                 "geckodriver-v{}-macos.tar.gz"
@@ -141,11 +143,11 @@ class testSetting(unittest.TestCase):
         self.assertEqual(self.setting["Program"]["DriversFileFormat"], ".exe" if platform.system() == 'Windows' else '')
         self.assertEqual(self.setting["Program"]["OSBitness"], os_bit)
 
-        self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+        self.assertEqual(self.setting["ChromeDriver"]["LinkLastRelease"], "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json")
         self.assertEqual(self.setting["ChromeDriver"]["LinkLastReleaseFile"], chromedriver_latest_release)
         self.assertEqual(self.setting["ChromeDriver"]["LastReleasePlatform"], 'chromedriver')
-        self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{}")
-        self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix={}/")
+        self.assertEqual(self.setting["ChromeDriver"]["LinkLatestReleaseSpecificVersion"], "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_{}")
+        self.assertEqual(self.setting["ChromeDriver"]["LinkCheckVersionIsValid"], "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json")
 
         self.assertEqual(self.setting["GeckoDriver"]["LinkLastReleasePlatform"], geckodriver_platform_release)
         self.assertEqual(self.setting["GeckoDriver"]["LastReleasePlatform"], 'geckodriver')

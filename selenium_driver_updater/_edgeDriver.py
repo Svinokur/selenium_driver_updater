@@ -1,11 +1,9 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
-import shutil
 import time
 from pathlib import Path
+from packaging import version
 
-# Third party imports
-import wget
 
 # Local imports
 
@@ -109,7 +107,7 @@ class EdgeDriver(DriverBase):
 
         latest_version = super()._get_latest_version_driver()
 
-        latest_version_main = int(latest_version.split('.', maxsplit=1)[0])
+        latest_version_main = version.parse(latest_version).major
         latest_previous_version_main = str(latest_version_main-1)
 
         if 'arm64' in self.setting["EdgeDriver"]["LinkLastReleaseFile"] or 'win' in  self.setting["EdgeDriver"]["LinkLastReleaseFile"]:
@@ -141,7 +139,6 @@ class EdgeDriver(DriverBase):
         """
 
         url : str = ''
-        driver_notes_path : str = self.path + 'Driver_Notes'
         latest_previous_version : str = ''
         latest_version : str = ''
 
@@ -194,11 +191,7 @@ class EdgeDriver(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download edgedriver by url: {url}')
-
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=out_path)
-        else:
-            archive_path = wget.download(url=url, out=out_path, bar=None)
+        archive_path = super()._wget_download_driver(url, out_path)
         time.sleep(2)
 
         logger.info(f'Edgedriver was downloaded to path: {archive_path}')
@@ -221,9 +214,6 @@ class EdgeDriver(DriverBase):
 
         if Path(archive_path).exists():
             Path(archive_path).unlink()
-
-        if Path(driver_notes_path).exists():
-            shutil.rmtree(driver_notes_path)
 
         driver_path = self.edgedriver_path
 

@@ -4,9 +4,6 @@ import time
 import re
 from pathlib import Path
 
-# Third party imports
-import wget
-
 # Local imports
 
 from selenium_driver_updater.util.logger import logger
@@ -209,11 +206,7 @@ class GeckoDriver(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download geckodriver by url: {url}')
-
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=out_path)
-        else:
-            archive_path = wget.download(url=url, out=out_path, bar=None)
+        archive_path = super()._wget_download_driver(url, out_path)
         time.sleep(2)
 
         logger.info(f'Geckodriver was downloaded to path: {archive_path}')

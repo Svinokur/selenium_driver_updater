@@ -7,9 +7,6 @@ from shutil import copyfile
 from pathlib import Path
 import re
 
-# Third party imports
-import wget
-
 # Local imports
 from selenium_driver_updater.util.logger import logger
 
@@ -233,38 +230,31 @@ class OperaDriver(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download operadriver by url: {url}')
-
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=out_path)
-        else:
-            archive_path = wget.download(url=url, out=out_path, bar=None)
-
+        archive_path = super()._wget_download_driver(url, out_path)
+        time.sleep(2)
+        
         logger.info(f'Operadriver was downloaded to path: {archive_path}')
 
-        time.sleep(2)
-
         out_path = self.path
-        self.extractor.extract_and_detect_archive_format(archive_path=archive_path, out_path=out_path)
 
-        platform : str = self.setting['OperaDriver']['LastReleasePlatform']
-
-        archive_folder_path = self.path + Path(archive_path).stem + os.path.sep
-        archive_operadriver_path = archive_folder_path + platform
+        parameters = dict(archive_path=archive_path, out_path=out_path)
 
         if not self.filename:
 
-            copyfile(archive_operadriver_path, self.path + platform)
+            self.extractor.extract_and_detect_archive_format(**parameters)
 
         else:
 
-            self.__rename_driver(archive_folder_path=archive_folder_path,
-                                                    archive_operadriver_path=archive_operadriver_path)
+            filename = str(self.setting['OperaDriver']['LastReleasePlatform'])
+            parameters.update(dict(filename=filename, filename_replace=self.filename))
+
+            self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
 
         if Path(archive_path).exists():
-            Path(archive_path).unlink()
+            shutil.rmtree(archive_path)
 
-        if Path(archive_folder_path).exists():
-            shutil.rmtree(archive_folder_path)
+        if Path(archive_path).exists():
+            shutil.rmtree(archive_path)
 
         driver_path = self.operadriver_path
 

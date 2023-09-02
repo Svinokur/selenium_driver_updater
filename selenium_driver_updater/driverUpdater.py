@@ -7,6 +7,7 @@ from typing import Any
 import time
 import sys
 import traceback
+from packaging import version
 
 # Local imports
 
@@ -79,8 +80,6 @@ class DriverUpdater():
             enable_library_update_check (bool)  : If true, it will enable checking for library update while starting. Defaults to True.
             system_name (Union[str, list[str]]) : Specific OS for driver. Defaults to empty string.
 
-            old_return (bool) : If true, it will return additional variables "result" and "message" in returning Tuple.
-
         Returns:
             str
 
@@ -89,9 +88,7 @@ class DriverUpdater():
         """
 
         #Initialize all variables
-        result_run:bool = True
         message_run:str = ''
-        old_return = bool(kwargs.get('old_return', False))
 
         driver_path = ''
 
@@ -162,13 +159,9 @@ class DriverUpdater():
                     driver_path = list_of_paths
 
         except Exception:
-            result_run:bool = False
 
             message_run = f'error: {str(traceback.format_exc())}'
             logger.error(message_run)
-
-        if old_return:
-            return result_run, message_run, driver_path
 
         return driver_path
 
@@ -190,6 +183,9 @@ class DriverUpdater():
         if isinstance(_info.driver_name,(list, str)):
 
             if _info.filename:
+
+                if isinstance(_info.driver_name,list) and isinstance(_info.filename, str):
+                    _info.filename = [_info.filename]
 
                 DriverUpdater.__check_parameter_type_is_valid(_info.filename, type(_info.driver_name), 'filename')
 
@@ -233,16 +229,13 @@ class DriverUpdater():
             current_version = str(setting["Program"]["version"])
             latest_version = json_data.get('info').get('version')
 
-            current_version_tuple = tuple(map(int, (current_version.split("."))))
-            latest_version_tuple = tuple(map(int, (latest_version.split("."))))
-
-            if latest_version_tuple > current_version_tuple:
+            if version.parse(latest_version) > version.parse(current_version):
                 message = ('Your selenium-driver-updater library is out of date,'
                         'please update it via "pip install selenium-driver-updater --upgrade" '
                         f'current_version: {current_version} latest_version: {latest_version} ')
                 logger.warning(message)
 
-            elif latest_version_tuple == current_version_tuple:
+            elif version.parse(latest_version) == version.parse(current_version):
                 message = 'Your selenium-driver-updater library is up to date.'
                 logger.info(message)
 

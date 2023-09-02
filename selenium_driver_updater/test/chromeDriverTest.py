@@ -61,7 +61,7 @@ class testChromeDriver(unittest.TestCase):
 
         self.start_time : float = time.time()
 
-        self.specific_version : str = '109.0.5414.74'
+        self.specific_version : str = '115.0.5763.0'
         self.specific_version_failure : str = 'blablablanotversion'
 
         self.chromedriver_name : str = "chromedriver_test.exe" if platform.system() == 'Windows' else\

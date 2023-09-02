@@ -7,7 +7,6 @@ from typing import Tuple
 from pathlib import Path
 import re
 from shutil import copyfile
-import wget
 
 # Local imports
 from selenium_driver_updater.util.logger import logger
@@ -302,11 +301,7 @@ class PhantomJS(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download phantomjs by url: {url}')
-
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=out_path)
-        else:
-            archive_path = wget.download(url=url, out=out_path, bar=None)
+        archive_path = super()._wget_download_driver(url, out_path)
         time.sleep(2)
 
         logger.info(f'PhantomJS was downloaded to path: {archive_path}')
@@ -315,25 +310,19 @@ class PhantomJS(DriverBase):
 
         parameters = dict(archive_path=archive_path, out_path=out_path)
 
-        self.extractor.extract_and_detect_archive_format(**parameters)
-
-        platform : str = self.setting["PhantomJS"]["LastReleasePlatform"]
-
-        archive_path_folder = self.path + url.split("/")[-1].replace('.zip', '').replace(".tar.bz2", '') + os.path.sep
-        archive_path_folder_bin = archive_path_folder + 'bin' +  os.path.sep
-        driver_archive_path = archive_path_folder_bin + platform
-
         if not self.filename:
 
-            copyfile(driver_archive_path, self.path + platform)
+            self.extractor.extract_and_detect_archive_format(**parameters)
 
         else:
 
-            parameters = dict(archive_folder_path=archive_path_folder_bin, archive_driver_path=driver_archive_path)
-            self.__rename_driver(**parameters)
+            filename = str(self.setting['PhantomJS']['LastReleasePlatform'])
+            parameters.update(dict(filename=filename, filename_replace=self.filename))
 
-        if Path(archive_path_folder).exists():
-            shutil.rmtree(archive_path_folder)
+            self.extractor.extract_all_zip_archive_with_specific_name(**parameters)
+
+        if Path(archive_path).exists():
+            shutil.rmtree(archive_path)
 
         driver_path = self.phantomjs_path
 

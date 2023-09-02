@@ -3,15 +3,15 @@
 import time
 from pathlib import Path
 from typing import Tuple
-
-# Third party imports
-import wget
+from packaging import version
 
 # Local imports
 from selenium_driver_updater.browsers._chromeBrowser import ChromeBrowser
 
 from selenium_driver_updater.util.logger import logger
 from selenium_driver_updater.driver_base import DriverBase
+
+from selenium_driver_updater.util.exceptions import DriverVersionInvalidException
 
 class ChromeDriver(DriverBase):
     """Class for working with Selenium chromedriver binary"""
@@ -26,7 +26,9 @@ class ChromeDriver(DriverBase):
 
         #assign of specific os
         specific_system = str(kwargs.get('system_name', ''))
-        specific_system = specific_system.replace('win64', 'win32')
+        specific_system = specific_system.replace('linux32', 'linux64')
+        specific_system = specific_system.replace('mac64_m1', 'mac-arm64')
+        specific_system = specific_system.replace('mac64', 'mac-x64')
         if specific_system:
             self.system_name = f"chromedriver_{specific_system}.zip"
 
@@ -69,28 +71,54 @@ class ChromeDriver(DriverBase):
                 driver_path = self._download_driver(previous_version=True)
 
         else:
+            
+            try:
+                if version.parse(self.version) < version.parse('115'):
+                    message = 'Versions below 115 are not supported - aborting operation'
+                    logger.error(message)
+                    raise DriverVersionInvalidException(message)
+            except:
+                raise DriverVersionInvalidException('Invalid version was provided, please check it')
 
             driver_path = self._download_driver(version=self.version)
 
         return driver_path
+    
+    def _get_latest_version_driver(self, no_messages : bool = False) -> str:
+        """Gets latest driver version
+
+        Returns:
+            str
+
+            latest_version (str)  : Latest version of specific driver.
+
+        """
+
+        latest_version : str = ''
+
+        url = self.setting[self.driver_name_setting]["LinkLastRelease"]
+        json_data = self.requests_getter.get_result_by_request(url=url, is_json=True)
+
+        latest_version = json_data.get('channels').get('Stable').get('version')
+
+        if not no_messages:
+
+            logger.info(f'Latest version of {self.driver_name}: {latest_version}')
+
+        return latest_version
 
     def _compare_latest_version_main_chromedriver_and_latest_version_main_chrome_browser(self) -> Tuple[bool, str, str]:
         """Compares latest main version of chromedriver and latest main version of chrome browser"""
         is_equal : bool = False
-        latest_version_chromedriver_main : str = ''
-        latest_version_browser_main : str = ''
 
-        latest_version_chromedriver = super()._get_latest_version_driver(no_messages=True)
+        latest_version_chromedriver = self._get_latest_version_driver(no_messages=True)
 
         latest_version_browser = self.chromebrowser._get_latest_version_chrome_browser(no_messages=True)
 
-        latest_version_chromedriver_main = latest_version_chromedriver.split('.', maxsplit=1)[0]
-        latest_version_browser_main = latest_version_browser.split('.', maxsplit=1)[0]
-
-        if int(latest_version_chromedriver_main) <= int(latest_version_browser_main):
+        if version.parse(latest_version_chromedriver).major <= version.parse(latest_version_browser).major:
             is_equal = True
 
-        return is_equal, latest_version_chromedriver_main, latest_version_browser_main
+        return is_equal, latest_version_chromedriver, latest_version_browser
 
     def _check_if_chromedriver_is_up_to_date(self) -> str:
         """Сhecks for the latest version, downloads or updates chromedriver binary
@@ -141,11 +169,8 @@ class ChromeDriver(DriverBase):
 
         latest_version_previous : str = ''
 
-        url = self.setting["ChromeDriver"]["LinkLastRelease"]
-        json_data = self.requests_getter.get_result_by_request(url=url)
-
-        latest_version = str(json_data)
-        latest_version_main = latest_version.split(".", maxsplit=1)[0]
+        latest_version = self._get_latest_version_driver()
+        latest_version_main = version.parse(latest_version).major
 
         latest_version_main_previous = int(latest_version_main) - 1
 
@@ -195,7 +220,7 @@ class ChromeDriver(DriverBase):
 
         else:
 
-            latest_version = super()._get_latest_version_driver()
+            latest_version = self._get_latest_version_driver()
 
             url = self.setting["ChromeDriver"]["LinkLastReleaseFile"].format(latest_version)
             logger.info(f'Started download chromedriver latest_version: {latest_version}')
@@ -224,10 +249,10 @@ class ChromeDriver(DriverBase):
             Path(out_path).unlink()
 
         logger.info(f'Started download chromedriver by url: {url}')
-        archive_path = self._wget_download_driver(url, out_path)
+        archive_path = super()._wget_download_driver(url, out_path)
         time.sleep(2)
 
-        logger.info(f'Chromedriver was downloaded to path: {archive_path}')
+        logger.info(f'\r\nChromedriver was downloaded to path: {archive_path}')
 
         out_path : str = self.path
 
@@ -256,10 +281,3 @@ class ChromeDriver(DriverBase):
             super()._chmod_driver()
 
         return driver_path
-
-    def _wget_download_driver(self, url, path):
-        if self.info_messages:
-            archive_path = wget.download(url=url, out=path)
-        else:
-            archive_path = wget.download(url=url, out=path, bar=None)
-        return archive_path

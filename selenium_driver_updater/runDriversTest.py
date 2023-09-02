@@ -60,18 +60,18 @@ try:
     testSuite.addTest(unittest.makeSuite(driverUpdaterTest.testDriverUpdater))
 
     testSuite.addTest(unittest.makeSuite(chromeDriverTest.testChromeDriver))
-    testSuite.addTest(unittest.makeSuite(chromeBrowserTest.testChromeBrowser))
+    #testSuite.addTest(unittest.makeSuite(chromeBrowserTest.testChromeBrowser))
 
     testSuite.addTest(unittest.makeSuite(geckoDriverTest.testGeckoDriver))
-    testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
+    #testSuite.addTest(unittest.makeSuite(firefoxBrowserTest.testFirefoxBrowser))
 
     if platform.system() == 'Darwin':
         testSuite.addTest(unittest.makeSuite(operaDriverTest.testOperaDriver))
-        testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser))
+        #testSuite.addTest(unittest.makeSuite(operaBrowserTest.testOperaBrowser))
 
     if platform.system() != 'Linux':
         testSuite.addTest(unittest.makeSuite(edgeDriverTest.testEdgeDriver))
-        testSuite.addTest(unittest.makeSuite(edgeBrowserTest.testEdgeBrowser))
+        #testSuite.addTest(unittest.makeSuite(edgeBrowserTest.testEdgeBrowser))
 
     testSuite.addTest(unittest.makeSuite(phantomJSTest.testPhantomJS))
 

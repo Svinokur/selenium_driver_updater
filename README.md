@@ -1,7 +1,7 @@
 # selenium_driver_updater
 
 [![PyPI version](https://badge.fury.io/py/selenium-driver-updater.svg)](https://badge.fury.io/py/selenium-driver-updater)
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/Svinokur/selenium_driver_updater/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Downloads](https://pepy.tech/badge/selenium-driver-updater)](https://pepy.tech/project/selenium-driver-updater)
 [![Downloads](https://pepy.tech/badge/selenium-driver-updater/month)](https://pepy.tech/project/selenium-driver-updater)
 [![Downloads](https://pepy.tech/badge/selenium-driver-updater/week)](https://pepy.tech/project/selenium-driver-updater)
@@ -11,8 +11,6 @@
 [![Windows](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/windows-tests.yml/badge.svg)](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/windows-tests.yml)
 [![macOS](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/macOS-tests.yml/badge.svg)](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/macOS-tests.yml)
 [![Ubuntu](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/ubuntu-tests.yml/badge.svg)](https://github.com/Svinokur/selenium_driver_updater/actions/workflows/ubuntu-tests.yml)
-
-[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/Svinokur/selenium_driver_updater)
 
 It is a fast and convenience package that can automatically download or update Selenium webdriver binaries and their browsers for different OS.
 
@@ -33,7 +31,7 @@ import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True, old_return=False)
+filename = DriverUpdater.install(path=base_dir, driver_name=DriverUpdater.chromedriver, upgrade=True, check_driver_is_up_to_date=True)
 
 driver = webdriver.Chrome(filename)
 driver.get('https://google.com')
@@ -49,7 +47,7 @@ import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 list_drivers = [DriverUpdater.chromedriver, DriverUpdater.geckodriver]
 
-filenames = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True, old_return=False)
+filenames = DriverUpdater.install(path=base_dir, driver_name=list_drivers, upgrade=True, check_driver_is_up_to_date=True)
 print(filenames)
 
 driver_chrome = webdriver.Chrome(filename[0])
@@ -66,6 +64,16 @@ Use
 selenium-driver-updater --help
 ```
 To see all available arguments and commands
+
+This example shows how you can use this console updater to download chromedriver to current dir 
+```bash
+selenium-driver-updater -d chromedriver
+```
+
+Or you can use console updater to download chromedriver and geckodriver at the same time
+```bash
+selenium-driver-updater -d chromedriver,geckodriver
+```
 
 # Supported Selenium Binaries
 
@@ -89,7 +97,9 @@ For installing or updating [geckodriver binary](https://github.com/mozilla/gecko
 All supported OS's for this driver are:
 
 - Windows
+- Windows ARM
 - Linux
+- Linux ARM
 - MacOS
 - MacOS with M1
 
