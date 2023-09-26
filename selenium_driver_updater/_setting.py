@@ -6,85 +6,97 @@ import platform
 base_dir = os.path.dirname(os.path.abspath(__file__)) + os.path.sep
 
 os_bit = platform.architecture()[0][:-3]
+os_bit_phantom_js = 'x86_64' if os_bit == '64' else "i686"
+
+is_arm = 'arm' in platform.processor().lower() or 'arm' in str(os.uname().machine)
+
+os_type = {
+    'Windows': {
+        'chromedriver': f"win{os_bit}",
+        'geckodriver': f"win{os_bit}.zip" if not is_arm else "win-aarch64.zip",
+        'operadriver': f"win{os_bit}",
+        'edgedriver': f"win{os_bit}",
+        'phantomjs': "windows.zip",
+    },
+    'Linux': {
+        'chromedriver': "linux64",
+        'geckodriver': f"linux{os_bit}.tar.gz" if not is_arm else "linux-aarch64.tar.gz",
+        'operadriver': "linux64",
+        'edgedriver': "linux64",
+        'phantomjs': f"linux-{os_bit_phantom_js}.tar.bz2",
+    },
+    'Darwin': {
+        'chromedriver': "mac-x64" if not is_arm else "mac-arm64",
+        'geckodriver': "macos.tar.gz" if not is_arm else "macos-aarch64.tar.gz",
+        'operadriver': "mac64",
+        'edgedriver': "mac64" if not is_arm else "mac64_m1",
+        'phantomjs': "macosx",
+    },
+    'Other': {
+        'edgedriver': "arm64" if is_arm else None,
+    }
+}
+
+os_name = platform.system()
+if os_name not in ['Darwin', 'Linux', 'Windows']:
+    os_name = 'Other'
 
 latest_release = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/{}/"
-
-chromedriver_latest_release =   f"win{os_bit}/" + f"chromedriver-win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                "linux64/" + "chromedriver-linux64.zip" if platform.system() == "Linux" else\
-                                "mac-arm64/" + "chromedriver-mac-arm64.zip" if 'arm' in str(os.uname().machine)\
-                                and platform.system() == 'Darwin' else\
-                                "mac-x64/" + "chromedriver-mac-x64.zip"
-chromedriver_latest_release = latest_release + chromedriver_latest_release
-
+chromedriver_latest_release = f'{latest_release}{os_type[os_name]["chromedriver"]}' + f"/chromedriver-{os_type[os_name]['chromedriver']}.zip"
 
 latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
-geckodriver_platform_release =  "geckodriver-v{}-" + f"win{os_bit}.zip" if platform.system() == 'Windows' and not 'arm' in platform.processor().lower() else\
-                                "geckodriver-v{}-" + "win-aarch64.zip" if platform.system() == 'Windows' and 'arm' in platform.processor().lower() else\
-                                "geckodriver-v{}-" + f"linux{os_bit}.tar.gz" if platform.system() == "Linux" and not 'arm' in platform.processor().lower() else\
-                                "geckodriver-v{}-" + f"linux-aarch64.tar.gz" if platform.system() == "Linux" and 'arm' in platform.processor().lower() else\
-                                "geckodriver-v{}-macos-aarch64.tar.gz" if 'arm' in str(os.uname().machine)\
-                                and platform.system() == 'Darwin' else\
-                                "geckodriver-v{}-macos.tar.gz"
-geckodriver_platform_release = latest_release_geckodriver + geckodriver_platform_release
-
+geckodriver_platform_release = f'{latest_release_geckodriver}geckodriver-v{{}}-{os_type[os_name]["geckodriver"]}'
 
 latest_release_operadriver = 'https://github.com/operasoftware/operachromiumdriver/releases/download/v.{}/'
-operadriver_latest_release =    f"operadriver_win{os_bit}.zip" if platform.system() == 'Windows' else\
-                                "operadriver_linux64.zip" if platform.system() == "Linux" else\
-                                "operadriver_mac64.zip"
-operadriver_latest_release = latest_release_operadriver + operadriver_latest_release
+operadriver_latest_release = f'{latest_release_operadriver}operadriver_{os_type[os_name]["operadriver"]}.zip'
 
 latest_release_edgedriver = 'https://msedgedriver.azureedge.net/{}/'
-edgedriver_latest_release =     f"edgedriver_win{os_bit}.zip" if platform.system() == 'Windows' and not 'arm' in platform.processor().lower() else\
-                                "edgedriver_mac64.zip" if platform.system() == 'Darwin' and not 'arm' in str(os.uname().machine) else\
-                                "edgedriver_mac64_m1.zip" if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else\
-                                "edgedriver_linux64.zip" if platform.system() == 'Linux' else\
-                                "edgedriver_arm64.zip"
-edgedriver_latest_release = latest_release_edgedriver + edgedriver_latest_release
-
+edgedriver_latest_release = f'{latest_release_edgedriver}edgedriver_{os_type[os_name]["edgedriver"]}.zip'
 
 url_release_phantomjs = "https://api.bitbucket.org/2.0/repositories/ariya/phantomjs/downloads/"
-os_bit_linux = 'x86_64' if os_bit == '64' else "i686"
-phantomjs_latest_release =  "phantomjs-{}-windows.zip" if platform.system() == 'Windows' else\
-                            "phantomjs-{}-" + f"linux-{os_bit_linux}.tar.bz2" if platform.system() == "Linux" else\
-                            "phantomjs-{}-macosx.zip"
-phantomjs_latest_release = url_release_phantomjs + phantomjs_latest_release
+phantomjs_latest_release = f'{url_release_phantomjs}phantomjs-{{}}-{os_type[os_name]["phantomjs"]}.zip'
 
 #
 # BROWSERS AND THEIR UPDATERS
 #                                 
 
-chrome_browser_path = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-"/Applications/Chromium.app/Contents/MacOS/Chromium"] if platform.system() == 'Darwin' else \
-['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
-r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'] if platform.system() == 'Windows' else \
-"google-chrome-stable" if platform.system() == 'Linux' else ''
+browser_paths = {
+    'Darwin': {
+        'chrome': ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                   "/Applications/Chromium.app/Contents/MacOS/Chromium"],
+        'firefox': '/Applications/Firefox.app/Contents/MacOS/firefox',
+        'edge': '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+        'edge_release': 'https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=1&channel=Stable' if not is_arm else
+                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable',
+        'opera': '/Applications/Opera.app/Contents/MacOS/Opera',
+    },
+    'Windows': {
+        'chrome': ['reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
+                   r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome" /v version'],
+        'firefox': ['reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion',
+                    'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Mozilla\Mozilla Firefox" /v CurrentVersion',
+                    r"Powershell (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion"],
+        'edge': 'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version',
+        'opera': r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera',
+    },
+    'Linux': {
+        'chrome': 'google-chrome-stable',
+        'firefox': 'firefox',
+        'opera': 'opera',
+    }
+}
 
-
-firefox_browser_path = '/Applications/Firefox.app/Contents/MacOS/firefox' if platform.system() == 'Darwin' else \
-['reg query "HKEY_CURRENT_USER\Software\Mozilla\Mozilla Firefox" /v CurrentVersion',
-'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Mozilla\Mozilla Firefox" /v CurrentVersion',
-r"Powershell (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion"] if platform.system() == 'Windows' else\
-"firefox" if platform.system() == 'Linux' else ''
-
-
-
-edge_browser_path = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' if platform.system() == 'Darwin' else\
-'reg query "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Edge\BLBeacon" /v version' if platform.system() == 'Windows' else ''
-
-edge_browser_release = 'https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and not 'arm' in str(os.uname().machine) else \
-                        'https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=1&channel=Stable' if platform.system() == 'Darwin' and 'arm' in str(os.uname().machine) else ''  
-
-
-opera_browser_path = r'reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall" /f Opera' if platform.system() == 'Windows' else \
-'/Applications/Opera.app/Contents/MacOS/Opera' if platform.system() == 'Darwin' else\
-"opera" if platform.system() == 'Linux' else ''
+chrome_browser_path = browser_paths[os_name].get('chrome', '')
+firefox_browser_path = browser_paths[os_name].get('firefox', '')
+edge_browser_path = browser_paths[os_name].get('edge', '')
+edge_browser_release = browser_paths[os_name].get('edge_release', '')
+opera_browser_path = browser_paths[os_name].get('opera', '')
 
 from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "6.0.0"
+    version = "6.0.1"
 
 setting = dict(
     {

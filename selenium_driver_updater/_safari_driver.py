@@ -1,7 +1,6 @@
 #pylint: disable=logging-fstring-interpolation
 #Standart library imports
 import platform
-import re
 
 #Third library imports
 from bs4 import BeautifulSoup

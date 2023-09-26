@@ -1,3 +1,15 @@
+## [6.0.1] - 25/09/2023
+This version was written and tested on Python 3.11.1
+
+#### Added
+
+- Added new package "packaging" in setup.py
+
+#### Improvements
+
+- Improved code in setting.py, made it more readable (config file)
+- Overall code improvements
+
 ## [6.0.0] - 02/09/2023
 This version was written and tested on Python 3.11.1
 
