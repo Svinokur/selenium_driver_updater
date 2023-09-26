@@ -16,7 +16,9 @@ base_dir = os.path.dirname(os.path.abspath(__file__))[:-5] + os.path.sep
 os_bit = platform.architecture()[0][:-3]
 os_bit_phantom_js = 'x86_64' if os_bit == '64' else "i686"
 
-is_arm = 'arm' in platform.processor().lower() or 'arm' in str(os.uname().machine)
+is_arm = 'arm' in platform.processor().lower()
+if os.name != 'nt':  # Check if not on Windows
+    is_arm = is_arm or 'arm' in str(os.uname().machine)
 
 os_type = {
     'Windows': {

@@ -1,4 +1,11 @@
-## [6.0.1] - 25/09/2023
+## [6.0.2] - 26/09/2023
+This version was written and tested on Python 3.11.1
+
+#### Fixes
+
+- Fixed checking for ARM-based architecture on Windows
+
+## [6.0.1] - 26/09/2023
 This version was written and tested on Python 3.11.1
 
 #### Added
