@@ -51,7 +51,7 @@ os_name = platform.system()
 if os_name not in ['Darwin', 'Linux', 'Windows']:
     os_name = 'Other'
 
-latest_release = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/{}/"
+latest_release = "https://storage.googleapis.com/chrome-for-testing-public/{}/"
 chromedriver_latest_release = f'{latest_release}{os_type[os_name]["chromedriver"]}' + f"/chromedriver-{os_type[os_name]['chromedriver']}.zip"
 
 latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
@@ -203,7 +203,7 @@ class testSetting(unittest.TestCase):
 
         self.assertEqual(self.setting["Github"]["linkLatestReleaseBySpecificRepoName"], 'https://api.github.com/repos/{}/releases/latest')
         self.assertEqual(self.setting["Github"]["linkAllReleasesTags"], 'https://api.github.com/repos/{}/git/refs/tags')
-        self.assertEqual(self.setting["Github"]["linkAllReleases"], 'https://api.github.com/repos/{}/releases')
+        self.assertEqual(self.setting["Github"]["linkAllReleases"], 'https://api.github.com/repos/{}/releases?per_page=100000')
 
         self.assertEqual(self.setting["PyPi"]["urlProjectJson"], 'https://pypi.python.org/pypi/selenium-driver-updater/json')
 

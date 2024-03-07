@@ -43,7 +43,7 @@ os_name = platform.system()
 if os_name not in ['Darwin', 'Linux', 'Windows']:
     os_name = 'Other'
 
-latest_release = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/{}/"
+latest_release = "https://storage.googleapis.com/chrome-for-testing-public/{}/"
 chromedriver_latest_release = f'{latest_release}{os_type[os_name]["chromedriver"]}' + f"/chromedriver-{os_type[os_name]['chromedriver']}.zip"
 
 latest_release_geckodriver = 'https://github.com/mozilla/geckodriver/releases/download/v{}/'
@@ -98,7 +98,7 @@ from dataclasses import dataclass
 
 @dataclass
 class info:
-    version = "6.0.2"
+    version = "6.0.3"
 
 setting = dict(
     {
@@ -180,7 +180,7 @@ setting = dict(
         {
             "linkLatestReleaseBySpecificRepoName"   : 'https://api.github.com/repos/{}/releases/latest',
             "linkAllReleasesTags"                   : 'https://api.github.com/repos/{}/git/refs/tags',
-            "linkAllReleases"                       : 'https://api.github.com/repos/{}/releases',
+            "linkAllReleases"                       : 'https://api.github.com/repos/{}/releases?per_page=100000',
         },
         "PyPi":
         {

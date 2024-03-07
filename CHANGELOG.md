@@ -1,3 +1,11 @@
+## [6.0.3] - 07/03/2024
+This version was written and tested on Python 3.11.1
+
+#### Fixes
+
+- Fixed an issue with incorrect url in chromedriver (#6)
+- Fixed an issue with not including all results when getting releases from github
+
 ## [6.0.2] - 26/09/2023
 This version was written and tested on Python 3.11.1
 
